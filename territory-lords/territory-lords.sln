@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.808.5
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "territory-lords", "territory-lords\territory-lords.csproj", "{6202AAB8-1812-43DB-B630-FB91F219CBDD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6202AAB8-1812-43DB-B630-FB91F219CBDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6202AAB8-1812-43DB-B630-FB91F219CBDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6202AAB8-1812-43DB-B630-FB91F219CBDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6202AAB8-1812-43DB-B630-FB91F219CBDD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DC6F4F00-29DD-4539-AA2F-263180973732}
+	EndGlobalSection
+EndGlobal
