@@ -1,0 +1,21 @@
+﻿<table>
+    @for (int r = 0; r < Rows; r++)
+    {
+        <tr class="game-board-row">
+            @for (int c = 0; c < Columns; c++)
+            {
+                <td class="game-board-column">[@r,@c]</td>
+            }
+        </tr>
+    }
+</table>
+
+
+
+@code {
+    // Demonstrates how a parent component can supply parameters
+    [Parameter]
+    public int Columns { get; set; }
+    [Parameter]
+    public int Rows { get; set; }
+}

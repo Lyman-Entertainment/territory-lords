@@ -1,0 +1,45 @@
+﻿@page "/GridTable"
+@inject NavigationManager NavManager
+@using Microsoft.AspNetCore.WebUtilities;
+
+<style>
+    .game-board-column {
+        background-color: lightblue;
+    }
+</style>
+
+<h1>TableGrid layout of gameboard</h1>
+<div @onclick="reloadPageForNewBoard">New Random Board</div>
+<TableGrid Rows="rows" Columns="columns" />
+
+@code {
+    int columns = 0;
+    int rows = 0;
+
+
+
+    protected override void OnInitialized()
+    {
+        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("columns", out var q_columns))
+        {
+            columns = Convert.ToInt32(q_columns);
+        }
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("rows", out var q_rows))
+        {
+            rows = Convert.ToInt32(q_rows);
+        }
+
+
+    }
+
+    private void reloadPageForNewBoard()
+    {
+        int randomColumns = 0;
+        int randomRows = 0;
+        var rnd = new Random();
+        randomColumns = rnd.Next(1, 100);
+        randomRows = rnd.Next(1, 100);
+        NavManager.NavigateTo($"/gridtable?columns={randomColumns}&rows={randomRows}", true);
+    }
+}
