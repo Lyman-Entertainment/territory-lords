@@ -1,10 +1,11 @@
 ﻿<table>
-    @for (int r = 0; r < Rows; r++)
+    @for (int r = 0; r < gameBoard.MaxRows; r++)
     {
         <tr class="game-board-row">
-            @for (int c = 0; c < Columns; c++)
+            @for (int c = 0; c < gameBoard.MaxColumns; c++)
             {
-                <td class="game-board-column">[@r,@c]</td>
+                GameSquare gameSquare = gameBoard.Board[r, c];
+                <td class="game-board-column" style="background-color:@gameSquare.Color" @onclick="() => HandleGameBoardSquareClick(gameSquare)">[@r,@c]</td>
             }
         </tr>
     }
@@ -13,9 +14,23 @@
 
 
 @code {
-    // Demonstrates how a parent component can supply parameters
+
     [Parameter]
-    public int Columns { get; set; }
-    [Parameter]
-    public int Rows { get; set; }
+    public GameBoard gameBoard { get; set; }
+    
+
+
+    private void HandleGameBoardSquareClick(GameSquare gameSquare)
+    {
+        Console.WriteLine(gameSquare.Color);
+        var rnd = new Random();
+        gameSquare.Color = Colors[rnd.Next(1,Colors.Count+1)];
+    }
+
+
+
+    public Dictionary<int,string> Colors = new Dictionary<int, string> { { 1, "orange" }, { 2, "blue" }, { 3, "red" }, { 4, "purple" } };
+
 }
+
+
