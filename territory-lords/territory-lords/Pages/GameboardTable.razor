@@ -1,45 +1,58 @@
 ﻿@page "/GridTable"
 @inject NavigationManager NavManager
 @using Microsoft.AspNetCore.WebUtilities;
+@using territory_lords.Data.Models;
 
-<style>
-    .game-board-column {
-        background-color: lightblue;
-    }
-</style>
+
+
 
 <h1>TableGrid layout of gameboard</h1>
-<div @onclick="reloadPageForNewBoard">New Random Board</div>
-<TableGrid Rows="rows" Columns="columns" />
+<div class="btn btn-dark btn-link" @onclick="ReloadPageForNewBoard">New Random Board</div>
+<TableGrid gameBoard="gameBoard" />
 
 @code {
-    int columns = 0;
-    int rows = 0;
 
+    GameBoard gameBoard;
 
 
     protected override void OnInitialized()
     {
+        int columns = 0;
+        int rows = 0;
+
         var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
         if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("columns", out var q_columns))
         {
-            columns = Convert.ToInt32(q_columns);
-        }
-        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("rows", out var q_rows))
-        {
-            rows = Convert.ToInt32(q_rows);
+            columns = Int32.TryParse(q_columns, out int column) ? column : GetRandomNumberBetween(10, 100);
         }
 
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("rows", out var q_rows))
+        {
+            rows = Int32.TryParse(q_rows, out int row) ? row : GetRandomNumberBetween(10, 100);
+        }
+
+        gameBoard = new GameBoard(rows, columns);
 
     }
 
-    private void reloadPageForNewBoard()
+    private void ReloadPageForNewBoard()
     {
-        int randomColumns = 0;
-        int randomRows = 0;
-        var rnd = new Random();
-        randomColumns = rnd.Next(1, 100);
-        randomRows = rnd.Next(1, 100);
+        int randomColumns = GetRandomNumberBetween(10, 100);
+        int randomRows = GetRandomNumberBetween(10, 100);
+
+
         NavManager.NavigateTo($"/gridtable?columns={randomColumns}&rows={randomRows}", true);
+    }
+
+    /// <summary>
+    /// Gets a random number between two digits
+    /// </summary>
+    /// <param name="begin"></param>
+    /// <param name="end"></param>
+    /// <returns></returns>
+    private int GetRandomNumberBetween(int begin, int end)
+    {
+        var rnd = new Random();
+        return rnd.Next(begin, end);
     }
 }
