@@ -8,6 +8,7 @@
 
 <h1>TableGrid layout of gameboard</h1>
 <div class="btn btn-dark btn-link" @onclick="ReloadPageForNewBoard">New Random Board</div>
+<div class="btn btn-dark btn-link" @onclick="ToggleCoordinates">Toggle Coordinates</div>
 <TableGrid gameBoard="gameBoard" />
 
 @code {
@@ -42,6 +43,11 @@
 
 
         NavManager.NavigateTo($"/gridtable?columns={randomColumns}&rows={randomRows}", true);
+    }
+
+    private void ToggleCoordinates()
+    {
+
     }
 
     /// <summary>

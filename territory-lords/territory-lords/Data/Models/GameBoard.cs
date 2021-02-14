@@ -9,13 +9,13 @@ namespace territory_lords.Data.Models
     {
         public int MaxRows { get; set; }
         public int MaxColumns { get; set; }
-        public GameSquare[,] Board {get;set;}
+        public GameTile[,] Board {get;set;}
 
         public GameBoard(int rows, int columns)
         {
             MaxRows = rows;
             MaxColumns = columns;
-            Board = new GameSquare[rows, columns];
+            Board = new GameTile[rows, columns];
             InitBoard();
         }
 
@@ -25,7 +25,12 @@ namespace territory_lords.Data.Models
             {
                 for(int c = 0; c < this.MaxColumns; c++)
                 {
-                    GameSquare gameSquare = Board[r, c] = new GameSquare { Color = "green" };
+                    GameTile gameSquare = Board[r, c] = new GameTile {
+                        Color = "green"
+                        , LandType = LandTypeFacotry.GetRandomLandType()
+                        ,Improvement = "castle"
+                        ,Piece = "peasant"
+                    };
                 }
             }
         }
