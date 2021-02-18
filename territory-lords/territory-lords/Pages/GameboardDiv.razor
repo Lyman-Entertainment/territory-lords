@@ -1,0 +1,64 @@
+﻿@page "/GridDiv"
+@inject NavigationManager NavManager
+@using Microsoft.AspNetCore.WebUtilities;
+@using territory_lords.Data.Models;
+
+
+
+
+<h1>Div layout of gameboard</h1>
+<div class="btn btn-dark btn-link" @onclick="ReloadPageForNewBoard">New Random Board</div>
+<div class="btn btn-dark btn-link" @onclick="ToggleCoordinates">Toggle Coordinates</div>
+<DivGrid gameBoard="gameBoard" />
+
+@code {
+
+    GameBoard gameBoard;
+
+
+    protected override void OnInitialized()
+    {
+        int columns = 0;
+        int rows = 0;
+
+        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("columns", out var q_columns))
+        {
+            columns = Int32.TryParse(q_columns, out int column) ? column : GetRandomNumberBetween(10, 50);
+        }
+
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("rows", out var q_rows))
+        {
+            rows = Int32.TryParse(q_rows, out int row) ? row : GetRandomNumberBetween(10, 50);
+        }
+
+        gameBoard = new GameBoard(rows, columns);
+
+    }
+
+    private void ReloadPageForNewBoard()
+    {
+        int randomColumns = GetRandomNumberBetween(10, 50);
+        int randomRows = GetRandomNumberBetween(10, 50);
+
+
+        NavManager.NavigateTo($"/griddiv?columns={randomColumns}&rows={randomRows}", true);
+    }
+
+    private void ToggleCoordinates()
+    {
+
+    }
+
+    /// <summary>
+    /// Gets a random number between two digits
+    /// </summary>
+    /// <param name="begin"></param>
+    /// <param name="end"></param>
+    /// <returns></returns>
+    private int GetRandomNumberBetween(int begin, int end)
+    {
+        var rnd = new Random();
+        return rnd.Next(begin, end);
+    }
+}

@@ -1,0 +1,76 @@
+﻿<div id="DivBoardContainer">
+    @for (int r = 0; r < gameBoard.MaxRows; r++)
+    {
+        <div class="game-board-row">
+            @for (int c = 0; c < gameBoard.MaxColumns; c++)
+            {
+                GameTile gameTile = gameBoard.Board[r, c];
+                <div class="game-board-tile @gameTile.LandType.ToString("G")" @onclick="() => HandleGameBoardSquareClick(gameTile)">
+                    <span class="game-tile-coordinate">[@r,@c]</span>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+
+
+@code {
+
+    [Parameter]
+    public GameBoard gameBoard { get; set; }
+
+
+
+    private void HandleGameBoardSquareClick(GameTile gameTile)
+    {
+        Console.WriteLine(gameTile.Color);
+        var rnd = new Random();
+        gameTile.Color = Colors[rnd.Next(1, Colors.Count + 1)];
+    }
+
+
+
+    public Dictionary<int, string> Colors = new Dictionary<int, string> { { 1, "orange" }, { 2, "blue" }, { 3, "red" }, { 4, "purple" } };
+
+}
+
+
+<style>
+    .game-board-tile {
+        width: 60px;
+        height: 60px;
+        display:inline-block;
+        border: 1px solid black;
+        background-color: lightskyblue;
+        cursor: pointer;
+    }
+
+    .Ocean {
+        background-image: url("Images/ocean.jpg");
+    }
+
+    .Grass {
+        background-image: url("Images/grassland.jpg");
+    }
+
+    .Desert {
+        background-image: url("Images/desert.jpg");
+    }
+
+    .Jungle {
+        background-image: url("Images/jungle.jpg");
+    }
+
+    .Forrest {
+        background-image: url("Images/forrest.jpg");
+    }
+
+    .Hill {
+        background-image: url("Images/hill.jpg");
+    }
+
+    .Mountain {
+        background-image: url("Images/mountain.jpg");
+    }
+</style>
