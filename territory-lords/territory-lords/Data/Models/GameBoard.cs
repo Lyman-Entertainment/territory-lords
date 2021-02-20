@@ -26,10 +26,10 @@ namespace territory_lords.Data.Models
                 for(int c = 0; c < this.MaxColumns; c++)
                 {
                     GameTile gameSquare = Board[r, c] = new GameTile {
-                        Color = "green"
+                        Color = ""
                         , LandType = LandTypeFacotry.GetRandomLandType()
                         ,Improvement = "castle"
-                        ,Piece = "peasant"
+                        ,Piece = "warrior"
                     };
                 }
             }

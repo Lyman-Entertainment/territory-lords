@@ -1,53 +1,75 @@
-﻿<div id="DivBoardContainer">
-    @for (int r = 0; r < gameBoard.MaxRows; r++)
-    {
-        <div class="game-board-row">
-            @for (int c = 0; c < gameBoard.MaxColumns; c++)
-            {
-                GameTile gameTile = gameBoard.Board[r, c];
-                <div class="game-board-tile @gameTile.LandType.ToString("G")" @onclick="() => HandleGameBoardSquareClick(gameTile)">
-                    <span class="game-tile-coordinate">[@r,@c]</span>
-                </div>
-            }
-        </div>
-    }
+﻿<div id="BoardWrapper">
+    <div id="BoardContainer">
+        @for (int r = 0; r < gameBoard.MaxRows; r++)
+        {
+            <div class="game-board-row">
+                @for (int c = 0; c < gameBoard.MaxColumns; c++)
+                {
+                    GameTile gameTile = gameBoard.Board[r, c];
+                    var shadowColor = "";
+                    if(gameTile.Color.Length > 0)
+                    {
+                        shadowColor = $"box-shadow: inset 0 0 5px 2px {gameTile.Color};";
+                    }
+                    <div class="game-board-tile @gameTile.LandType.ToString("G")"   style="@shadowColor" @onclick="() => HandleGameBoardSquareClick(gameTile)">
+                        @*<span class="game-tile-coordinate">[@r,@c]</span>*@
+                    </div>
+                }
+            </div>
+        }
+    </div>
 </div>
 
 
 
 @code {
 
-    [Parameter]
-    public GameBoard gameBoard { get; set; }
+        [Parameter]
+        public GameBoard gameBoard { get; set; }
 
 
 
-    private void HandleGameBoardSquareClick(GameTile gameTile)
-    {
-        Console.WriteLine(gameTile.Color);
-        var rnd = new Random();
-        gameTile.Color = Colors[rnd.Next(1, Colors.Count + 1)];
-    }
+        private void HandleGameBoardSquareClick(GameTile gameTile)
+        {
+            Console.WriteLine(gameTile.Color);
+            var rnd = new Random();
+            gameTile.Color = Colors[rnd.Next(1, Colors.Count + 1)];
+        }
 
 
 
-    public Dictionary<int, string> Colors = new Dictionary<int, string> { { 1, "orange" }, { 2, "blue" }, { 3, "red" }, { 4, "purple" } };
+    public Dictionary<int, string> Colors = new Dictionary<int, string> { { 1, "Orange" }, { 2, "Cyan" }, { 3, "Crimson" }, { 4, "Chartreuse" }, { 5, "DeepPink" } };
 
 }
 
 
 <style>
+    #BoardWrapper {
+        overflow:auto;
+        padding: 60px;
+        text-align: center;
+        background-image: url("Images/ocean.jpg");
+    }
+    #BoardContainer {
+        margin: auto;
+        display: inline-block;
+    }
+    .game-board-row {
+        display: flex;
+    }
+
     .game-board-tile {
+        flex: 0 0 60px;
         width: 60px;
         height: 60px;
-        display:inline-block;
-        border: 1px solid black;
-        background-color: lightskyblue;
+        display: inline-block;
+        border: 1px solid green;
+        /*background-color: #534aa3;*/
         cursor: pointer;
     }
 
     .Ocean {
-        background-image: url("Images/ocean.jpg");
+        border: 1px dashed #534aa3
     }
 
     .Grass {
