@@ -1,8 +1,8 @@
 ﻿<table>
-    @for (int r = 0; r < gameBoard.MaxRows; r++)
+    @for (int r = 0; r < gameBoard.RowCount; r++)
     {
         <tr class="game-board-row">
-            @for (int c = 0; c < gameBoard.MaxColumns; c++)
+            @for (int c = 0; c < gameBoard.ColumnCount; c++)
             {
                 GameTile gameTile = gameBoard.Board[r, c];
                 <td class="game-board-tile @gameTile.LandType.ToString("G")" @onclick="() => HandleGameBoardSquareClick(gameTile)">
