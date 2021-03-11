@@ -1,4 +1,4 @@
-﻿@page "/GridDiv"
+﻿@page "/GridDiv/{rows}/{columns}"
 @inject NavigationManager NavManager
 @using Microsoft.AspNetCore.WebUtilities;
 @using territory_lords.Data.Models;
@@ -114,33 +114,25 @@
 </style>
 
 <h1>Div layout of gameboard</h1>
-<div class="btn btn-dark btn-link" @onclick="ReloadPageForNewBoard">New Random Board</div>
-<div class="btn btn-dark btn-link" @onclick="ToggleCoordinates">Toggle Coordinates</div>
+<div class="btn btn-dark btn-link" @onclick="ReloadPageForNewBoard">New Board but Init Twice</div>
+<NavLink class="nav-link" href="@GetURLWithRandomRowAndColumnCount()" >
+    <span class="oi " aria-hidden="true"></span> New Random Board Init Once
+</NavLink>
 <DivGrid gameBoard="gameBoard" />
 
 @code {
+    [Parameter]
+    public string rows { get; set; }
+
+    [Parameter]
+    public string columns { get; set; }
 
     GameBoard gameBoard;
-
+    private int testRow = 0;
 
     protected override void OnParametersSet()
     {
-        int columns = 0;
-        int rows = 0;
-
-        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
-        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("columns", out var q_columns))
-        {
-            columns = Int32.TryParse(q_columns, out int column) ? column : GetRandomNumberBetween(10, 50);
-        }
-
-        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("rows", out var q_rows))
-        {
-            rows = Int32.TryParse(q_rows, out int row) ? row : GetRandomNumberBetween(10, 50);
-        }
-
-        gameBoard = new GameBoard(rows, columns);
-
+        gameBoard = new GameBoard(int.Parse(rows), int.Parse(columns));
     }
 
     private void ReloadPageForNewBoard()
@@ -149,12 +141,12 @@
         int randomRows = GetRandomNumberBetween(10, 50);
 
 
-        NavManager.NavigateTo($"/griddiv?columns={randomColumns}&rows={randomRows}", true);
+        NavManager.NavigateTo(GetURLWithRandomRowAndColumnCount(), true);
     }
 
-    private void ToggleCoordinates()
+    private string GetURLWithRandomRowAndColumnCount()
     {
-
+        return $"GridDiv/{GetRandomNumberBetween(10, 50)}/{GetRandomNumberBetween(10, 50)}";
     }
 
     /// <summary>
