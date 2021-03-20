@@ -63,6 +63,7 @@ namespace territory_lords
             {
                 endpoints.MapBlazorHub();
                 endpoints.MapHub<ChatHub>("/chathub");
+                endpoints.MapHub<GameHub>("/gamehub");
                 endpoints.MapFallbackToPage("/_Host");
             });
         }

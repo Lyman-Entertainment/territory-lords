@@ -1,4 +1,8 @@
-﻿<div id="BoardWrapper">
+﻿
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager NavigationManager
+
+<div id="BoardWrapper">
     <div id="BoardContainer">
         @for (int r = 0; r < gameBoard.RowCount; r++)
         {
@@ -7,11 +11,11 @@
                 {
                     GameTile gameTile = gameBoard.Board[r, c];
                     var shadowColor = "";
-                    if(gameTile.Color.Length > 0)
+                    if (gameTile.Color.Length > 0)
                     {
                         shadowColor = $"box-shadow: inset 0 0 5px 2px {gameTile.Color};";
                     }
-                    <div class="game-board-tile @GetCorrectBackgroundCSSClass(gameTile)"  style="@shadowColor" @onclick="() => HandleGameBoardSquareClick(gameTile)">
+                    <div class="game-board-tile @GetCorrectBackgroundCSSClass(gameTile)" style="@shadowColor" @onclick="() => HandleGameBoardSquareClick(gameTile)">
                         @*<span class="game-tile-coordinate">[@r,@c]</span>*@
                     </div>
                 }
@@ -27,11 +31,35 @@
     [Parameter]
     public GameBoard gameBoard { get; set; }
 
+    private HubConnection hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/gamehub"))
+            .Build();
+
+        hubConnection.On<int, int, string>("TileUpdate", (row, col, color) =>
+        {
+            gameBoard.Board[row, col].Color = color;
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    private void SendTileUpdate(int row, int col, string color) {
+
+        hubConnection.SendAsync("SendTileUpdate", row, col, color);
+    }
+
+    public bool IsConnected =>
+        hubConnection.State == HubConnectionState.Connected;
 
     //At some point I think this should be handled by a game manager or something
     private void HandleGameBoardSquareClick(GameTile gameTile)
     {
-        if(gameTile.LandType == LandType.Ocean)
+        if (gameTile.LandType == LandType.Ocean)
         {
             //don't do anything. You can't do anything with ocean tiles
         }
@@ -41,6 +69,8 @@
             gameTile.Color = Colors[rnd.Next(1, Colors.Count + 1)];
         }
 
+        //What are ya silly? I'm still gonna send it
+        SendTileUpdate(gameTile.RowIndex, gameTile.ColumnIndex, gameTile.Color);
     }
 
     /// <summary>
@@ -54,17 +84,17 @@
         //if we're on the edge we need to check if there is an ocean tile in the adjoining tiles not in the corresponding line with the tile we're working with
         //if there is not an ocean tile then set the class to the correct straight ocean sprite
 
-        if(gameTile.LandType == LandType.Ocean)
+        if (gameTile.LandType == LandType.Ocean)
         {
             //figure out what's around us so we can act accordingly and not look wierd to everyone. Keep it together Kevin!
             var directNeighbors = gameBoard.GetGameTileDirectNeighbors(gameTile);
 
             //if all of the direct neighbors are ocean then this is ocean too
-            if((directNeighbors[0] == null || directNeighbors[0].LandType == LandType.Ocean) && (directNeighbors[1] == null || directNeighbors[1].LandType == LandType.Ocean) && (directNeighbors[2] == null || directNeighbors[2].LandType == LandType.Ocean) && (directNeighbors[3] == null || directNeighbors[3].LandType == LandType.Ocean))
+            if ((directNeighbors[0] == null || directNeighbors[0].LandType == LandType.Ocean) && (directNeighbors[1] == null || directNeighbors[1].LandType == LandType.Ocean) && (directNeighbors[2] == null || directNeighbors[2].LandType == LandType.Ocean) && (directNeighbors[3] == null || directNeighbors[3].LandType == LandType.Ocean))
             {
                 return "Ocean";
             }
-            else if((directNeighbors[0] == null || directNeighbors[0].LandType == LandType.Ocean) && (directNeighbors[1] == null || directNeighbors[1].LandType == LandType.Ocean) && (directNeighbors[2] != null && directNeighbors[2].LandType != LandType.Ocean) && (directNeighbors[3] == null || directNeighbors[3].LandType == LandType.Ocean))
+            else if ((directNeighbors[0] == null || directNeighbors[0].LandType == LandType.Ocean) && (directNeighbors[1] == null || directNeighbors[1].LandType == LandType.Ocean) && (directNeighbors[2] != null && directNeighbors[2].LandType != LandType.Ocean) && (directNeighbors[3] == null || directNeighbors[3].LandType == LandType.Ocean))
             {
                 return "Ocean-top";
             }
@@ -80,11 +110,11 @@
             {
                 return "Ocean-right";
             }
-            else if((directNeighbors[0] != null && directNeighbors[0].LandType != LandType.Ocean) && (directNeighbors[1] != null && directNeighbors[1].LandType != LandType.Ocean) && (directNeighbors[2] != null && directNeighbors[2].LandType != LandType.Ocean) && (directNeighbors[3] != null && directNeighbors[3].LandType != LandType.Ocean))
+            else if ((directNeighbors[0] != null && directNeighbors[0].LandType != LandType.Ocean) && (directNeighbors[1] != null && directNeighbors[1].LandType != LandType.Ocean) && (directNeighbors[2] != null && directNeighbors[2].LandType != LandType.Ocean) && (directNeighbors[3] != null && directNeighbors[3].LandType != LandType.Ocean))
             {
                 return "Ocean-single";
             }
-            else if((directNeighbors[0] == null || directNeighbors[0].LandType == LandType.Ocean) && (directNeighbors[1] != null && directNeighbors[1].LandType != LandType.Ocean) && (directNeighbors[2] != null && directNeighbors[2].LandType != LandType.Ocean) && (directNeighbors[3] != null && directNeighbors[3].LandType != LandType.Ocean))
+            else if ((directNeighbors[0] == null || directNeighbors[0].LandType == LandType.Ocean) && (directNeighbors[1] != null && directNeighbors[1].LandType != LandType.Ocean) && (directNeighbors[2] != null && directNeighbors[2].LandType != LandType.Ocean) && (directNeighbors[3] != null && directNeighbors[3].LandType != LandType.Ocean))
             {
                 return "Ocean-bay-top";
             }
@@ -130,28 +160,17 @@
             }
         }
 
-        //if(gameTile.RowIndex == 0 && (gameTile.ColumnIndex != 0 && gameTile.ColumnIndex != gameBoard.ColumnCount-1))
-        //{
-        //    return "Ocean-top";
-        //}
-        //else if(gameTile.RowIndex == gameBoard.RowCount - 1)
-        //{
-        //    return "Ocean-bottom";
-        //}
-        //else if(gameTile.ColumnIndex == 0)
-        //{
-        //    return "Ocean-left";
-        //}
-        //else if(gameTile.ColumnIndex == gameBoard.ColumnCount - 1)
-        //{
-        //    return "Ocean-right";
-        //}
-
+        //just return the basic name other wise for now
         return gameTile.LandType.ToString("G");
     }
 
 
     public Dictionary<int, string> Colors = new Dictionary<int, string> { { 1, "Orange" }, { 2, "Cyan" }, { 3, "Red" }, { 4, "Chartreuse" }, { 5, "DeepPink" } };
+
+    public async ValueTask DisposeAsync()
+    {
+        await hubConnection.DisposeAsync();
+    }
 
 }
 
