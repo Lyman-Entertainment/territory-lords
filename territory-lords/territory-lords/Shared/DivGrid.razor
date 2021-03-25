@@ -1,7 +1,9 @@
 ﻿
+@using territory_lords.Data.Cache;
 @using Microsoft.AspNetCore.SignalR.Client
 @inject NavigationManager NavigationManager
-
+@inject GameBoardCache BoardCache
+@*I don't love that we have to inject this here too. This component should pass along to it's parent or a game manager object*@
 <div id="BoardWrapper">
     <div id="BoardContainer">
         @for (int r = 0; r < gameBoard.RowCount; r++)
@@ -39,18 +41,23 @@
             .WithUrl(NavigationManager.ToAbsoluteUri("/gamehub"))
             .Build();
 
-        hubConnection.On<int, int, string>("TileUpdate", (row, col, color) =>
+        hubConnection.On<string, int, int, string>("TileUpdate", (gameBoardId, row, col, color) =>
         {
-            gameBoard.Board[row, col].Color = color;
-            StateHasChanged();
+            if(gameBoardId == gameBoard.GameBoardId)
+            {
+                gameBoard.Board[row, col].Color = color;
+                StateHasChanged();
+            }
+
         });
 
         await hubConnection.StartAsync();
     }
 
-    private void SendTileUpdate(int row, int col, string color) {
+    private void SendTileUpdate(int row, int col, string color)
+    {
 
-        hubConnection.SendAsync("SendTileUpdate", row, col, color);
+        hubConnection.SendAsync("SendTileUpdate",gameBoard.GameBoardId, row, col, color);
     }
 
     public bool IsConnected =>
@@ -68,6 +75,8 @@
             var rnd = new Random();
             gameTile.Color = Colors[rnd.Next(1, Colors.Count + 1)];
         }
+
+        BoardCache.UpdateGameCache(gameBoard);
 
         //What are ya silly? I'm still gonna send it
         SendTileUpdate(gameTile.RowIndex, gameTile.ColumnIndex, gameTile.Color);

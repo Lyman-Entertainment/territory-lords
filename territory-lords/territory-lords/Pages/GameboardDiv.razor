@@ -1,7 +1,9 @@
-﻿@page "/GridDiv/{rows}/{columns}"
-@inject NavigationManager NavManager
+﻿@page "/GridDiv/{gameBoardId}"
+@using territory_lords.Data.Cache;
 @using Microsoft.AspNetCore.WebUtilities;
 @using territory_lords.Data.Models;
+@inject NavigationManager NavManager
+@inject GameBoardCache BoardCache
 
 
 <style>
@@ -36,54 +38,69 @@
     .Ocean {
         background: url(Images/TER257.PIC_256_resized.png) 0px -500px;
     }
+
     .Ocean-top {
         background: url(Images/TER257.PIC_256_resized.png) -200px -500px;
     }
+
     .Ocean-right {
         background: url(Images/TER257.PIC_256_resized.png) -200px -500px;
         transform: rotate(90deg);
     }
+
     .Ocean-bottom {
         background: url(Images/TER257.PIC_256_resized.png) -200px -500px;
-        transform:rotate(180deg);
+        transform: rotate(180deg);
     }
+
     .Ocean-left {
         background: url(Images/TER257.PIC_256_resized.png) -200px -500px;
-        transform:rotate(-90deg);
+        transform: rotate(-90deg);
     }
+
     .Ocean-single {
         background: url(Images/TER257.PIC_256_resized.png) -250px -550px;
     }
+
     .Ocean-bay-top {
         background: url(Images/TER257.PIC_256_resized.png) -700px -500px;
     }
+
     .Ocean-bay-right {
         background: url(Images/TER257.PIC_256_resized.png) -650px -500px;
         /*transform:rotate(90deg);*/
     }
+
     .Ocean-bay-bottom {
         background: url(Images/TER257.PIC_256_resized.png) -550px -500px;
         /*transform: rotate(180deg);*/
     }
+
     .Ocean-bay-left {
         background: url(Images/TER257.PIC_256_resized.png) -350px -500px;
         /*transform: rotate(270deg);*/
     }
+
     .Ocean-channel-horizontal {
         background: url(Images/TER257.PIC_256_resized.png) -250px -500px;
     }
+
     .Ocean-channel-vertical {
         background: url(Images/TER257.PIC_256_resized.png) -500px -500px;
     }
+
     .Ocean-elbow-top-right {
         background: url(Images/TER257.PIC_256_resized.png) -600px -500px;
     }
+
     .Ocean-elbow-bottom-right {
         background: url(Images/TER257.PIC_256_resized.png) -450px -500px;
     }
+
     .Ocean-elbow-bottom-left {
         background: url(Images/TER257.PIC_256_resized.png) -150px -500px;
     }
+
     .Ocean-elbow-top-left {
         background: url(Images/TER257.PIC_256_resized.png) -300px -500px;
     }
@@ -114,39 +131,33 @@
 </style>
 
 <h1>Div layout of gameboard</h1>
-<div class="btn btn-dark btn-link" @onclick="ReloadPageForNewBoard">New Board but Init Twice</div>
-<NavLink class="nav-link" href="@GetURLWithRandomRowAndColumnCount()" >
+<NavLink class="nav-link" href="@GetRandomGameBoardIdURL()">
     <span class="oi " aria-hidden="true"></span> New Random Board Init Once
 </NavLink>
 <DivGrid gameBoard="gameBoard" />
 
 @code {
     [Parameter]
-    public string rows { get; set; }
+    public string gameBoardId { get; set; }
 
-    [Parameter]
-    public string columns { get; set; }
 
     GameBoard gameBoard;
-    private int testRow = 0;
 
     protected override void OnParametersSet()
     {
-        gameBoard = new GameBoard(int.Parse(rows), int.Parse(columns));
+        gameBoard = BoardCache.GetGameBoard(gameBoardId);
+
+        if(gameBoard == null)
+        {
+            gameBoard = new GameBoard(gameBoardId);
+            BoardCache.UpdateGameCache(gameBoard);
+        }
+
     }
 
-    private void ReloadPageForNewBoard()
+    private string GetRandomGameBoardIdURL()
     {
-        int randomColumns = GetRandomNumberBetween(10, 50);
-        int randomRows = GetRandomNumberBetween(10, 50);
-
-
-        NavManager.NavigateTo(GetURLWithRandomRowAndColumnCount(), true);
-    }
-
-    private string GetURLWithRandomRowAndColumnCount()
-    {
-        return $"GridDiv/{GetRandomNumberBetween(10, 50)}/{GetRandomNumberBetween(10, 50)}";
+        return $"GridDiv/{GetRandomNumberBetween(1, 11)}";
     }
 
     /// <summary>
