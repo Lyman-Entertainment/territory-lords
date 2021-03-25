@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using territory_lords.Data;
 using territory_lords.Hubs;
 using Microsoft.AspNetCore.ResponseCompression;
+using territory_lords.Data.Cache;
 
 namespace territory_lords
 {
@@ -35,6 +36,9 @@ namespace territory_lords
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
                     new[] { "application/octet-stream" });
             });
+
+            //inject our in memory DB/game cache
+            services.AddSingleton<GameBoardCache>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

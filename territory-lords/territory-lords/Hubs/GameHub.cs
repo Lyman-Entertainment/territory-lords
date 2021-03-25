@@ -8,9 +8,9 @@ namespace territory_lords.Hubs
 {
     public class GameHub : Hub
     {
-        public async Task SendTileUpdate(int row, int col, string color)
+        public async Task SendTileUpdate(string gameBoardId,int row, int col, string color)
         {
-            await Clients.Others.SendAsync("TileUpdate", row, col, color);
+            await Clients.Others.SendAsync("TileUpdate",gameBoardId, row, col, color);
         }
     }
 }

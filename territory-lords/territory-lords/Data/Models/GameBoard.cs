@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,12 +8,14 @@ namespace territory_lords.Data.Models
 {
     public class GameBoard
     {
+        public string GameBoardId { get; set; }
         public int RowCount { get; set; }
         public int ColumnCount { get; set; }
         public GameTile[,] Board {get;set;}
 
-        public GameBoard(int rows, int columns)
+        public GameBoard(string gameBoardId, int rows = 10, int columns = 10)
         {
+            GameBoardId = gameBoardId;
             RowCount = rows;
             ColumnCount = columns;
             Board = new GameTile[rows, columns];
@@ -127,6 +130,11 @@ namespace territory_lords.Data.Models
             neighbors[7] = GetGameTileAtIndex(gameTile.RowIndex + 1, gameTile.ColumnIndex - 1);
 
             return neighbors;
+        }
+
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this);
         }
     }
 }
