@@ -37,6 +37,10 @@ namespace territory_lords
                     new[] { "application/octet-stream" });
             });
 
+            //hook up application insights
+            services.AddApplicationInsightsTelemetry();
+            //services.AddBlazorApplicationInsights("instrumentkey");
+
             //inject our in memory DB/game cache
             services.AddSingleton<GameBoardCache>();
         }
