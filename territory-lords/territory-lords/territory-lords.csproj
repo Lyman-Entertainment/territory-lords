@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -8,12 +8,16 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'territory-lords' " />
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.3" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="System.Text.Encodings.Web" Version="5.0.0" />
+    <Compile Remove="Data\Models\Interfaces\**" />
+    <Content Remove="Data\Models\Interfaces\**" />
+    <EmbeddedResource Remove="Data\Models\Interfaces\**" />
+    <None Remove="Data\Models\Interfaces\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Models\Interfaces\" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.17.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="5.0.0" />
   </ItemGroup>
 </Project>
