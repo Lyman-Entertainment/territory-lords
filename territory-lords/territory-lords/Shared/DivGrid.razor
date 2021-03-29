@@ -18,7 +18,10 @@
                         shadowColor = $"box-shadow: inset 0 0 5px 2px {gameTile.Color};";
                     }
                     <div class="game-board-tile @GetCorrectBackgroundCSSClass(gameTile)" style="@shadowColor" @onclick="() => HandleGameBoardSquareClick(gameTile)">
-                        @*<span class="game-tile-coordinate">[@r,@c]</span>*@
+                        @if(gameTile.Unit != null)
+                        {
+                        <div class="Unit @gameTile.Unit.GetType().Name"></div>
+                        }
                     </div>
                 }
             </div>
