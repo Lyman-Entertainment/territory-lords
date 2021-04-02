@@ -141,7 +141,7 @@ namespace territory_lords.Data.Models
 
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this);
+            return JsonConvert.SerializeObject(this, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
         }
     }
 }

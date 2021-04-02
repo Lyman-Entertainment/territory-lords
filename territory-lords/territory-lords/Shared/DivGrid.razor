@@ -20,7 +20,7 @@
                     <div class="game-board-tile @GetCorrectBackgroundCSSClass(gameTile)" style="@shadowColor" @onclick="() => HandleGameBoardSquareClick(gameTile)">
                         @if(gameTile.Unit != null)
                         {
-                        <div class="Unit @gameTile.Unit.GetType().Name"></div>
+                        <div class="Unit @(gameTile.Unit.GetType().Name) @(gameTile.Unit.Active ? "Active" : "") " @onclick="() => HandleUnitClick(gameTile)"></div>
                         }
                     </div>
                 }
@@ -37,6 +37,7 @@
     public GameBoard gameBoard { get; set; }
 
     private HubConnection hubConnection;
+    private territory_lords.Data.Models.Units.IUnit PlayerActiveUnit = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -77,12 +78,35 @@
         {
             var rnd = new Random();
             gameTile.Color = Colors[rnd.Next(1, Colors.Count + 1)];
+
+            if(PlayerActiveUnit != null)
+            {
+                //clear the unit at the old coordinates
+                gameBoard.GetGameTileAtIndex(PlayerActiveUnit.Y, PlayerActiveUnit.X).Unit = null;
+
+                //put it in the new coordinates
+                gameTile.Unit = PlayerActiveUnit;
+                gameTile.Unit.X = gameTile.ColumnIndex;
+                gameTile.Unit.Y = gameTile.RowIndex;
+            }
         }
 
         BoardCache.UpdateGameCache(gameBoard);
 
         //What are ya silly? I'm still gonna send it
         SendTileUpdate(gameTile.RowIndex, gameTile.ColumnIndex, gameTile.Color);
+    }
+
+    private void HandleUnitClick(GameTile gameTile)
+    {
+        var localUnit = gameTile.Unit;
+        localUnit.X = gameTile.ColumnIndex;
+        localUnit.Y = gameTile.RowIndex;
+        //check for if players unit so we don't do stuff to other players units
+
+        //set the class to be active
+        localUnit.Active = !localUnit.Active;
+        PlayerActiveUnit = localUnit.Active ? localUnit : null;
     }
 
     /// <summary>

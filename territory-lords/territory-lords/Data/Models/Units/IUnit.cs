@@ -12,5 +12,10 @@ namespace territory_lords.Data.Models.Units
         public byte Attack { get;  set; }
         public byte Defense { get;  set; }
         public byte MoveDistance { get; set; }
+        public bool Active { get; set; }
+        public byte Player { get; set; }//this will be turned into a player object later but is byte for now
+        public int X { get; set; }
+        public int Y { get; set; }
+    
     }
 }

@@ -25,7 +25,7 @@ namespace territory_lords.Data.Cache
         {
             string jsonBoard = _gameCache.GetValueOrDefault(gameBoardId);
 
-            return string.IsNullOrEmpty(jsonBoard) ? null : JsonConvert.DeserializeObject<GameBoard>(jsonBoard);
+            return string.IsNullOrEmpty(jsonBoard) ? null : JsonConvert.DeserializeObject<GameBoard>(jsonBoard,new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
         }
     }
 }
