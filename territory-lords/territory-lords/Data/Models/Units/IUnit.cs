@@ -14,8 +14,8 @@ namespace territory_lords.Data.Models.Units
         public byte MoveDistance { get; set; }
         public bool Active { get; set; }
         public byte Player { get; set; }//this will be turned into a player object later but is byte for now
-        public int X { get; set; }
-        public int Y { get; set; }
+        public int ColumnIndex { get; set; }
+        public int RowIndex { get; set; }
     
     }
 }
