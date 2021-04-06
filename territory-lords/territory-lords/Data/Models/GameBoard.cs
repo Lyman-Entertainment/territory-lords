@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using territory_lords.Data.Models.Units;
 
 namespace territory_lords.Data.Models
 {
@@ -42,10 +43,16 @@ namespace territory_lords.Data.Models
                         Color = ""
                         , LandType = tileLandType
                         , Improvement = "castle"
-                        , Piece = "warrior"
+                        , Unit = new Random().Next(100) < 20 ? new Malitia() : null
                         , RowIndex = r
                         , ColumnIndex = c
                     };
+
+                    //no units in the ocean for now
+                    if(Board[r,c].LandType == LandType.Ocean)
+                    {
+                        Board[r, c].Unit = null;
+                    }
                 }
             }
         }
@@ -134,7 +141,7 @@ namespace territory_lords.Data.Models
 
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this);
+            return JsonConvert.SerializeObject(this, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
         }
     }
 }
