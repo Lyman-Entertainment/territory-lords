@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,5 +15,10 @@ namespace territory_lords.Data.Models
         public LandType LandType { get; set; }
         public string Improvement { get; set; }
         public IUnit Unit { get; set; }
+
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
+        }
     }
 }

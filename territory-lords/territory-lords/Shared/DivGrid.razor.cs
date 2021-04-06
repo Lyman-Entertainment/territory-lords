@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,11 +28,15 @@ namespace territory_lords.Shared
                 .WithUrl(NavigationManager.ToAbsoluteUri("/gamehub"))
                 .Build();
 
-            hubConnection.On<string, int, int, string>("TileUpdate", (gameBoardId, row, col, color) =>
+            hubConnection.On<string, string>("TileUpdate", (gameBoardId, serializedGameTile) =>
             {
                 if (gameBoardId == gameBoard.GameBoardId)
                 {
-                    gameBoard.Board[row, col].Color = color;
+                    GameTile gameTile = JsonConvert.DeserializeObject<GameTile>(serializedGameTile,new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
+                    Console.WriteLine("TileUpdate");
+                    Console.WriteLine(serializedGameTile);
+                    //Console.WriteLine(gameTile.ToJson());
+                    gameBoard.Board[gameTile.RowIndex, gameTile.ColumnIndex] = gameTile;
                     StateHasChanged();
                 }
 
@@ -40,10 +45,11 @@ namespace territory_lords.Shared
             await hubConnection.StartAsync();
         }
 
-        private void SendTileUpdate(int row, int col, string color)
+        private void SendTileUpdate(GameTile gameTile)
         {
-
-            hubConnection.SendAsync("SendTileUpdate", gameBoard.GameBoardId, row, col, color);
+            Console.WriteLine("SendingTileUpdate");
+            Console.WriteLine(gameTile.ToJson());
+            hubConnection.SendAsync("SendTileUpdate", gameBoard.GameBoardId, gameTile.ToJson());
         }
 
         public bool IsConnected =>
@@ -62,7 +68,7 @@ namespace territory_lords.Shared
                 gameTile.Color = Colors[rnd.Next(1, Colors.Count + 1)];
 
                 //there's got to be a better way to do this than all these if statements
-                //if there is a unit on this tile
+                //if there is a unit on this tile select it as active
                 if(gameTile.Unit != null)
                 {
                     var localUnit = gameTile.Unit;
@@ -80,19 +86,26 @@ namespace territory_lords.Shared
                     localUnit.Active = !localUnit.Active;
                     PlayerActiveUnit = localUnit.Active ? localUnit : null;
                 }
-                else
+                else //this is an empty tile that they might be moving a unit to
                 {
-                    //this is an empty tile that they might be moving a unit to
+                    
                     if (PlayerActiveUnit != null)
                     {
                         //clear the unit at the old coordinates
-                        gameBoard.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex).Unit = null;
+                        GameTile oldTile = gameBoard.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex);
+                        oldTile.Unit = null;
+                        //send an update to everyone
+                        SendTileUpdate(oldTile);
+                        //gameBoard.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex).Unit = null;
 
-                        //put it in the new coordinates
+                        //update the unit to be in the new place
                         gameTile.Unit = PlayerActiveUnit;
                         gameTile.Unit.ColumnIndex = gameTile.ColumnIndex;
                         gameTile.Unit.RowIndex = gameTile.RowIndex;
                         gameTile.Unit.Active = false;
+
+                        //then set the active unit to be nothing because we just moved a unit
+                        PlayerActiveUnit = null;
                     }
                 }
 
@@ -102,7 +115,7 @@ namespace territory_lords.Shared
             BoardCache.UpdateGameCache(gameBoard);
 
             //What are ya silly? I'm still gonna send it
-            SendTileUpdate(gameTile.RowIndex, gameTile.ColumnIndex, gameTile.Color);
+            SendTileUpdate(gameTile);
         }
 
         /// <summary>
