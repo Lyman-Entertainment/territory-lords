@@ -11,7 +11,7 @@ using territory_lords.Data.Models;
 
 namespace territory_lords.Shared
 {
-    public partial class DivGrid
+    public partial class GameBoardDisplay : IAsyncDisposable
     {
         [Inject] NavigationManager NavigationManager { get; set; }
         [Inject] GameBoardCache BoardCache { get; set; }
@@ -19,41 +19,36 @@ namespace territory_lords.Shared
         [Parameter]
         public GameBoard gameBoard { get; set; }
 
-        private HubConnection hubConnection;
+        private HubConnection gameHubConnection;
         private territory_lords.Data.Models.Units.IUnit PlayerActiveUnit = null;
 
         protected override async Task OnInitializedAsync()
         {
-            hubConnection = new HubConnectionBuilder()
+            gameHubConnection = new HubConnectionBuilder()
                 .WithUrl(NavigationManager.ToAbsoluteUri("/gamehub"))
                 .Build();
 
-            hubConnection.On<string, string>("TileUpdate", (gameBoardId, serializedGameTile) =>
+            gameHubConnection.On<string, string>("TileUpdate", (gameBoardId, serializedGameTile) =>
             {
                 if (gameBoardId == gameBoard.GameBoardId)
                 {
                     GameTile gameTile = JsonConvert.DeserializeObject<GameTile>(serializedGameTile,new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
-                    Console.WriteLine("TileUpdate");
-                    Console.WriteLine(serializedGameTile);
-                    //Console.WriteLine(gameTile.ToJson());
                     gameBoard.Board[gameTile.RowIndex, gameTile.ColumnIndex] = gameTile;
                     StateHasChanged();
                 }
 
             });
 
-            await hubConnection.StartAsync();
+            await gameHubConnection.StartAsync();
         }
 
         private void SendTileUpdate(GameTile gameTile)
         {
-            Console.WriteLine("SendingTileUpdate");
-            Console.WriteLine(gameTile.ToJson());
-            hubConnection.SendAsync("SendTileUpdate", gameBoard.GameBoardId, gameTile.ToJson());
+            gameHubConnection.SendAsync("SendTileUpdate", gameBoard.GameBoardId, gameTile.ToJson());
         }
 
         public bool IsConnected =>
-            hubConnection.State == HubConnectionState.Connected;
+            gameHubConnection.State == HubConnectionState.Connected;
 
         //At some point I think this should be handled by a game manager or something
         private void HandleGameBoardSquareClick(GameTile gameTile)
@@ -214,7 +209,7 @@ namespace territory_lords.Shared
 
         public async ValueTask DisposeAsync()
         {
-            await hubConnection.DisposeAsync();
+            await gameHubConnection.DisposeAsync();
         }
     }
 }
