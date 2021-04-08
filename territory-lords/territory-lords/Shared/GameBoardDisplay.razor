@@ -1,9 +1,5 @@
 ﻿
-@using territory_lords.Data.Cache;
-@using Microsoft.AspNetCore.SignalR.Client
-@*inject NavigationManager NavigationManager
-@*inject GameBoardCache BoardCache
-@*I don't love that we have to inject this here too. This component should pass along to it's parent or a game manager object*@
+
 <div id="BoardWrapper">
     <div id="BoardContainer">
         @for (int r = 0; r < gameBoard.RowCount; r++)

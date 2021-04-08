@@ -1,4 +1,4 @@
-﻿@page "/GridDiv/{gameBoardId}"
+﻿@page "/Map/{gameBoardId}"
 @using territory_lords.Data.Cache;
 @using Microsoft.AspNetCore.WebUtilities;
 @using territory_lords.Data.Models;
@@ -6,15 +6,11 @@
 @inject GameBoardCache BoardCache
 
 
-<style>
-    
-</style>
-
 <h1>Div layout of gameboard</h1>
 <NavLink class="nav-link" href="@GetRandomGameBoardIdURL()">
-    <span class="oi " aria-hidden="true"></span> New Random Board Init Once
+    <span class="oi " aria-hidden="true"></span> New Map
 </NavLink>
-<DivGrid gameBoard="gameBoard" />
+<GameBoardDisplay gameBoard="gameBoard" />
 
 @code {
     [Parameter]
@@ -37,7 +33,7 @@
 
     private string GetRandomGameBoardIdURL()
     {
-        return $"GridDiv/{GetRandomNumberBetween(1, 11)}";
+        return $"Map/{GetRandomNumberBetween(1, 11)}";
     }
 
     /// <summary>
