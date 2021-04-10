@@ -16,6 +16,7 @@ namespace territory_lords.Data.Models.Units
         public byte Player { get; set; }//this will be turned into a player object later but is byte for now
         public int ColumnIndex { get; set; }
         public int RowIndex { get; set; }
+        
     
     }
 }

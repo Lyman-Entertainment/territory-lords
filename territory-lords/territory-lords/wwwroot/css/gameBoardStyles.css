@@ -76,17 +76,14 @@
 
 .Ocean-bay-right {
     background: url(/Images/TER257.PIC_256_resized.png) -650px -500px;
-    /*transform:rotate(90deg);*/
 }
 
 .Ocean-bay-bottom {
     background: url(/Images/TER257.PIC_256_resized.png) -550px -500px;
-    /*transform: rotate(180deg);*/
 }
 
 .Ocean-bay-left {
     background: url(/Images/TER257.PIC_256_resized.png) -350px -500px;
-    /*transform: rotate(270deg);*/
 }
 
 .Ocean-channel-horizontal {
@@ -114,34 +111,82 @@
 }
 
 .Grass {
-    background: url(/Images/TER257.PIC_256_resized.png) 0px -50px, url(/Images/SP257.PIC_256_resized.png) 0px -200px;
+    background: url(/Images/TER257.PIC_256_resized.png) 0px -50px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
 
 .Desert {
-    background: url(/Images/TER257.PIC_256_resized.png) 0px 0px, url(/Images/SP257.PIC_256_resized.png) 0px -200px;
+    background: url(/Images/TER257.PIC_256_resized.png) 0px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
 
 .Jungle {
-    background: url(/Images/TER257.PIC_256_resized.png) 0px -450px, url(/Images/SP257.PIC_256_resized.png) 0px -200px;
+    background: url(/Images/TER257.PIC_256_resized.png) 0px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
 
 .Forrest {
-    background: url(/Images/TER257.PIC_256_resized.png) 0px -150px, url(/Images/SP257.PIC_256_resized.png) 0px -200px;
+    background: url(/Images/TER257.PIC_256_resized.png) 0px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
 
 .Hill {
-    background: url(/Images/TER257.PIC_256_resized.png) 0px -200px, url(/Images/SP257.PIC_256_resized.png) 0px -200px;
+    background: url(/Images/TER257.PIC_256_resized.png) 0px -200px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
 
 .Mountain {
-    background: url(/Images/TER257.PIC_256_resized.png) 0px -250px, url(/Images/SP257.PIC_256_resized.png) 0px -200px;
+    background: url(/Images/TER257.PIC_256_resized.png) 0px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
 
 .Unit {
     width: 100%;
     height: 100%;
+    
 }
 
+
 .Malitia {
-    background: url(/Images/SP257.PIC_256_resized.png) -50px -500px;
+    width: 90%;
+    height: 90%;
+    object-position: -50px -505px;
+    object-fit: none;
+    background-color:tan;
+    border: 2px solid black;
+    border-radius:5px;
+}
+
+.Phalanx {
+    width: 90%;
+    height: 90%;
+    object-position: -100px -505px;
+    object-fit: none;
+    background-color: pink;
+    border: 2px solid deeppink;
+    border-radius: 5px;
+}
+
+.Legion {
+    width: 90%;
+    height: 90%;
+    object-position: -150px -505px;
+    object-fit: none;
+    background-color: dodgerblue;
+    border: 2px solid darkblue;
+    border-radius: 5px;
+}
+
+.Calvary {
+    width: 90%;
+    height: 90%;
+    object-position: -303px -505px;
+    object-fit: none;
+    background-color: cyan;
+    border: 2px solid darkblue;
+    border-radius: 5px;
+}
+
+.Chariot {
+    width: 90%;
+    height: 90%;
+    object-position: -501px -505px;
+    object-fit: none;
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 5px;
 }
