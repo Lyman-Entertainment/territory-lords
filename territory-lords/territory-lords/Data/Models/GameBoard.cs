@@ -14,7 +14,7 @@ namespace territory_lords.Data.Models
         public int ColumnCount { get; set; }
         public GameTile[,] Board {get;set;}
 
-        public GameBoard(string gameBoardId, int rows = 10, int columns = 10)
+        public GameBoard(string gameBoardId, int rows = 15, int columns = 15)
         {
             GameBoardId = gameBoardId;
             RowCount = rows;
@@ -43,7 +43,7 @@ namespace territory_lords.Data.Models
                         Color = ""
                         , LandType = tileLandType
                         , Improvement = "castle"
-                        , Unit = new Random().Next(100) < 20 ? new Malitia() : null
+                        , Unit = GetRandomUnitType()
                         , RowIndex = r
                         , ColumnIndex = c
                     };
@@ -142,6 +142,28 @@ namespace territory_lords.Data.Models
         public string ToJson()
         {
             return JsonConvert.SerializeObject(this, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
+        }
+
+        /// <summary>
+        /// Just a silly "random" unit generator for now. Just testing purposes
+        /// </summary>
+        /// <returns></returns>
+        private IUnit GetRandomUnitType()
+        {
+            var rnd = new Random().Next(40); 
+            var unitList = new List<IUnit> {
+                new Malitia()
+                ,new Phalanx()
+                ,new Legion()
+                ,new Calvary()
+                ,new Chariot()
+            };
+
+            if(rnd < unitList.Count)
+            {
+                return unitList[rnd];
+            }
+            return null;
         }
     }
 }

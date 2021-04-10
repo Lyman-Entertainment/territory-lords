@@ -16,7 +16,9 @@
                     <div class="game-board-tile @GetCorrectBackgroundCSSClass(gameTile)" style="@shadowColor" @onclick="() => HandleGameBoardSquareClick(gameTile)">
                         @if(gameTile.Unit != null)
                         {
-                        <div class="Unit @(gameTile.Unit.GetType().Name) @(gameTile.Unit.Active ? "Active" : "")"></div>
+                        <div class="Unit  @(gameTile.Unit.Active ? "Active" : "")">
+                            <img class ="@(gameTile.Unit.GetType().Name)" src="/Images/Layer2Sprite.png"/>
+                        </div>
                         }
                     </div>
                 }
