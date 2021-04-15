@@ -11,8 +11,6 @@ namespace territory_lords.Hubs
     {
         public async Task SendTileUpdate(string gameBoardId,string serializedGameTile)
         {
-            Console.WriteLine("HUBSendTileUpdate");
-            Console.WriteLine(serializedGameTile);
             await Clients.Others.SendAsync("TileUpdate",gameBoardId, serializedGameTile);
         }
     }

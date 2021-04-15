@@ -33,6 +33,12 @@ namespace territory_lords.Shared
                 if (gameBoardId == gameBoard.GameBoardId)
                 {
                     GameTile gameTile = JsonConvert.DeserializeObject<GameTile>(serializedGameTile,new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
+                    
+                    //we don't want to display the other players active units so if there is a unit in here set it's active state to false
+                    if(gameTile.Unit != null)
+                    {
+                        gameTile.Unit.Active = false;
+                    }
                     gameBoard.Board[gameTile.RowIndex, gameTile.ColumnIndex] = gameTile;
                     StateHasChanged();
                 }
