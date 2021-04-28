@@ -26,21 +26,32 @@ namespace territory_lords.Pages
                     CookieAuthenticationDefaults.AuthenticationScheme);
             }
             catch { }
-            // *** !!! This is where you would validate the user !!! ***
-            // In this example we just log the user in
-            // (Always log the user in for this demo)
+
+            //Since we don't have a DB at the current moment we'll just use the persons name as their "id" and we'll
+            //see if they know the super secret password, otherwise they will fail.
+            if(!paramPassword.Equals("kevinisawesome",StringComparison.OrdinalIgnoreCase))
+            {
+                throw new Exception("Invalid Credentials");
+            }
+
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, paramUsername),
-                new Claim(ClaimTypes.Role, "Administrator"),
+                new Claim(ClaimTypes.Role, "Player"),
             };
+
             var claimsIdentity = new ClaimsIdentity(
-                claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                claims, 
+                CookieAuthenticationDefaults.AuthenticationScheme
+                );
+
             var authProperties = new AuthenticationProperties
             {
                 IsPersistent = true,
                 RedirectUri = this.Request.Host.Value
             };
+
+
             try
             {
                 await HttpContext.SignInAsync(
@@ -52,6 +63,7 @@ namespace territory_lords.Pages
             {
                 string error = ex.Message;
             }
+
             return LocalRedirect(returnUrl);
         }
     }

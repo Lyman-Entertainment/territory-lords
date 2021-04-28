@@ -4,7 +4,7 @@
 @using territory_lords.Data.Models;
 @inject NavigationManager NavManager
 @inject GameBoardCache BoardCache
-
+@attribute [Authorize]
 
 <h1>Div layout of gameboard</h1>
 <NavLink class="nav-link" href="@GetRandomGameBoardIdURL()">
