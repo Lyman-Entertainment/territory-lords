@@ -1,35 +1,30 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.SignalR.Client
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @implements IAsyncDisposable
 
-<div class="form-group">
-    <label>
-        User:
-        <input @bind="userInput" />
-    </label>
-</div>
-<div class="form-group">
-    <label>
-        Message:
-        <input @bind="messageInput" size="50" />
-    </label>
-</div>
-<button @onclick="Send" disabled="@(!IsConnected)">Send</button>
-
-<hr>
-
-<ul id="messagesList">
-    @foreach (var message in messages)
-    {
-        <li>@message</li>
-    }
-</ul>
+<AuthorizeView>
+    <form @onsubmit="Send">
+        <div class="form-group">
+            <label>Message:</label>
+            <input @bind="messageInput" size="50"/>
+        </div>
+        <MudButton @onclick="Send" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Primary" Disabled="@(!IsConnected)">Send</MudButton>
+        <hr>
+        <ul id="messagesList">
+            @foreach (var message in messages)
+            {
+                <li>@message</li>
+            }
+        </ul>
+    </form>
+</AuthorizeView>
 
 @code {
     private HubConnection hubConnection;
     private List<string> messages = new List<string>();
-    private string userInput;
+    //private string userName;
     private string messageInput;
 
     protected override async Task OnInitializedAsync()
@@ -48,8 +43,13 @@
         await hubConnection.StartAsync();
     }
 
-    Task Send() =>
-        hubConnection.SendAsync("SendMessage", userInput, messageInput);
+    private async Task Send()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync().ConfigureAwait(false);
+        var user = authState.User;
+        await hubConnection.SendAsync("SendMessage", user.Identity.Name, messageInput);
+    }
+
 
     public bool IsConnected =>
         hubConnection.State == HubConnectionState.Connected;

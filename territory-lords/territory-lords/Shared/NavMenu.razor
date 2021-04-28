@@ -1,32 +1,27 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">territory-lords</a>
-    <button class="navbar-toggler" @onclick="ToggleNavMenu">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-</div>
+﻿
+<MudPaper Width="250px" Class="py-3" Square="true">
+    <MudNavMenu>
+        <MudText Typo="Typo.h6" Class="px-4">Territory Lords</MudText>
+        <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">Thanks Civilization</MudText>
+        <MudDivider Class="my-2" />
+        <MudNavLink Href="/">Home</MudNavLink>
+        <MudNavGroup Title="Games" Expanded="false">
+            <MudNavLink Href="/Games" Icon="@Icons.Filled.List">My Games</MudNavLink>
+            <MudNavLink Href="/CreateGame" Icon="@Icons.Filled.Add">New Game</MudNavLink>
+            <MudNavLink Href="/Map/10" Icon="@Icons.Rounded.BubbleChart">Random Game</MudNavLink>
+        </MudNavGroup>
+        <MudNavLink Href="/About" Icon="@Icons.Filled.Info">About</MudNavLink>
+    </MudNavMenu>
+</MudPaper>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="Map/10">
-                <span class="oi " aria-hidden="true"></span> New Map
-            </NavLink>
-        </li>
-    </ul>
-</div>
 
-@code {
-    private bool collapseNavMenu = true;
 
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
-    private void ToggleNavMenu()
+@code{
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
     {
-        collapseNavMenu = !collapseNavMenu;
+        _drawerOpen = !_drawerOpen;
     }
 }

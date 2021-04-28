@@ -13,6 +13,14 @@ using territory_lords.Data;
 using territory_lords.Hubs;
 using Microsoft.AspNetCore.ResponseCompression;
 using territory_lords.Data.Cache;
+using MudBlazor.Services;
+// ******
+// BLAZOR COOKIE Auth Code (begin)
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
+using System.Net.Http;
+// BLAZOR COOKIE Auth Code (end)
+// ******
 
 namespace territory_lords
 {
@@ -43,6 +51,30 @@ namespace territory_lords
 
             //inject our in memory DB/game cache
             services.AddSingleton<GameBoardCache>();
+
+            // ******
+            // BLAZOR COOKIE Auth Code (begin)
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+            services.AddAuthentication(
+                CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie();
+            // BLAZOR COOKIE Auth Code (end)
+            // ******
+            // BLAZOR COOKIE Auth Code (begin)
+            // From: https://github.com/aspnet/Blazor/issues/1554
+            // HttpContextAccessor
+            services.AddHttpContextAccessor();
+            services.AddScoped<HttpContextAccessor>();
+            services.AddHttpClient();
+            services.AddScoped<HttpClient>();
+            // BLAZOR COOKIE Auth Code (end)
+            // ******
+
+            services.AddMudServices();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -65,7 +97,12 @@ namespace territory_lords
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            // ******
+            // BLAZOR COOKIE Auth Code (begin)
+            app.UseCookiePolicy();
+            app.UseAuthentication();
+            // BLAZOR COOKIE Auth Code (end)
+            // ******
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub();

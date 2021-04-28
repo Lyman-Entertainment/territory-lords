@@ -1,0 +1,58 @@
+﻿@page "/loginControl"
+@using System.Web;
+@inject NavigationManager NavigationManager
+
+<AuthorizeView>
+    <Authorized>
+        <MudText Style="padding-right:10px;">Hello, @context.User.Identity.Name!</MudText>
+        <MudButton StartIcon="@Icons.Filled.Logout"
+                   Variant="Variant.Filled"
+                   ButtonType="ButtonType.Button"
+                   Color="Color.Error"
+                   OnClick="Logout">Logout</MudButton>
+    </Authorized>
+    <NotAuthorized>
+        <form @onsubmit="Login">
+
+            <input type="text"
+                   placeholder="User Name"
+                   @bind="@Username" />
+            &nbsp;&nbsp;
+
+
+            <input type="password"
+                   placeholder="Password"
+                   @bind="@Password" />
+
+            <MudButton StartIcon="@Icons.Material.Outlined.Login" 
+                       Variant="Variant.Filled" 
+                       ButtonType="ButtonType.Submit"  
+                       Color="Color.Success">Login</MudButton>
+        </form>
+
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    string Username = "";
+    string Password = "";
+
+    private string encode(string param)
+    {
+        return HttpUtility.UrlEncode(param);
+    }
+
+    private void Login()
+    {
+        if (!String.IsNullOrWhiteSpace(Username) && !String.IsNullOrWhiteSpace(Password))
+        {
+            NavigationManager.NavigateTo($"/login?paramUsername={@encode(Username)}&paramPassword={@encode(@Password)}",true);
+        }
+    }
+
+    private void Logout()
+    {
+        NavigationManager.NavigateTo($"/logout?returnUrl=/", true);
+    }
+
+}

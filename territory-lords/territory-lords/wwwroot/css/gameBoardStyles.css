@@ -144,7 +144,7 @@
 .Malitia {
     width: 90%;
     height: 90%;
-    object-position: -50px -505px;
+    object-position: -53px -507px;
     object-fit: none;
     background-color:tan;
     border: 2px solid black;
@@ -154,7 +154,7 @@
 .Phalanx {
     width: 90%;
     height: 90%;
-    object-position: -100px -505px;
+    object-position: -103px -507px;
     object-fit: none;
     background-color: pink;
     border: 2px solid deeppink;
@@ -164,7 +164,7 @@
 .Legion {
     width: 90%;
     height: 90%;
-    object-position: -150px -505px;
+    object-position: -153px -507px;
     object-fit: none;
     background-color: dodgerblue;
     border: 2px solid darkblue;
@@ -184,7 +184,7 @@
 .Chariot {
     width: 90%;
     height: 90%;
-    object-position: -501px -505px;
+    object-position: -502px -507px;
     object-fit: none;
     background-color: white;
     border: 2px solid black;
