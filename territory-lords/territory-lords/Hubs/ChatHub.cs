@@ -3,14 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using territory_lords.Data.Models;
 
 namespace territory_lords.Hubs
 {
     public class ChatHub : Hub
     {
-        public async Task SendMessage(string user, string message)
+        public async Task SendMessage(ChatMessage chatMessage)
         {
-            await Clients.All.SendAsync("ReceiveMessage", user, message);
+            //we don't need to send the message to everyone
+            //await Clients.All.SendAsync("ReceiveMessage", user, message);
+
+            //just send it to the people who aren't us. We already know about it
+            await Clients.Others.SendAsync("ReceiveMessage", chatMessage);
         }
     }
 }

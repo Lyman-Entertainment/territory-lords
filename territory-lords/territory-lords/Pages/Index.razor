@@ -8,14 +8,20 @@
     <form @onsubmit="Send">
         <div class="form-group">
             <label>Message:</label>
-            <input @bind="messageInput" size="50"/>
+            @*<MudTextField T="string" Label="Filled" Variant="Variant.Filled" Text="@messageInput" Lines="3" />*@
+            <input @bind="messageInput" size="50" />
+
         </div>
         <MudButton @onclick="Send" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Primary" Disabled="@(!IsConnected)">Send</MudButton>
         <hr>
         <ul id="messagesList">
-            @foreach (var message in messages)
+            @foreach (var chatMessage in ChatMessages)
             {
-                <li>@message</li>
+                <li class="message @(chatMessage.Mine ?  "my-message" : "their-message" )">
+                    <MudCard>
+                        <MudText>@chatMessage.UserName : @chatMessage.Message</MudText>
+                    </MudCard>
+                </li>
             }
         </ul>
     </form>
@@ -23,8 +29,8 @@
 
 @code {
     private HubConnection hubConnection;
-    private List<string> messages = new List<string>();
-    //private string userName;
+    private List<ChatMessage> ChatMessages = new List<ChatMessage>();
+    private string userName;
     private string messageInput;
 
     protected override async Task OnInitializedAsync()
@@ -33,10 +39,11 @@
             .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
             .Build();
 
-        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        hubConnection.On<ChatMessage>("ReceiveMessage", (message) =>
         {
-            var encodedMsg = $"{user}: {message}";
-            messages.Add(encodedMsg);
+            //I'm not sure I like how this is handled
+            message.Mine = false;//we're assuming any message coming in from the hub isn't ours
+            ChatMessages.Add(message);
             StateHasChanged();
         });
 
@@ -47,7 +54,17 @@
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync().ConfigureAwait(false);
         var user = authState.User;
-        await hubConnection.SendAsync("SendMessage", user.Identity.Name, messageInput);
+        var chatMessage = new ChatMessage
+        {
+            UserName = user.Identity.Name
+            ,
+            Message = messageInput
+            ,
+            Mine = true
+        };
+        await hubConnection.SendAsync("SendMessage", chatMessage);
+        ChatMessages.Add(chatMessage);
+        ClearMessageInput();
     }
 
 
@@ -57,5 +74,10 @@
     public async ValueTask DisposeAsync()
     {
         await hubConnection.DisposeAsync();
+    }
+
+    private void ClearMessageInput()
+    {
+        messageInput = "";
     }
 }
