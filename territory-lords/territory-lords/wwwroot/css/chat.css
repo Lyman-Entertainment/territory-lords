@@ -1,0 +1,18 @@
+﻿/*learn how to put css with a component so it's self contained. Then do that with this*/
+.message{
+    padding:1rem;
+    width:50%;
+}
+    .message div {
+        padding: 0.25rem;
+    }
+.message.my-message div{
+    background-color:skyblue;
+}
+.message.their-message{
+    position:relative;
+    right:-50%;
+}
+    .message.their-message div {
+        background-color: lightgreen;
+    }
