@@ -1,37 +1,52 @@
-﻿@page "/loginControl"
+﻿@*@page "/loginControl"*@
 @using System.Web;
 @inject NavigationManager NavigationManager
+<MudGrid Spacing="1" Justify="Justify.Center">
+    <AuthorizeView>
+        <Authorized>
+            <MudItem xs="9" Class="py-2 px-2">
+                <MudText Style="padding-right:10px;">Hello, @context.User.Identity.Name!</MudText>
+                <MudButton StartIcon="@Icons.Filled.Logout"
+                           Variant="Variant.Filled"
+                           ButtonType="ButtonType.Button"
+                           Color="Color.Error"
+                           OnClick="Logout">Logout</MudButton>
+            </MudItem>
+        </Authorized>
+        <NotAuthorized>
+            <form @onsubmit="Login">
 
-<AuthorizeView>
-    <Authorized>
-        <MudText Style="padding-right:10px;">Hello, @context.User.Identity.Name!</MudText>
-        <MudButton StartIcon="@Icons.Filled.Logout"
-                   Variant="Variant.Filled"
-                   ButtonType="ButtonType.Button"
-                   Color="Color.Error"
-                   OnClick="Logout">Logout</MudButton>
-    </Authorized>
-    <NotAuthorized>
-        <form @onsubmit="Login">
+                <MudItem xs="9" Class="py-2 px-2">
+                    <input type="text"
+                           placeholder="User Name"
+                           @bind="@Username" />
+                    <input type="password"
+                           placeholder="Password"
+                           @bind="@Password" />
 
-            <input type="text"
-                   placeholder="User Name"
-                   @bind="@Username" />
-            &nbsp;&nbsp;
+                    <MudButton StartIcon="@Icons.Material.Outlined.Login"
+                               Variant="Variant.Filled"
+                               ButtonType="ButtonType.Submit"
+                               Color="Color.Success">Login</MudButton>
+                </MudItem>
+
+            </form>
+            <MudItem xs="9" Class="py-2 px-2">
 
 
-            <input type="password"
-                   placeholder="Password"
-                   @bind="@Password" />
+                    <MudButton Link="/register"
+                               Target="_blank"
+                               Variant="Variant.Filled"
+                               EndIcon="@Icons.Filled.AssignmentInd"
+                               Color="Color.Primary"
+                               Disabled=false>
+                        Register!
+                    </MudButton>
 
-            <MudButton StartIcon="@Icons.Material.Outlined.Login" 
-                       Variant="Variant.Filled" 
-                       ButtonType="ButtonType.Submit"  
-                       Color="Color.Success">Login</MudButton>
-        </form>
-
-    </NotAuthorized>
-</AuthorizeView>
+            </MudItem>
+        </NotAuthorized>
+    </AuthorizeView>
+</MudGrid>
 
 @code{
     string Username = "";
@@ -46,7 +61,7 @@
     {
         if (!String.IsNullOrWhiteSpace(Username) && !String.IsNullOrWhiteSpace(Password))
         {
-            NavigationManager.NavigateTo($"/login?paramUsername={@encode(Username)}&paramPassword={@encode(@Password)}",true);
+            NavigationManager.NavigateTo($"/login?paramUsername={@encode(Username)}&paramPassword={@encode(@Password)}", true);
         }
     }
 

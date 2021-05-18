@@ -1,16 +1,25 @@
 ﻿
 <MudPaper Width="250px" Class="py-3" Square="true">
     <MudNavMenu>
-        <MudText Typo="Typo.h6" Class="px-4">Territory Lords</MudText>
         <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">Thanks Civilization</MudText>
         <MudDivider Class="my-2" />
-        <MudNavLink Href="/">Home</MudNavLink>
-        <MudNavGroup Title="Games" Expanded="false">
-            <MudNavLink Href="/Games" Icon="@Icons.Filled.List">My Games</MudNavLink>
-            <MudNavLink Href="/CreateGame" Icon="@Icons.Filled.Add">New Game</MudNavLink>
-            <MudNavLink Href="/Map/10" Icon="@Icons.Rounded.BubbleChart">Random Game</MudNavLink>
-        </MudNavGroup>
+
+        <MudNavLink Href="/" Icon="@Icons.Filled.Home">Home</MudNavLink>
+
+        <AuthorizeView>
+            <Authorized>
+                <MudNavGroup Title="Games" Expanded="_gamesDrawerOpen" Icon="@Icons.Filled.Games">
+                    <MudNavLink Href="/Games" Icon="@Icons.Filled.List">My Games</MudNavLink>
+                    <MudNavLink Href="/CreateGame" Icon="@Icons.Filled.Add">New Game</MudNavLink>
+                    <MudNavLink Href="/Map/10" Icon="@Icons.Rounded.BubbleChart">Random Game</MudNavLink>
+                </MudNavGroup>
+            </Authorized>
+        </AuthorizeView>
+
         <MudNavLink Href="/About" Icon="@Icons.Filled.Info">About</MudNavLink>
+
+        <LoginControl />
+
     </MudNavMenu>
 </MudPaper>
 
@@ -18,10 +27,10 @@
 
 
 @code{
-    bool _drawerOpen = true;
+    bool _gamesDrawerOpen = true;
 
-    void DrawerToggle()
+    void GamesDrawerToggle()
     {
-        _drawerOpen = !_drawerOpen;
+        _gamesDrawerOpen = !_gamesDrawerOpen;
     }
 }
