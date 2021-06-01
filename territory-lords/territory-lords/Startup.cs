@@ -14,11 +14,15 @@ using territory_lords.Hubs;
 using Microsoft.AspNetCore.ResponseCompression;
 using territory_lords.Data.Cache;
 using MudBlazor.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.UI;
 // ******
 // BLAZOR COOKIE Auth Code (begin)
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
-using System.Net.Http;
+//using Microsoft.AspNetCore.Authentication.Cookies;
+//using Microsoft.AspNetCore.Http;
+//using System.Net.Http;
 // BLAZOR COOKIE Auth Code (end)
 // ******
 
@@ -54,25 +58,43 @@ namespace territory_lords
 
             // ******
             // BLAZOR COOKIE Auth Code (begin)
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
-            services.AddAuthentication(
-                CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie();
+            //services.Configure<CookiePolicyOptions>(options =>
+            //{
+            //    options.CheckConsentNeeded = context => true;
+            //    options.MinimumSameSitePolicy = SameSiteMode.None;
+            //});
+            //services.AddAuthentication(
+            //    CookieAuthenticationDefaults.AuthenticationScheme)
+            //    .AddCookie();
             // BLAZOR COOKIE Auth Code (end)
             // ******
             // BLAZOR COOKIE Auth Code (begin)
             // From: https://github.com/aspnet/Blazor/issues/1554
             // HttpContextAccessor
-            services.AddHttpContextAccessor();
-            services.AddScoped<HttpContextAccessor>();
-            services.AddHttpClient();
-            services.AddScoped<HttpClient>();
+            //services.AddHttpContextAccessor();
+            //services.AddScoped<HttpContextAccessor>();
+            //services.AddHttpClient();
+            //services.AddScoped<HttpClient>();
             // BLAZOR COOKIE Auth Code (end)
             // ******
+
+
+            //****Azure B2C****//
+            services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+                    .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAdB2C"));
+
+            services.AddControllersWithViews()
+                    .AddMicrosoftIdentityUI();
+
+            services.AddAuthorization(options =>
+            {
+                // By default, all incoming requests will be authorized according to the default policy
+                options.FallbackPolicy = options.DefaultPolicy;
+            });
+
+            services.AddServerSideBlazor()
+                    .AddMicrosoftIdentityConsentHandler();
+            //****Azure B2C****//
 
             services.AddMudServices();
         }
@@ -97,18 +119,23 @@ namespace territory_lords
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             // ******
             // BLAZOR COOKIE Auth Code (begin)
-            app.UseCookiePolicy();
-            app.UseAuthentication();
+            //app.UseCookiePolicy();
+            //app.UseAuthentication();
             // BLAZOR COOKIE Auth Code (end)
             // ******
             app.UseEndpoints(endpoints =>
             {
+
+                endpoints.MapControllers();
                 endpoints.MapBlazorHub();
+                endpoints.MapFallbackToPage("/_Host");
                 endpoints.MapHub<ChatHub>("/chathub");
                 endpoints.MapHub<GameHub>("/gamehub");
-                endpoints.MapFallbackToPage("/_Host");
             });
         }
     }
