@@ -25,7 +25,10 @@ namespace territory_lords.Shared
         protected override async Task OnInitializedAsync()
         {
             gameHubConnection = new HubConnectionBuilder()
-                .WithUrl(NavigationManager.ToAbsoluteUri("/gamehub"))
+                .WithUrl(
+                    NavigationManager.ToAbsoluteUri("/gamehub"),
+                    config => config.UseDefaultCredentials = true)
+                .WithAutomaticReconnect()
                 .Build();
 
             gameHubConnection.On<string, string>("TileUpdate", (gameBoardId, serializedGameTile) =>
@@ -45,7 +48,19 @@ namespace territory_lords.Shared
 
             });
 
-            await gameHubConnection.StartAsync();
+            try
+            {
+
+                await gameHubConnection.StartAsync();
+            }
+            catch (Exception ex)
+            {
+                var t = ex.ToString();
+                
+            }finally
+            {
+                var g = gameHubConnection;
+            }
         }
 
         private void SendTileUpdate(GameTile gameTile)
