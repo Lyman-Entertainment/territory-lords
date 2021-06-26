@@ -1,33 +1,43 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.Extensions.Logging
+@using territory_lords.Logger
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject TokenProvider TokenProvider
 @implements IAsyncDisposable
 
 <AuthorizeView>
-    <form @onsubmit="Send">
-        <div class="form-group">
-            <label>Message:</label>
-            @*<MudTextField T="string" Label="Filled" Variant="Variant.Filled" Text="@messageInput" Lines="3" />*@
-            <input @bind="messageInput" size="50" />
+    <Authorized>
+        <form @onsubmit="Send">
+            <div class="form-group">
+                <label>Message:</label>
+                <MudTextField T="string" Label="Filled" Variant="Variant.Filled" Text="@messageInput" Lines="3" />
+                <input @bind="messageInput" size="50" />
 
-        </div>
-        <MudButton @onclick="Send" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Primary" Disabled="@(!IsConnected)">Send</MudButton>
-        <hr>
-        <ul id="messagesList">
-            @foreach (var chatMessage in ChatMessages)
-            {
-                <li class="message @(chatMessage.Mine ?  "my-message" : "their-message" )">
-                    <MudCard>
-                        <MudText>@chatMessage.UserName : @chatMessage.Message</MudText>
-                    </MudCard>
-                </li>
-            }
-        </ul>
-    </form>
+            </div>
+            <MudButton @onclick="Send" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Primary" Disabled="@(!IsConnected)">Send</MudButton>
+            <hr>
+            <ul id="messagesList">
+                @foreach (var chatMessage in ChatMessages)
+                {
+                    <li class="message @(chatMessage.Mine ?  "my-message" : "their-message" )">
+                        <MudCard>
+                            <MudText>@chatMessage.UserName : @chatMessage.Message</MudText>
+                        </MudCard>
+                    </li>
+                }
+            </ul>
+        </form>
+    </Authorized>
+    <NotAuthorized>
+        you made it and you're not authorized
+    </NotAuthorized>
 </AuthorizeView>
 
 @code {
+
     private HubConnection hubConnection;
     private List<ChatMessage> ChatMessages = new List<ChatMessage>();
     private string userName;
@@ -35,9 +45,19 @@
 
     protected override async Task OnInitializedAsync()
     {
+
         hubConnection = new HubConnectionBuilder()
-            .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
-            .Build();
+    .WithUrl(
+            NavigationManager.ToAbsoluteUri("/chathub"), options =>
+            {
+                options.AccessTokenProvider = GetAccessToken;
+            })
+    .ConfigureLogging(logging =>
+    {
+        logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
+    })
+    .Build();
+
 
         hubConnection.On<ChatMessage>("ReceiveMessage", (message) =>
         {
@@ -49,7 +69,6 @@
 
         await hubConnection.StartAsync();
 
-        var another = "A line of code";
     }
 
     private async Task Send()
@@ -67,6 +86,7 @@
         await hubConnection.SendAsync("SendMessage", chatMessage);
         ChatMessages.Add(chatMessage);
         ClearMessageInput();
+
     }
 
 
@@ -81,5 +101,10 @@
     private void ClearMessageInput()
     {
         messageInput = "";
+    }
+
+    private async Task<string> GetAccessToken()
+    {
+        return await Task.FromResult<string>(TokenProvider.AccessToken);
     }
 }

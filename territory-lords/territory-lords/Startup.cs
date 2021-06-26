@@ -18,13 +18,9 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
-// ******
-// BLAZOR COOKIE Auth Code (begin)
-//using Microsoft.AspNetCore.Authentication.Cookies;
-//using Microsoft.AspNetCore.Http;
-//using System.Net.Http;
-// BLAZOR COOKIE Auth Code (end)
-// ******
+using territory_lords.Data.Models;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 
 namespace territory_lords
 {
@@ -41,8 +37,39 @@ namespace territory_lords
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            //****Azure B2C****//
+            services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+                    .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAdB2C"));
+            //services.AddAuthentication(options => options.)
+            //        .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAdB2C"));
+
+            services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
+            {
+                options.ResponseType = OpenIdConnectResponseType.Code;
+                options.SaveTokens = true;
+
+                options.Scope.Add("offline_access");
+                options.Scope.Add("c4002afd-6b73-4727-be4f-e5fe63dd1d23");
+            });
+
+            services.AddControllersWithViews()
+                    .AddMicrosoftIdentityUI();
+
+            services.AddAuthorization(options =>
+            {
+                // By default, all incoming requests will be authorized according to the default policy
+                options.FallbackPolicy = options.DefaultPolicy;
+            });
+
             services.AddRazorPages();
-            services.AddServerSideBlazor();
+            services.AddServerSideBlazor()
+                    .AddMicrosoftIdentityConsentHandler();
+
+            //services.AddAuthentication(AzureADB2CDefaults.AuthenticationScheme).AddAzureADB2C(options => Configuration.Bind("AzureAdB2C", options));
+            //services.AddMicrosoftWebApiAuthentication();
+            //services.AddAzureADB2CBearer(options => Configuration.Bind("AzureAdB2C", options));
+            //****Azure B2C****//
+
             services.AddResponseCompression(opts =>
             {
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
@@ -56,47 +83,11 @@ namespace territory_lords
             //inject our in memory DB/game cache
             services.AddSingleton<GameBoardCache>();
 
-            // ******
-            // BLAZOR COOKIE Auth Code (begin)
-            //services.Configure<CookiePolicyOptions>(options =>
-            //{
-            //    options.CheckConsentNeeded = context => true;
-            //    options.MinimumSameSitePolicy = SameSiteMode.None;
-            //});
-            //services.AddAuthentication(
-            //    CookieAuthenticationDefaults.AuthenticationScheme)
-            //    .AddCookie();
-            // BLAZOR COOKIE Auth Code (end)
-            // ******
-            // BLAZOR COOKIE Auth Code (begin)
-            // From: https://github.com/aspnet/Blazor/issues/1554
-            // HttpContextAccessor
-            //services.AddHttpContextAccessor();
-            //services.AddScoped<HttpContextAccessor>();
-            //services.AddHttpClient();
-            //services.AddScoped<HttpClient>();
-            // BLAZOR COOKIE Auth Code (end)
-            // ******
-
-
-            //****Azure B2C****//
-            services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-                    .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAdB2C"));
-
-            services.AddControllersWithViews()
-                    .AddMicrosoftIdentityUI();
-
-            services.AddAuthorization(options =>
-            {
-                // By default, all incoming requests will be authorized according to the default policy
-                options.FallbackPolicy = options.DefaultPolicy;
-            });
-
-            services.AddServerSideBlazor()
-                    .AddMicrosoftIdentityConsentHandler();
-            //****Azure B2C****//
-
+            services.AddHttpClient();
+            services.AddScoped<TokenProvider>();
             services.AddMudServices();
+
+            services.AddHttpContextAccessor();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -122,12 +113,7 @@ namespace territory_lords
             app.UseAuthentication();
             app.UseAuthorization();
 
-            // ******
-            // BLAZOR COOKIE Auth Code (begin)
-            //app.UseCookiePolicy();
-            //app.UseAuthentication();
-            // BLAZOR COOKIE Auth Code (end)
-            // ******
+
             app.UseEndpoints(endpoints =>
             {
 
