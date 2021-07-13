@@ -61,11 +61,12 @@
 
         hubConnection.On<ChatMessage>("ReceiveMessage", (message) =>
         {
-            //I'm not sure I like how this is handled
-            message.Mine = false;//we're assuming any message coming in from the hub isn't ours
-            ChatMessages.Add(message);
+        //I'm not sure I like how this is handled
+        message.Mine = false;//we're assuming any message coming in from the hub isn't ours
+        ChatMessages.Add(message);
             StateHasChanged();
         });
+
 
         await hubConnection.StartAsync();
 
