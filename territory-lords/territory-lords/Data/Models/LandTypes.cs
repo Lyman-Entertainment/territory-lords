@@ -16,6 +16,7 @@ namespace territory_lords.Data.Models
         Mountain = 6
     }
 
+    //this is only for a bit. Need to create an algo to make an actual world rather than just random tiles
     public static class LandTypeFacotry
     {
         public static LandType GetRandomLandType()
