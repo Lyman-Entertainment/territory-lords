@@ -14,7 +14,7 @@ namespace territory_lords.Hubs
 
         public GameHub()
         {
-
+            //what should go in a ctor of a hub?
         }
         public async Task SendTileUpdate(string gameBoardId,string serializedGameTile)
         {
