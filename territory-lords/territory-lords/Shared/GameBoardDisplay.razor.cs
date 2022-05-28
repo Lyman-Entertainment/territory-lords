@@ -22,8 +22,13 @@ namespace territory_lords.Shared
         private HubConnection gameHubConnection;
         private territory_lords.Data.Models.Units.IUnit PlayerActiveUnit = null;
 
+        /// <summary>
+        /// What do to when we initialze this page
+        /// </summary>
+        /// <returns></returns>
         protected override async Task OnInitializedAsync()
         {
+            //build a connection to the game hub
             gameHubConnection = new HubConnectionBuilder()
                 .WithUrl(
                     NavigationManager.ToAbsoluteUri("/gamehub"),
@@ -31,6 +36,7 @@ namespace territory_lords.Shared
                 .WithAutomaticReconnect()
                 .Build();
 
+            //What do to when the TileUpdate event comes in
             gameHubConnection.On<string, string>("TileUpdate", (gameBoardId, serializedGameTile) =>
             {
                 if (gameBoardId == gameBoard.GameBoardId)
@@ -48,6 +54,7 @@ namespace territory_lords.Shared
 
             });
 
+            //try and actually connect the connection to the game hub
             try
             {
 
@@ -63,6 +70,7 @@ namespace territory_lords.Shared
             }
         }
 
+        //send a Tile Update event
         private void SendTileUpdate(GameTile gameTile)
         {
             gameHubConnection.SendAsync("SendTileUpdate", gameBoard.GameBoardId, gameTile.ToJson());
@@ -72,6 +80,10 @@ namespace territory_lords.Shared
             gameHubConnection.State == HubConnectionState.Connected;
 
         //At some point I think this should be handled by a game manager or something
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="gameTile"></param>
         private void HandleGameBoardSquareClick(GameTile gameTile)
         {
             if (gameTile.LandType == LandType.Ocean)
@@ -90,9 +102,11 @@ namespace territory_lords.Shared
                     var localUnit = gameTile.Unit;
                     localUnit.ColumnIndex = gameTile.ColumnIndex;
                     localUnit.RowIndex = gameTile.RowIndex;
-                    //check for if players unit so we don't do stuff to other players units
 
-                    if (PlayerActiveUnit != null && (localUnit.ColumnIndex != PlayerActiveUnit?.ColumnIndex || localUnit.RowIndex != PlayerActiveUnit?.RowIndex))
+                    //see if they clicked on a different unit than the active unit so we can make the current active unit stop being currently active
+                    if (PlayerActiveUnit != null && 
+                        (localUnit.ColumnIndex != PlayerActiveUnit?.ColumnIndex 
+                        || localUnit.RowIndex != PlayerActiveUnit?.RowIndex))
                     {
                         //the user clicked on a different unit so unset the old active
                         PlayerActiveUnit.Active = false;
