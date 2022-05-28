@@ -12,7 +12,8 @@ namespace territory_lords.Data.Models
         public string GameBoardId { get; set; }
         public int RowCount { get; set; }
         public int ColumnCount { get; set; }
-        public GameTile[,] Board {get;set;}
+        public GameTile[,] Board { get; set; }
+        public List<Player> Players { get; set; }
 
         public GameBoard(string gameBoardId, int rows = 15, int columns = 15)
         {
@@ -20,36 +21,48 @@ namespace territory_lords.Data.Models
             RowCount = rows;
             ColumnCount = columns;
             Board = new GameTile[rows, columns];
+
+            //for now do this
+            Players = new List<Player> {
+                new Player { Id = new Guid("2a35f57a-b83a-4f70-9a38-0755c7540721"),Name = "KHL-Y",Color = "dodgerblue", BorderColor = "deepblue"},
+                new Player { Id = new Guid("e3428b1c-343e-4008-aac5-f84fcea54088"),Name = "KHL-Y",Color = "pink", BorderColor = "deeppink" }
+            };
             InitBoard();
         }
 
         private void InitBoard()
         {
-            
-            for(int r = 0; r < this.RowCount; r++)
+
+            for (int r = 0; r < this.RowCount; r++)
             {
-                for(int c = 0; c < this.ColumnCount; c++)
+                for (int c = 0; c < this.ColumnCount; c++)
                 {
                     LandType tileLandType = LandType.Ocean;
 
                     //we want a 1 game tile ocean boarder around the whole thing so land never reaches and edge
                     //find a better way to do this check. This is fine for now
-                    if(!(r == 0 || r == this.RowCount - 1 || c == 0 || c == this.ColumnCount - 1))
+                    if (!(r == 0 || r == this.RowCount - 1 || c == 0 || c == this.ColumnCount - 1))
                     {
                         tileLandType = LandTypeFacotry.GetRandomLandType();
                     }
 
-                    GameTile gameSquare = Board[r, c] = new GameTile {
+                    GameTile gameSquare = Board[r, c] = new GameTile
+                    {
                         Color = ""
-                        , LandType = tileLandType
-                        , Improvement = "castle"
-                        , Unit = GetRandomUnitType()
-                        , RowIndex = r
-                        , ColumnIndex = c
+                        ,
+                        LandType = tileLandType
+                        ,
+                        Improvement = "castle"
+                        ,
+                        Unit = GetRandomUnitType()
+                        ,
+                        RowIndex = r
+                        ,
+                        ColumnIndex = c
                     };
 
                     //no units in the ocean for now
-                    if(Board[r,c].LandType == LandType.Ocean)
+                    if (Board[r, c].LandType == LandType.Ocean)
                     {
                         Board[r, c].Unit = null;
                     }
@@ -64,7 +77,7 @@ namespace territory_lords.Data.Models
         /// <param name="rowIndex"></param>
         /// <param name="columnIndex"></param>
         /// <returns>GameTile object. Null if one doesn't exist</returns>
-        public GameTile GetGameTileAtIndex(int rowIndex, int columnIndex)
+        public GameTile? GetGameTileAtIndex(int rowIndex, int columnIndex)
         {
             //we're outside the board bounds
             if (rowIndex < 0 || columnIndex < 0 || rowIndex > RowCount - 1 || columnIndex > ColumnCount - 1)
@@ -148,18 +161,23 @@ namespace territory_lords.Data.Models
         /// Just a silly "random" unit generator for now. Just testing purposes
         /// </summary>
         /// <returns></returns>
-        private IUnit GetRandomUnitType()
+        private IUnit? GetRandomUnitType()
         {
-            var rnd = new Random().Next(40); 
+            
+            var rnd = new Random().Next(40);
+
+            //grab one of the players
+            var tempPlayer = rnd % 2 == 0 ? Players[0] : Players[1]; 
             var unitList = new List<IUnit> {
-                new Malitia()
-                ,new Phalanx()
-                ,new Legion()
-                ,new Calvary()
-                ,new Chariot()
+                new Malitia(tempPlayer)
+                ,new Phalanx(tempPlayer)
+                ,new Legion(tempPlayer)
+                ,new Calvary(tempPlayer)
+                ,new Chariot(tempPlayer)
             };
 
-            if(rnd < unitList.Count)
+            //a chinsy way to only put units on some of the tiles since there are only 5 unit types but our random goes to 40. That's 5/40 or ~1 out of every 8 that will have a unit
+            if (rnd < unitList.Count)
             {
                 return unitList[rnd];
             }

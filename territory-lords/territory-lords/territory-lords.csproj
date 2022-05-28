@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+	  <Nullable>enable</Nullable>
     <RootNamespace>territory_lords</RootNamespace>
 	  <UserSecretsId>aspnet-territorylords-123456789</UserSecretsId>
   </PropertyGroup>

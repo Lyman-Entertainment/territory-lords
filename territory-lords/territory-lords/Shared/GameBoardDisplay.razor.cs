@@ -20,7 +20,7 @@ namespace territory_lords.Shared
         public GameBoard gameBoard { get; set; }
 
         private HubConnection gameHubConnection;
-        private territory_lords.Data.Models.Units.IUnit PlayerActiveUnit = null;
+        private territory_lords.Data.Models.Units.IUnit? PlayerActiveUnit = null;
 
         /// <summary>
         /// What do to when we initialze this page
@@ -44,7 +44,7 @@ namespace territory_lords.Shared
                     GameTile gameTile = JsonConvert.DeserializeObject<GameTile>(serializedGameTile,new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
                     
                     //we don't want to display the other players active units so if there is a unit in here set it's active state to false
-                    if(gameTile.Unit != null)
+                    if(gameTile?.Unit != null)
                     {
                         gameTile.Unit.Active = false;
                     }
@@ -93,7 +93,7 @@ namespace territory_lords.Shared
             else
             {
                 var rnd = new Random();
-                gameTile.Color = Colors[rnd.Next(1, Colors.Count + 1)];
+                //gameTile.Color = Colors[rnd.Next(1, Colors.Count + 1)];
 
                 //there's got to be a better way to do this than all these if statements
                 //if there is a unit on this tile select it as active
@@ -239,7 +239,7 @@ namespace territory_lords.Shared
             return gameTile.LandType.ToString("G");
         }
 
-
+        //old color list for marking tile border color
         public Dictionary<int, string> Colors = new Dictionary<int, string> { { 1, "Orange" }, { 2, "Cyan" }, { 3, "Red" }, { 4, "Chartreuse" }, { 5, "DeepPink" } };
 
         public async ValueTask DisposeAsync()

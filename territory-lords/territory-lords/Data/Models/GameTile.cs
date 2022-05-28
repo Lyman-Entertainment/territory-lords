@@ -10,11 +10,13 @@ namespace territory_lords.Data.Models
     public class GameTile
     {
         public int RowIndex { get; set; }
-        public int ColumnIndex { get; set; }    
-        public string Color { get; set; }
+        public int ColumnIndex { get; set; }
+        [Obsolete("Player property will contain color")]
+        public string Color { get; set; } = default!;
         public LandType LandType { get; set; }
-        public string Improvement { get; set; }
-        public IUnit Unit { get; set; }
+        public string Improvement { get; set; } = default!;
+        public IUnit? Unit { get; set; }
+        public Player? OwningPlayer { get; set; }
 
         public string ToJson()
         {

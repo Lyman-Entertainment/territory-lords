@@ -9,15 +9,17 @@
                 {
                     GameTile gameTile = gameBoard.Board[r, c];
                     var shadowColor = "";
-                    if (gameTile.Color.Length > 0)
+                    if (gameTile.OwningPlayer != null)
                     {
-                        shadowColor = $"box-shadow: inset 0 0 5px 2px {gameTile.Color};";
+                        shadowColor = $"box-shadow: inset 0 0 5px 2px {gameTile.OwningPlayer.Color};";
                     }
                     <div class="game-board-tile @GetCorrectBackgroundCSSClass(gameTile)" style="@shadowColor" @onclick="() => HandleGameBoardSquareClick(gameTile)">
                         @if(gameTile.Unit != null)
                         {
-                        <div class="Unit  @(gameTile.Unit.Active ? "Active" : "")">
-                            <img class ="@(gameTile.Unit.GetType().Name)" src="/Images/Layer2Sprite.png"/>
+                            var unitcolor = $"background-color: {gameTile.Unit.OwningPlayer!.Color}; border-color:{gameTile.Unit.OwningPlayer!.BorderColor}";
+                            
+                            <div class="Unit  @(gameTile.Unit.Active ? "Active" : "")">
+                            <img class ="@(gameTile.Unit.GetType().Name)" style="@unitcolor" src="/Images/Layer2Sprite.png"/>
                         </div>
                         }
                     </div>
@@ -26,9 +28,3 @@
         }
     </div>
 </div>
-
-
-
-
-
-
