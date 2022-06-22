@@ -14,7 +14,7 @@ namespace territory_lords.Data.Cache
     public class GameBoardCache : IGameBoardCache
     {
         
-        private Dictionary<string, string> _gameCache;
+        private readonly Dictionary<string, string> _gameCache;
         public GameBoardCache()
         {
             _gameCache = new Dictionary<string, string>();

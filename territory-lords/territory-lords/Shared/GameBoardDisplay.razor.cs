@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 using Newtonsoft.Json;
 using System;
@@ -11,35 +12,42 @@ using territory_lords.Data.Models;
 
 namespace territory_lords.Shared
 {
+    //This needs to be refactored and lots of stuff needs to be pulled out. The job of Game Board Display should be to display, not handle click events and hub connections
     public partial class GameBoardDisplay : IAsyncDisposable
     {
         [Inject] NavigationManager NavigationManager { get; set; }
         [Inject] GameBoardCache BoardCache { get; set; }
+        [Inject] AuthenticationStateProvider AuthStateProvider { get; set; }
 
         [Parameter]
-        public GameBoard gameBoard { get; set; }
+        public GameBoard TheGameBoard { get; set; }
 
-        private HubConnection gameHubConnection;
+        private HubConnection GameHubConnection;
         private territory_lords.Data.Models.Units.IUnit? PlayerActiveUnit = null;
-
-        /// <summary>
-        /// What do to when we initialze this page
-        /// </summary>
-        /// <returns></returns>
+        private Guid? CurrentPlayerGuid = default;
+ 
         protected override async Task OnInitializedAsync()
         {
+            var authUser = (await AuthStateProvider.GetAuthenticationStateAsync()).User;
+            var possibleGuidString = authUser.FindFirst(c => c.Type.Contains("objectidentifier"))?.Value;
+            if(possibleGuidString != null)
+            {
+                CurrentPlayerGuid = new Guid(possibleGuidString);
+            }
+            
+
             //build a connection to the game hub
-            gameHubConnection = new HubConnectionBuilder()
+            GameHubConnection = new HubConnectionBuilder()
                 .WithUrl(
                     NavigationManager.ToAbsoluteUri("/gamehub"),
                     config => config.UseDefaultCredentials = true)
                 .WithAutomaticReconnect()
                 .Build();
 
-            //What do to when the TileUpdate event comes in
-            gameHubConnection.On<string, string>("TileUpdate", (gameBoardId, serializedGameTile) =>
+            //What to do when the TileUpdate event comes in
+            GameHubConnection.On<string, string>("TileUpdate", (gameBoardId, serializedGameTile) =>
             {
-                if (gameBoardId == gameBoard.GameBoardId)
+                if (gameBoardId == TheGameBoard.GameBoardId)
                 {
                     GameTile gameTile = JsonConvert.DeserializeObject<GameTile>(serializedGameTile,new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
                     
@@ -48,7 +56,7 @@ namespace territory_lords.Shared
                     {
                         gameTile.Unit.Active = false;
                     }
-                    gameBoard.Board[gameTile.RowIndex, gameTile.ColumnIndex] = gameTile;
+                    TheGameBoard.Board[gameTile.RowIndex, gameTile.ColumnIndex] = gameTile;
                     StateHasChanged();
                 }
 
@@ -58,7 +66,7 @@ namespace territory_lords.Shared
             try
             {
 
-                await gameHubConnection.StartAsync();
+                await GameHubConnection.StartAsync();
             }
             catch (Exception ex)
             {
@@ -66,55 +74,95 @@ namespace territory_lords.Shared
                 
             }finally
             {
-                var g = gameHubConnection;
+                var g = GameHubConnection;
             }
         }
 
         //send a Tile Update event
         private void SendTileUpdate(GameTile gameTile)
         {
-            gameHubConnection.SendAsync("SendTileUpdate", gameBoard.GameBoardId, gameTile.ToJson());
+            GameHubConnection.SendAsync("SendTileUpdate", TheGameBoard.GameBoardId, gameTile.ToJson());
         }
 
         public bool IsConnected =>
-            gameHubConnection.State == HubConnectionState.Connected;
+            GameHubConnection.State == HubConnectionState.Connected;
 
         //At some point I think this should be handled by a game manager or something
         /// <summary>
-        /// 
+        /// Figure out what happens when a player clicks a tile
         /// </summary>
         /// <param name="gameTile"></param>
         private void HandleGameBoardSquareClick(GameTile gameTile)
         {
+            //there's got to be a better way to do this than all these if statements
+
             if (gameTile.LandType == LandType.Ocean)
             {
                 //don't do anything now. You can't do anything with ocean tiles yet
             }
             else
             {
-                var rnd = new Random();
-                //gameTile.Color = Colors[rnd.Next(1, Colors.Count + 1)];
-
-                //there's got to be a better way to do this than all these if statements
-                //if there is a unit on this tile select it as active
+               
+                //if there is a unit on this tile we need to figure out if it's the player's unit to select it as active or an enemy unit the player is attacking
                 if(gameTile.Unit != null)
                 {
+                    
                     var localUnit = gameTile.Unit;
                     localUnit.ColumnIndex = gameTile.ColumnIndex;
                     localUnit.RowIndex = gameTile.RowIndex;
 
-                    //see if they clicked on a different unit than the active unit so we can make the current active unit stop being currently active
-                    if (PlayerActiveUnit != null && 
-                        (localUnit.ColumnIndex != PlayerActiveUnit?.ColumnIndex 
-                        || localUnit.RowIndex != PlayerActiveUnit?.RowIndex))
+                    //this is their own unit
+                    if (gameTile.Unit.OwningPlayer?.Id == CurrentPlayerGuid)
                     {
-                        //the user clicked on a different unit so unset the old active
-                        PlayerActiveUnit.Active = false;
+                        //all we need to do is switch the active flag on the localUnit and either set or null out the ActiveUnit
+
+                        //see if they clicked on a different unit than the active unit so we can make the current active unit stop being currently active
+                        if (PlayerActiveUnit != null &&
+                            (localUnit.ColumnIndex != PlayerActiveUnit?.ColumnIndex
+                            || localUnit.RowIndex != PlayerActiveUnit?.RowIndex))
+                        {
+                            //the user clicked on a different unit so unset the old active
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+                            PlayerActiveUnit.Active = false;
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+                        }
+
+                        localUnit.Active = !localUnit.Active;
+                        PlayerActiveUnit = localUnit.Active ? localUnit : null;
+                    }
+                    else//this is not their own unit
+                    {
+                        //for right now we don't care if the unit is in range
+                        //TODO: make sure the unit can move here
+                        if (PlayerActiveUnit != null)
+                        {
+                            //this is the EXACT same code as moving a unit
+                            //TODO: Make moving a unit a method to call
+                            //clear the unit at the old coordinates
+                            GameTile? oldTile = TheGameBoard.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex);
+                            if (oldTile != null)
+                            {
+                                oldTile.Unit = null;
+                                //send an update to everyone
+                                SendTileUpdate(oldTile);
+                                //gameBoard.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex).Unit = null;
+                            }
+
+                            //update the unit to be in the new place
+                            gameTile.Unit = PlayerActiveUnit;
+                            gameTile.Unit.ColumnIndex = gameTile.ColumnIndex;
+                            gameTile.Unit.RowIndex = gameTile.RowIndex;
+                            gameTile.Unit.Active = false;
+
+                            //then set the active unit to be nothing because we just moved a unit
+                            PlayerActiveUnit = null;
+                        }
+                            
                     }
 
-                    //set the class to be active
-                    localUnit.Active = !localUnit.Active;
-                    PlayerActiveUnit = localUnit.Active ? localUnit : null;
+                    
+
+                    
                 }
                 else //this is an empty tile that they might be moving a unit to
                 {
@@ -122,11 +170,14 @@ namespace territory_lords.Shared
                     if (PlayerActiveUnit != null)
                     {
                         //clear the unit at the old coordinates
-                        GameTile oldTile = gameBoard.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex);
-                        oldTile.Unit = null;
-                        //send an update to everyone
-                        SendTileUpdate(oldTile);
-                        //gameBoard.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex).Unit = null;
+                        GameTile? oldTile = TheGameBoard.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex);
+                        if (oldTile != null)
+                        {
+                            oldTile.Unit = null;
+                            //send an update to everyone
+                            SendTileUpdate(oldTile);
+                            //gameBoard.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex).Unit = null;
+                        }
 
                         //update the unit to be in the new place
                         gameTile.Unit = PlayerActiveUnit;
@@ -142,7 +193,8 @@ namespace territory_lords.Shared
                 
             }
 
-            BoardCache.UpdateGameCache(gameBoard);
+            //update the game board cache
+            BoardCache.UpdateGameCache(TheGameBoard);
 
             //What are ya silly? I'm still gonna send it
             SendTileUpdate(gameTile);
@@ -162,7 +214,7 @@ namespace territory_lords.Shared
             if (gameTile.LandType == LandType.Ocean)
             {
                 //figure out what's around us so we can act accordingly and not look wierd to everyone. Keep it together Kevin!
-                var directNeighbors = gameBoard.GetGameTileDirectNeighbors(gameTile);
+                var directNeighbors = TheGameBoard.GetGameTileDirectNeighbors(gameTile);
 
                 //if all of the direct neighbors are ocean then this is ocean too
                 if ((directNeighbors[0] == null || directNeighbors[0].LandType == LandType.Ocean) && (directNeighbors[1] == null || directNeighbors[1].LandType == LandType.Ocean) && (directNeighbors[2] == null || directNeighbors[2].LandType == LandType.Ocean) && (directNeighbors[3] == null || directNeighbors[3].LandType == LandType.Ocean))
@@ -244,7 +296,7 @@ namespace territory_lords.Shared
 
         public async ValueTask DisposeAsync()
         {
-            await gameHubConnection.DisposeAsync();
+            await GameHubConnection.DisposeAsync();
         }
     }
 }

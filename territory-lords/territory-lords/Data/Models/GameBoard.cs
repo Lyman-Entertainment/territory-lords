@@ -25,7 +25,7 @@ namespace territory_lords.Data.Models
             //for now do this
             Players = new List<Player> {
                 new Player { Id = new Guid("2a35f57a-b83a-4f70-9a38-0755c7540721"),Name = "KHL-Y",Color = "dodgerblue", BorderColor = "deepblue"},
-                new Player { Id = new Guid("e3428b1c-343e-4008-aac5-f84fcea54088"),Name = "KHL-Y",Color = "pink", BorderColor = "deeppink" }
+                new Player { Id = new Guid("e3428b1c-343e-4008-aac5-f84fcea54088"),Name = "KHL-G",Color = "pink", BorderColor = "deeppink" }
             };
             InitBoard();
         }
@@ -46,25 +46,33 @@ namespace territory_lords.Data.Models
                         tileLandType = LandTypeFacotry.GetRandomLandType();
                     }
 
+                    //fill with some bogus player owned tiles
+                    Player? fillPlayerForNow = null;
+                    if (r >= 6 && r <= 8 && c >= 6 && c <= 8)
+                    {
+                        fillPlayerForNow = Players[0];
+                    }
+                    //this some Capture stuff right here.
+                    if (r >= 1 && r <= 3 && c >= 1 && c <= 3)
+                    {
+                        fillPlayerForNow = Players[1];
+                    }
+
                     GameTile gameSquare = Board[r, c] = new GameTile
                     {
-                        Color = ""
-                        ,
-                        LandType = tileLandType
-                        ,
-                        Improvement = "castle"
-                        ,
-                        Unit = GetRandomUnitType()
-                        ,
-                        RowIndex = r
-                        ,
+                        OwningPlayer = fillPlayerForNow,
+                        LandType = tileLandType,
+                        Improvement = "castle",
+                        Unit = GetRandomUnitType(),
+                        RowIndex = r,
                         ColumnIndex = c
                     };
 
-                    //no units in the ocean for now
+                    //no units in the ocean or players owning the ocean for now
                     if (Board[r, c].LandType == LandType.Ocean)
                     {
                         Board[r, c].Unit = null;
+                        Board[r, c].OwningPlayer = null;
                     }
                 }
             }
@@ -156,6 +164,8 @@ namespace territory_lords.Data.Models
         {
             return JsonConvert.SerializeObject(this, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
         }
+
+         
 
         /// <summary>
         /// Just a silly "random" unit generator for now. Just testing purposes

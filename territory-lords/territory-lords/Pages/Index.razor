@@ -38,7 +38,7 @@
 
 @code {
 
-    private HubConnection hubConnection;
+    private HubConnection HubConnection;
     private List<ChatMessage> ChatMessages = new List<ChatMessage>();
     private string userName;
     private string messageInput;
@@ -46,7 +46,7 @@
     protected override async Task OnInitializedAsync()
     {
 
-        hubConnection = new HubConnectionBuilder()
+        HubConnection = new HubConnectionBuilder()
     .WithUrl(
             NavigationManager.ToAbsoluteUri("/chathub"), options =>
             {
@@ -59,7 +59,7 @@
     .Build();
 
 
-        hubConnection.On<ChatMessage>("ReceiveMessage", (message) =>
+        HubConnection.On<ChatMessage>("ReceiveMessage", (message) =>
         {
         //I'm not sure I like how this is handled
         message.Mine = false;//we're assuming any message coming in from the hub isn't ours
@@ -68,7 +68,7 @@
         });
 
 
-        await hubConnection.StartAsync();
+        await HubConnection.StartAsync();
 
     }
 
@@ -84,7 +84,7 @@
             ,
             Mine = true
         };
-        await hubConnection.SendAsync("SendMessage", chatMessage);
+        await HubConnection.SendAsync("SendMessage", chatMessage);
         ChatMessages.Add(chatMessage);
         ClearMessageInput();
 
@@ -92,11 +92,11 @@
 
 
     public bool IsConnected =>
-        hubConnection.State == HubConnectionState.Connected;
+        HubConnection.State == HubConnectionState.Connected;
 
     public async ValueTask DisposeAsync()
     {
-        await hubConnection.DisposeAsync();
+        await HubConnection.DisposeAsync();
     }
 
     private void ClearMessageInput()

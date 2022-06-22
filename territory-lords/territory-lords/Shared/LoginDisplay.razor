@@ -11,7 +11,16 @@
         else
         {
             <text>Hello, @context.User.Identity.Name!</text>
-            
+@*            <ul>
+            @foreach (var claim in context.User.Claims)
+            {
+                <li><span>Actor</span>@claim.Subject?.Actor</li>
+                <li><span>Label</span>@claim.Subject?.Label</li>
+                <li><span>Name</span>@claim.Subject?.Name</li>
+                <li><span>Type</span>@claim.Type</li>
+                <li><span>Value</span>@claim.Value</li>
+            }
+            </ul>*@
         }
         <br/>
         <a href="MicrosoftIdentity/Account/SignOut">Log out</a>

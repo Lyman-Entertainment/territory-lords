@@ -2,12 +2,12 @@
 
 <div id="BoardWrapper">
     <div id="BoardContainer">
-        @for (int r = 0; r < gameBoard.RowCount; r++)
+        @for (int r = 0; r < TheGameBoard.RowCount; r++)
         {
             <div class="game-board-row">
-                @for (int c = 0; c < gameBoard.ColumnCount; c++)
+                @for (int c = 0; c < TheGameBoard.ColumnCount; c++)
                 {
-                    GameTile gameTile = gameBoard.Board[r, c];
+                    GameTile gameTile = TheGameBoard.Board[r, c];
                     var shadowColor = "";
                     if (gameTile.OwningPlayer != null)
                     {
