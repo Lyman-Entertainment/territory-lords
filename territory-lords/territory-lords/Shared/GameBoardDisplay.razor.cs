@@ -122,9 +122,7 @@ namespace territory_lords.Shared
                             || localUnit.RowIndex != PlayerActiveUnit?.RowIndex))
                         {
                             //the user clicked on a different unit so unset the old active
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
                             PlayerActiveUnit.Active = false;
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
                         }
 
                         localUnit.Active = !localUnit.Active;

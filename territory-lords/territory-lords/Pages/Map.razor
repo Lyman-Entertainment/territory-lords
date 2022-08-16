@@ -6,7 +6,7 @@
 @inject GameBoardCache BoardCache
 @attribute [Authorize]
 
-<h1>Div layout of gameboard</h1>
+<h1>Game @GameBoardId</h1>
 <NavLink class="nav-link" href="@GetRandomGameBoardIdURL()">
     <span class="oi " aria-hidden="true"></span> New Map
 </NavLink>
@@ -33,7 +33,7 @@
 
     private string GetRandomGameBoardIdURL()
     {
-        return $"Map/{GetRandomNumberBetween(1, 11)}";
+        return $"Map/{GetRandomNumberBetween(1, 100)}";
     }
 
     /// <summary>

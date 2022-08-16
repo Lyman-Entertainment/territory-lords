@@ -9,6 +9,7 @@ namespace territory_lords.Data.Models
 {
     public class GameBoard
     {
+        //These should probably be private with some accessors
         public string GameBoardId { get; set; }
         public int RowCount { get; set; }
         public int ColumnCount { get; set; }
@@ -17,8 +18,12 @@ namespace territory_lords.Data.Models
 
         public GameBoard(string gameBoardId, int rows = 15, int columns = 15)
         {
+            //because there is a border of 1 ocean around everything we need to actually make the incoming rows and columns bigger by 2 to make that border
+            rows = rows + 2;
+            columns = columns + 2;
+
             GameBoardId = gameBoardId;
-            RowCount = rows;
+            RowCount = rows;//do we need this, can't this be figured out by getting the length of the different directions of the Board?
             ColumnCount = columns;
             Board = new GameTile[rows, columns];
 
@@ -32,7 +37,6 @@ namespace territory_lords.Data.Models
 
         private void InitBoard()
         {
-
             for (int r = 0; r < this.RowCount; r++)
             {
                 for (int c = 0; c < this.ColumnCount; c++)

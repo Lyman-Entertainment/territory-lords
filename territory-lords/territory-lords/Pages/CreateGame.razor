@@ -1,0 +1,82 @@
+﻿@page "/creategame"
+@using territory_lords.Data.Cache;
+@inject NavigationManager NavManager
+@inject GameBoardCache BoardCache
+
+<h3>CreateGame</h3>
+@if(ShowError)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Filled">@string.Join(";", errorMessages)</MudAlert>
+}
+
+<form @onsubmit="BuildGame">
+    <div class="form-group">
+        <label>Game Id:</label>
+        <input @bind="GameId" size="100" pattern="^[a-zA-Z0-9_]{1,100}$" minlength="1"/>
+    </div>
+    <div class="form-group">
+        <label>Game Board Size:</label>
+        <label>Columns:</label>
+        <input @bind="Columns" type="number" min="@minColumnRows" max="@maxColumnRows" />
+        <label>Rows:</label>
+        <input @bind="Rows"  type="number" min="@minColumnRows" max="@maxColumnRows"  />
+    </div>
+    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Create" Color="Color.Primary" ButtonType="ButtonType.Submit">Create Game</MudButton>
+    <div>@GameId</div>
+</form>
+
+@code {
+    private string GameId = "";
+    private byte Columns;
+    private byte Rows;
+    private bool ShowError = false;
+    private readonly byte minColumnRows = 3;
+    private readonly byte maxColumnRows = 25;
+    private List<string> errorMessages = new List<string>();
+
+
+    private async Task BuildGame()
+    {
+        //need to reset showError at beginning
+        ShowError = false;
+
+        //make sure the inputs are valid to build a game board
+        if (Columns < minColumnRows || Columns > maxColumnRows)
+        {
+            ShowError = true;
+            errorMessages.Add($"Columns falls outside of range {minColumnRows} - {maxColumnRows}");
+        }
+
+        if (Rows < minColumnRows || Rows > maxColumnRows)
+        {
+            ShowError = true;
+            errorMessages.Add($"Rows falls outside of range {minColumnRows} - {maxColumnRows}");
+        }
+
+        if (string.IsNullOrWhiteSpace(GameId))
+        {
+            ShowError = true;
+            errorMessages.Add($"GameId cannot be blank");
+        }
+
+        //see if there is already a game at that address
+        if (BoardCache.GetGameBoard(GameId) != null)
+        {
+            ShowError = true;
+            errorMessages.Add($"There is already a Game with the Id of {GameId}");
+        }
+
+        if (ShowError)
+            return;
+
+
+        //create the game and save it
+        var TheGameBoard = new GameBoard(GameId, Rows, Columns);
+        BoardCache.UpdateGameCache(TheGameBoard);
+
+        //redirect the player to the game address
+        NavManager.NavigateTo($"/Map/{GameId}");
+
+    }
+}
+

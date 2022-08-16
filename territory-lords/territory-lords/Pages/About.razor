@@ -5,19 +5,15 @@
 @inject IHttpContextAccessor httpContextAccessor
 @inject NavigationManager NavManager
 
-<h3>About</h3>
+<h1>About</h1>
 
-<div>
-    @access_token
-</div>
-This is the about page.
+
+<section>
+    <h2>Inspiration</h2>
+    <p>
+        I played the Civilization game from the 90's a lot growing up. I wanted to learn Blazor Server so I thought why not use it as a chance to learn and doing something crazy and fun.
+    </p>
+</section>
 @code {
-    public string access_token { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        //access_token = await HttpContext.GetTokenAsync("access_token");
-        var headers = httpContextAccessor.HttpContext.Request.Headers;
-        access_token = httpContextAccessor.HttpContext.Request.Headers["access_token"];
-    }
 }
