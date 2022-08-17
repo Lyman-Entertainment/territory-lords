@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using territory_lords.Data.Cache;
 using territory_lords.Data.Models;
-
+using territory_lords.Data.Models.Units;
 
 namespace territory_lords.Shared
 {
@@ -23,7 +23,7 @@ namespace territory_lords.Shared
         public GameBoard TheGameBoard { get; set; }
 
         private HubConnection GameHubConnection;
-        private territory_lords.Data.Models.Units.IUnit? PlayerActiveUnit = null;
+        private IUnit? PlayerActiveUnit = null;
         private Guid? CurrentPlayerGuid = default;
  
         protected override async Task OnInitializedAsync()
@@ -47,15 +47,26 @@ namespace territory_lords.Shared
             //What to do when the TileUpdate event comes in
             GameHubConnection.On<string, string>("TileUpdate", (gameBoardId, serializedGameTile) =>
             {
+                //TODO need to find a way that other games messages won't even come here. Still should probably make sure the gameID matches, but if there are 100 games going that's going to be a lot of messages that don't pertain to this game
                 if (gameBoardId == TheGameBoard.GameBoardId)
                 {
                     GameTile gameTile = JsonConvert.DeserializeObject<GameTile>(serializedGameTile,new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
                     
-                    //we don't want to display the other players active units so if there is a unit in here set it's active state to false
-                    if(gameTile?.Unit != null)
+                    
+                    if (gameTile?.Unit != null)
                     {
+                        //we don't want to display the other players active units so if there is a unit in here set it's active state to false
                         gameTile.Unit.Active = false;
+
+                        //we need to set the Active Unit to nothing if the other player moved their unit onto our active unit
+                        if (gameTile.Unit.ColumnIndex == PlayerActiveUnit?.ColumnIndex
+                        && gameTile.Unit.RowIndex == PlayerActiveUnit?.RowIndex)
+                        {
+                            PlayerActiveUnit = null;
+                        }
                     }
+                    
+
                     TheGameBoard.Board[gameTile.RowIndex, gameTile.ColumnIndex] = gameTile;
                     StateHasChanged();
                 }
@@ -91,12 +102,12 @@ namespace territory_lords.Shared
         /// <summary>
         /// Figure out what happens when a player clicks a tile
         /// </summary>
-        /// <param name="gameTile"></param>
-        private void HandleGameBoardSquareClick(GameTile gameTile)
+        /// <param name="selectedGameTile"></param>
+        private void HandleGameBoardSquareClick(GameTile selectedGameTile)
         {
             //there's got to be a better way to do this than all these if statements
 
-            if (gameTile.LandType == LandType.Ocean)
+            if (selectedGameTile.LandType == LandType.Ocean)
             {
                 //don't do anything now. You can't do anything with ocean tiles yet
             }
@@ -104,29 +115,58 @@ namespace territory_lords.Shared
             {
                
                 //if there is a unit on this tile we need to figure out if it's the player's unit to select it as active or an enemy unit the player is attacking
-                if(gameTile.Unit != null)
+                if(selectedGameTile.Unit != null)
                 {
                     
-                    var localUnit = gameTile.Unit;
-                    localUnit.ColumnIndex = gameTile.ColumnIndex;
-                    localUnit.RowIndex = gameTile.RowIndex;
+                    var selectedUnit = selectedGameTile.Unit;
+                    //doesn't seem like we should need to do this but whatever for now it's fine
+                    selectedUnit.ColumnIndex = selectedGameTile.ColumnIndex;
+                    selectedUnit.RowIndex = selectedGameTile.RowIndex;
 
                     //this is their own unit
-                    if (gameTile.Unit.OwningPlayer?.Id == CurrentPlayerGuid)
+                    if (selectedUnit.OwningPlayer?.Id == CurrentPlayerGuid)
                     {
-                        //all we need to do is switch the active flag on the localUnit and either set or null out the ActiveUnit
+                        //there are 3 scenarios here.
+                        //1. they are selecting a unit to be active. Meaning there is no active unit
+                        //2. they are deselecting the active unit. Meaning they are clicking on the active unit
+                        //3. they have an active unit and are wanting the two units to switch places
 
-                        //see if they clicked on a different unit than the active unit so we can make the current active unit stop being currently active
-                        if (PlayerActiveUnit != null &&
-                            (localUnit.ColumnIndex != PlayerActiveUnit?.ColumnIndex
-                            || localUnit.RowIndex != PlayerActiveUnit?.RowIndex))
+                        if (PlayerActiveUnit == null)
                         {
-                            //the user clicked on a different unit so unset the old active
-                            PlayerActiveUnit.Active = false;
+                            //they are selecting a unit
+                            selectedUnit.Active = true;
+                            PlayerActiveUnit = selectedUnit;
                         }
+                        else if(PlayerActiveUnit.Equals(selectedUnit))
+                        {
+                            //they are de-selecting a unit
+                            selectedUnit.Active = false;
+                            PlayerActiveUnit = null;
+                        }
+                        else
+                        {
+                            //they are swapping the active unit and selected units positions
+                            //put the clicked on unit into the square where the active unit currently is
+                            GameTile? oldTile = TheGameBoard.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex);
+                            selectedUnit.ColumnIndex = PlayerActiveUnit.ColumnIndex;
+                            selectedUnit.RowIndex = PlayerActiveUnit.RowIndex; 
+                            selectedUnit.Active = false;//turn off active
 
-                        localUnit.Active = !localUnit.Active;
-                        PlayerActiveUnit = localUnit.Active ? localUnit : null;
+                            oldTile.Unit = selectedUnit;
+                            SendTileUpdate(oldTile);
+
+
+                            //now put the active unit into the clicked on square
+                            selectedGameTile.Unit = PlayerActiveUnit;
+                            selectedGameTile.Unit.ColumnIndex = selectedGameTile.ColumnIndex;
+                            selectedGameTile.Unit.RowIndex = selectedGameTile.RowIndex;
+                            selectedGameTile.Unit.Active = false;
+
+                            //then set the active unit to be nothing because we just moved a unit
+                            PlayerActiveUnit = null;
+
+
+                        }
                     }
                     else//this is not their own unit
                     {
@@ -143,14 +183,13 @@ namespace territory_lords.Shared
                                 oldTile.Unit = null;
                                 //send an update to everyone
                                 SendTileUpdate(oldTile);
-                                //gameBoard.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex).Unit = null;
                             }
 
                             //update the unit to be in the new place
-                            gameTile.Unit = PlayerActiveUnit;
-                            gameTile.Unit.ColumnIndex = gameTile.ColumnIndex;
-                            gameTile.Unit.RowIndex = gameTile.RowIndex;
-                            gameTile.Unit.Active = false;
+                            selectedGameTile.Unit = PlayerActiveUnit;
+                            selectedGameTile.Unit.ColumnIndex = selectedGameTile.ColumnIndex;
+                            selectedGameTile.Unit.RowIndex = selectedGameTile.RowIndex;
+                            selectedGameTile.Unit.Active = false;
 
                             //then set the active unit to be nothing because we just moved a unit
                             PlayerActiveUnit = null;
@@ -174,14 +213,13 @@ namespace territory_lords.Shared
                             oldTile.Unit = null;
                             //send an update to everyone
                             SendTileUpdate(oldTile);
-                            //gameBoard.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex).Unit = null;
                         }
 
                         //update the unit to be in the new place
-                        gameTile.Unit = PlayerActiveUnit;
-                        gameTile.Unit.ColumnIndex = gameTile.ColumnIndex;
-                        gameTile.Unit.RowIndex = gameTile.RowIndex;
-                        gameTile.Unit.Active = false;
+                        selectedGameTile.Unit = PlayerActiveUnit;
+                        selectedGameTile.Unit.ColumnIndex = selectedGameTile.ColumnIndex;
+                        selectedGameTile.Unit.RowIndex = selectedGameTile.RowIndex;
+                        selectedGameTile.Unit.Active = false;
 
                         //then set the active unit to be nothing because we just moved a unit
                         PlayerActiveUnit = null;
@@ -195,7 +233,7 @@ namespace territory_lords.Shared
             BoardCache.UpdateGameCache(TheGameBoard);
 
             //What are ya silly? I'm still gonna send it
-            SendTileUpdate(gameTile);
+            SendTileUpdate(selectedGameTile);
         }
 
         /// <summary>
