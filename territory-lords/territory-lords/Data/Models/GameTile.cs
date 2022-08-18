@@ -1,8 +1,5 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using territory_lords.Data.Models.Improvements;
 using territory_lords.Data.Models.Units;
 
 namespace territory_lords.Data.Models
@@ -11,10 +8,8 @@ namespace territory_lords.Data.Models
     {
         public int RowIndex { get; set; }
         public int ColumnIndex { get; set; }
-        [Obsolete("Player property will contain color")]
-        public string Color { get; set; } = default!;
         public LandType LandType { get; set; }
-        public string Improvement { get; set; } = default!;
+        public ITileImprovement? Improvement { get; set; }
         public IUnit? Unit { get; set; }
         public Player? OwningPlayer { get; set; }
 

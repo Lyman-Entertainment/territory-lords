@@ -22,8 +22,9 @@ namespace territory_lords.Data.Models
         {
             DodgerBlue,
             Pink,
-            DarkGreen,
-            Yellow,
+            MediumSeaGreen,
+            Khaki,
+            LightCoral
         };
 
         private enum BorderColorsToChooseFrom 
@@ -31,7 +32,8 @@ namespace territory_lords.Data.Models
             DeepSkyBlue,
             DeepPink,
             DarkOliveGreen,
-            DarkYellow
+            Gold,
+            Firebrick
         };
 
         public GameBoard(string gameBoardId, int rows = 15, int columns = 15)
@@ -45,11 +47,6 @@ namespace territory_lords.Data.Models
             ColumnCount = columns;
             Board = new GameTile[rows, columns];
 
-            ////for now do this
-            //Players = new List<Player> {
-            //    new Player { Id = new Guid("2a35f57a-b83a-4f70-9a38-0755c7540721"),Name = "KHL-Y",Color = "dodgerblue", BorderColor = "deepblue"},
-            //    new Player { Id = new Guid("e3428b1c-343e-4008-aac5-f84fcea54088"),Name = "KHL-G",Color = "pink", BorderColor = "deeppink" }
-            //};
             InitBoard();
         }
 
@@ -94,7 +91,7 @@ namespace territory_lords.Data.Models
                     {
                         OwningPlayer = null,
                         LandType = tileLandType,
-                        Improvement = "",
+                        Improvement = null,
                         Unit = null,
                         RowIndex = r,
                         ColumnIndex = c

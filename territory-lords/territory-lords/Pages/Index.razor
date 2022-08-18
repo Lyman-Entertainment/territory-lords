@@ -47,23 +47,23 @@
     {
 
         HubConnection = new HubConnectionBuilder()
-    .WithUrl(
-            NavigationManager.ToAbsoluteUri("/chathub"), options =>
-            {
-                options.AccessTokenProvider = GetAccessToken;
-            })
-    .ConfigureLogging(logging =>
-    {
-        logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
-    })
-    .Build();
+        .WithUrl(
+                NavigationManager.ToAbsoluteUri("/chathub"), options =>
+                {
+                    options.AccessTokenProvider = GetAccessToken;
+                })
+        .ConfigureLogging(logging =>
+        {
+            logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
+        })
+        .Build();
 
 
         HubConnection.On<ChatMessage>("ReceiveMessage", (message) =>
         {
-        //I'm not sure I like how this is handled
-        message.Mine = false;//we're assuming any message coming in from the hub isn't ours
-        ChatMessages.Add(message);
+            //I'm not sure I like how this is handled
+            message.Mine = false;//we're assuming any message coming in from the hub isn't ours
+            ChatMessages.Add(message);
             StateHasChanged();
         });
 
