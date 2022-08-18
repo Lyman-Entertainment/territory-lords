@@ -1,6 +1,14 @@
 ﻿
 
 <div id="BoardWrapper">
+    <div id="PlayerList">
+        @foreach (Player player in TheGameBoard.Players)
+        {
+            <div>
+                @player.Name - @player.Colors.TileColor
+            </div>
+        }
+    </div>
     <div id="BoardContainer">
         @for (int r = 0; r < TheGameBoard.RowCount; r++)
         {
@@ -11,16 +19,16 @@
                     var shadowColor = "";
                     if (gameTile.OwningPlayer != null)
                     {
-                        shadowColor = $"box-shadow: inset 0 0 5px 2px {gameTile.OwningPlayer.Color};";
+                        shadowColor = $"box-shadow: inset 0 0 5px 2px {gameTile.OwningPlayer.Colors.TileColor};";
                     }
                     <div class="game-board-tile @GetCorrectBackgroundCSSClass(gameTile)" style="@shadowColor" @onclick="() => HandleGameBoardSquareClick(gameTile)">
                         @if(gameTile.Unit != null)
                         {
-                            var unitcolor = $"background-color: {gameTile.Unit.OwningPlayer!.Color}; border-color:{gameTile.Unit.OwningPlayer!.BorderColor}";
+                            var unitcolor = $"background-color: {gameTile.Unit.OwningPlayer.Colors.TileColor}; border-color:{gameTile.Unit.OwningPlayer.Colors.BorderColor}";
                             
                             <div class="Unit  @(gameTile.Unit.Active ? "Active" : "")">
                             <img class ="@(gameTile.Unit.GetType().Name)" style="@unitcolor" src="/Images/Layer2Sprite.png"/>
-                        </div>
+                            </div>
                         }
                     </div>
                 }

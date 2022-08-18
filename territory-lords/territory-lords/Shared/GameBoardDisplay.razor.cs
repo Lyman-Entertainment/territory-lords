@@ -28,13 +28,6 @@ namespace territory_lords.Shared
  
         protected override async Task OnInitializedAsync()
         {
-            var authUser = (await AuthStateProvider.GetAuthenticationStateAsync()).User;
-            var possibleGuidString = authUser.FindFirst(c => c.Type.Contains("objectidentifier"))?.Value;
-            if(possibleGuidString != null)
-            {
-                CurrentPlayerGuid = new Guid(possibleGuidString);
-            }
-            
 
             //build a connection to the game hub
             GameHubConnection = new HubConnectionBuilder()
@@ -87,9 +80,35 @@ namespace territory_lords.Shared
             {
                 var g = GameHubConnection;
             }
+
+            //this needs to happen at the end because we want to send a tile update with a unit
+            var authUser = (await AuthStateProvider.GetAuthenticationStateAsync()).User;
+            var possibleGuidString = authUser.FindFirst(c => c.Type.Contains("objectidentifier"))?.Value;
+            if (possibleGuidString != null)
+            {
+                //add them to the board as well as track them here
+                CurrentPlayerGuid = new Guid(possibleGuidString);
+                Player? addedPlayer = TheGameBoard.AddPlayerToGame(CurrentPlayerGuid.Value, authUser.Identity.Name);
+                if (addedPlayer != null)
+                {
+                    
+                    //TODO: the other players need to know this user joined
+
+                    //TODO: create a unit and put it on the board and send an update
+                    //this isn't the way to do it but is the way I'm doing it for now to test it
+                    var newUnit = new Malitia(addedPlayer);
+                    var aTile = TheGameBoard.GetGameTileAtIndex(3, 3);
+                    newUnit.RowIndex = 3;
+                    newUnit.ColumnIndex = 3;
+                    aTile.Unit = newUnit;
+                    BoardCache.UpdateGameCache(TheGameBoard);
+                    SendTileUpdate(aTile);
+                    
+                }
+            }
+
         }
 
-        //send a Tile Update event
         private void SendTileUpdate(GameTile gameTile)
         {
             GameHubConnection.SendAsync("SendTileUpdate", TheGameBoard.GameBoardId, gameTile.ToJson());
@@ -326,9 +345,6 @@ namespace territory_lords.Shared
             //just return the basic name other wise for now
             return gameTile.LandType.ToString("G");
         }
-
-        //old color list for marking tile border color
-        public Dictionary<int, string> Colors = new Dictionary<int, string> { { 1, "Orange" }, { 2, "Cyan" }, { 3, "Red" }, { 4, "Chartreuse" }, { 5, "DeepPink" } };
 
         public async ValueTask DisposeAsync()
         {

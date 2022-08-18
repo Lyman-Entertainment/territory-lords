@@ -7,9 +7,8 @@ namespace territory_lords.Data.Models.Units
 {
     public class Legion : BaseUnit, IUnit
     {
-        public Legion(Player player)
+        public Legion(Player player) : base(player)
         {
-            base.OwningPlayer = player;
             base.Price = 1;
             base.Maintenance = 1;
             base.Attack = 1;

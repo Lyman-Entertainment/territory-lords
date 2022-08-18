@@ -7,9 +7,8 @@ namespace territory_lords.Data.Models.Units
 {
     public class Malitia : BaseUnit, IUnit
     {
-        public Malitia(Player player)
+        public Malitia(Player player) : base(player)
         {
-            base.OwningPlayer = player;
             base.Price = 1;
             base.Maintenance = 1;
             base.Attack = 1;

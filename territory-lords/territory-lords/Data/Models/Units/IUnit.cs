@@ -13,7 +13,7 @@ namespace territory_lords.Data.Models.Units
         public byte Defense { get;  set; }
         public byte MoveDistance { get; set; }
         public bool Active { get; set; }
-        public Player? OwningPlayer { get; set; } //this probably shouldn't be allowed to be null
+        public Player OwningPlayer { get; set; } 
         public int ColumnIndex { get; set; }
         public int RowIndex { get; set; }
         

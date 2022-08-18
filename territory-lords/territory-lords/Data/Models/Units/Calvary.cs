@@ -7,9 +7,8 @@ namespace territory_lords.Data.Models.Units
 {
     public class Calvary : BaseUnit, IUnit
     {
-        public Calvary(Player player)
+        public Calvary(Player player) : base(player)
         {
-            base.OwningPlayer = player;
             base.Price = 1;
             base.Maintenance = 1;
             base.Attack = 1;
