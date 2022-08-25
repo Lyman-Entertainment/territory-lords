@@ -17,5 +17,15 @@ namespace territory_lords.Data.Models
         {
             return JsonConvert.SerializeObject(this, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
         }
+
+        public GameTile(int rowIndex, int columnIndex, LandType landType, ITileImprovement? improvement = null, IUnit? unit= null, Player? owningPlayer = null)
+        {
+            RowIndex = rowIndex;
+            ColumnIndex = columnIndex;
+            LandType = landType;
+            Improvement = improvement;
+            Unit = unit;
+            OwningPlayer = owningPlayer;
+        }
     }
 }

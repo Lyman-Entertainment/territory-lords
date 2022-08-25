@@ -22,12 +22,26 @@
                         shadowColor = $"box-shadow: inset 0 0 5px 2px {gameTile.OwningPlayer.Colors.TileColor};";
                     }
                     <div class="game-board-tile @GetCorrectBackgroundCSSClass(gameTile)" style="@shadowColor" @onclick="() => HandleGameBoardSquareClick(gameTile)">
+
+                        @if (gameTile.Improvement != null)
+                        {
+                            var improvementColor = string.Empty;
+                            //cities need borders. Should maybe make this a property of improvements so the piece itself will know
+                            @if (gameTile.Improvement.GetType().Name == "City")
+                            {
+                                improvementColor = $"background-color: {gameTile.Improvement.OwningPlayer.Colors.TileColor};";
+                            }
+                            <div class="Tile-improvement">
+                            <img class ="@(gameTile.Improvement.GetType().Name)" style="@improvementColor" src="/Images/Layer2Sprite.png"/>
+                            </div>
+                        }
+
                         @if(gameTile.Unit != null)
                         {
-                            var unitcolor = $"background-color: {gameTile.Unit.OwningPlayer.Colors.TileColor}; border-color:{gameTile.Unit.OwningPlayer.Colors.BorderColor}";
+                            var unitColor = $"background-color: {gameTile.Unit.OwningPlayer.Colors.TileColor}; border-color:{gameTile.Unit.OwningPlayer.Colors.BorderColor}";
                             
                             <div class="Unit  @(gameTile.Unit.Active ? "Active" : "")">
-                            <img class ="@(gameTile.Unit.GetType().Name)" style="@unitcolor" src="/Images/Layer2Sprite.png"/>
+                            <img class ="@(gameTile.Unit.GetType().Name)" style="@unitColor" src="/Images/Layer2Sprite.png"/>
                             </div>
                         }
                     </div>

@@ -12,10 +12,15 @@ namespace territory_lords.Data.Models
     {
         //These should probably be private with some accessors
         public string GameBoardId { get; set; }
-        public int RowCount { get; set; }
-        public int ColumnCount { get; set; }
+        public int RowCount { get; init; }
+        public int ColumnCount { get; init; }
+        public int LandMass { get; init; }
+        public int Temperature { get; init; }
+        public int Climate { get; init; }
+        public int Age { get; init; }
         public GameTile[,] Board { get; set; }
         public List<Player> Players { get; set; } = new List<Player>();
+        private static readonly Random RandomNumGen = new();
 
         //TODO: handle this differently or more better or something. Creating enums inside this class feels odd
         private enum TileColorsToChooseFrom
@@ -36,11 +41,17 @@ namespace territory_lords.Data.Models
             Firebrick
         };
 
-        public GameBoard(string gameBoardId, int rows = 15, int columns = 15)
+        public GameBoard(string gameBoardId, int rows = 20, int columns = 20, int landMass = 1, int temperature = 1, int climate = 1, int age = 1)
         {
             //because there is a border of 1 ocean around everything we need to actually make the incoming rows and columns bigger by 2 to make that border
-            rows = rows + 2;
-            columns = columns + 2;
+            rows += 2;
+            columns += 2;
+
+            //these should only be 1-3, maybe check that here
+            LandMass = landMass;
+            Temperature = temperature;
+            Climate = climate;
+            Age = age;
 
             GameBoardId = gameBoardId;
             RowCount = rows;//do we need this, can't this be figured out by getting the length of the different directions of the Board?
@@ -52,61 +63,205 @@ namespace territory_lords.Data.Models
 
         private void InitBoard()
         {
-            for (int r = 0; r < this.RowCount; r++)
-            {
-                for (int c = 0; c < this.ColumnCount; c++)
-                {
-                    LandType tileLandType = LandType.Ocean;
+            var elevationMap = GenerateElevationMap();
+            var latitudeMap = TemperatureAdjustments();
+            MergeElevationAndLatitudeMaps(elevationMap, latitudeMap);
 
-                    //we want a 1 game tile ocean boarder around the whole thing so land never reaches and edge
-                    //find a better way to do this check. This is fine for now
-                    if (!(r == 0 || r == this.RowCount - 1 || c == 0 || c == this.ColumnCount - 1))
-                    {
-                        tileLandType = LandTypeFacotry.GetRandomLandType();
-                    }
+            /*** old code to make random map ***/
+            //for (int r = 0; r < this.RowCount; r++)
+            //{
+            //    for (int c = 0; c < this.ColumnCount; c++)
+            //    {
+            //        LandType tileLandType = LandType.Ocean;
 
-                    ////fill with some bogus player owned tiles
-                    //Player? fillPlayerForNow = null;
-                    //if (r >= 6 && r <= 8 && c >= 6 && c <= 8)
-                    //{
-                    //    fillPlayerForNow = Players[0];
-                    //}
-                    ////this some Capture stuff right here.
-                    //if (r >= 1 && r <= 3 && c >= 1 && c <= 3)
-                    //{
-                    //    fillPlayerForNow = Players[1];
-                    //}
+            //        //we want a 1 game tile ocean boarder around the whole thing so land never reaches and edge
+            //        //find a better way to do this check. This is fine for now
+            //        if (!(r == 0 || r == this.RowCount - 1 || c == 0 || c == this.ColumnCount - 1))
+            //        {
+            //            tileLandType = LandTypeFacotry.GetRandomLandType();
+            //        }
 
-                    //GameTile gameSquare = Board[r, c] = new GameTile
-                    //{
-                    //    OwningPlayer = fillPlayerForNow,
-                    //    LandType = tileLandType,
-                    //    Improvement = "castle",
-                    //    Unit = GetRandomUnitType(),
-                    //    RowIndex = r,
-                    //    ColumnIndex = c
-                    //};
+            //        ////fill with some bogus player owned tiles
+            //        //Player? fillPlayerForNow = null;
+            //        //if (r >= 6 && r <= 8 && c >= 6 && c <= 8)
+            //        //{
+            //        //    fillPlayerForNow = Players[0];
+            //        //}
+            //        ////this some Capture stuff right here.
+            //        //if (r >= 1 && r <= 3 && c >= 1 && c <= 3)
+            //        //{
+            //        //    fillPlayerForNow = Players[1];
+            //        //}
 
-                    Board[r, c] = new GameTile
-                    {
-                        OwningPlayer = null,
-                        LandType = tileLandType,
-                        Improvement = null,
-                        Unit = null,
-                        RowIndex = r,
-                        ColumnIndex = c
-                    };
+            //        //GameTile gameSquare = Board[r, c] = new GameTile
+            //        //{
+            //        //    OwningPlayer = fillPlayerForNow,
+            //        //    LandType = tileLandType,
+            //        //    Improvement = "castle",
+            //        //    Unit = GetRandomUnitType(),
+            //        //    RowIndex = r,
+            //        //    ColumnIndex = c
+            //        //};
 
-                    //no units in the ocean or players owning the ocean for now
-                    if (Board[r, c].LandType == LandType.Ocean)
-                    {
-                        Board[r, c].Unit = null;
-                        Board[r, c].OwningPlayer = null;
-                    }
-                }
-            }
+            //        Board[r, c] = new GameTile
+            //        {
+            //            OwningPlayer = null,
+            //            LandType = tileLandType,
+            //            Improvement = null,
+            //            Unit = null,
+            //            RowIndex = r,
+            //            ColumnIndex = c
+            //        };
+
+            //        //no units in the ocean or players owning the ocean for now
+            //        if (Board[r, c].LandType == LandType.Ocean)
+            //        {
+            //            Board[r, c].Unit = null;
+            //            Board[r, c].OwningPlayer = null;
+            //        }
+            //    }
+            //}
+            /*** old code to make random map ***/
         }
 
+        /// <summary>
+        /// Uses the maps row and column counts to generate sections of land for the map at a time
+        /// </summary>
+        /// <returns></returns>
+        private bool[,] GenerateLandChunk()
+        {
+            //var randomNumGen = new Random();
+            int rowBuffer = 3, colBuffer = 4;//we don't want to start right up against the edge so create a buffer zone for starting
+
+            bool[,] stencil = new bool[RowCount, ColumnCount];
+            int r = RandomNumGen.Next(rowBuffer, RowCount - rowBuffer);
+            int c = RandomNumGen.Next(colBuffer, ColumnCount - colBuffer);
+            int maxElevationChanges = RandomNumGen.Next(1, 64);//why 1-64?
+
+            for (int i = 0; i < maxElevationChanges; i++)
+            {
+                //create a starter patch
+                stencil[r, c] = true;
+                stencil[r + 1, c] = true;
+                stencil[r,c + 1] = true;
+
+                //now randomly move in a direction
+                switch (RandomNumGen.Next(4))
+                {
+                    case 0: r -= 1; break;
+                    case 1: c += 1; break;
+                    case 2: r += 1; break;
+                    case 3: c -= 1; break;
+                }
+
+                //if at any point we're outside our "buffered bounds" break out
+                if (r < rowBuffer || c < colBuffer || r > RowCount - rowBuffer || c > ColumnCount - colBuffer)
+                    break;
+            }
+            //return the whole map with a section of tiles as trues
+            return stencil;
+        }
+
+        /// <summary>
+        /// Uses the maps row and column counts to generate a secondary elevation map
+        /// </summary>
+        /// <returns></returns>
+        private int[,] GenerateElevationMap()
+        {
+            //we need an elevation map to know where ocean,plains,hills,mountains are
+            int[,] elevation = new int[RowCount, ColumnCount];
+
+            //why 12.5? Why + 2? Taken from civ clone code.
+            int landMassSize = (int)((RowCount * ColumnCount)/12.5) * (LandMass + 2);
+
+            //so long as we haven't surpased our land mass size, which seems a bit arbitrary keep generating land
+            while((from int tile in elevation where tile > 0 select 1).Sum() < landMassSize)
+            {
+                bool[,] chunk = GenerateLandChunk();
+                for (int r = 0; r < RowCount; r++)
+                    for (int c = 0; c < ColumnCount; c++)
+                    {
+                            if (chunk[r, c])
+                                elevation[r, c]++;
+                    }
+            }
+
+            //TODO: remove narrow passages
+
+            return elevation;
+        }
+
+        /// <summary>
+        /// Create a map of the game board with latitude values
+        /// </summary>
+        /// <returns></returns>
+        private int[,] TemperatureAdjustments()
+        {
+            int[,] latitude = new int[RowCount,ColumnCount];
+
+            for (int r = 0; r < RowCount; r++)
+                for (int c = 0; c < ColumnCount; c++)
+                {
+                    int l = (int)(((float)r / RowCount) * 50) - 29;//why 50? why 29? What is this trying to represent?
+                    l += RandomNumGen.Next(7);
+                    if (l < 0) l = -l;
+                    l += 1 - Temperature;//why 1?
+
+                    l = (l / 6) + 1;
+
+                    switch (l)//why have this be 8 different options with two options meaning the same thing? Why not just do 4 options?
+                    {
+                        case 0:
+                        case 1: latitude[r, c] = 0; break;
+                        case 2:
+                        case 3: latitude[r, c] = 1; break;
+                        case 4:
+                        case 5: latitude[r, c] = 2; break;
+                        case 6:
+                        default: latitude[r, c] = 3; break;
+                    }
+                }
+
+            return latitude;
+        }
+
+
+        /// <summary>
+        /// Merges an elevation map and a latitude map to fill in the GameTile[,] Board map
+        /// </summary>
+        /// <param name="elevationMap"></param>
+        /// <param name="latitudeMap"></param>
+        private void MergeElevationAndLatitudeMaps(int[,] elevationMap, int[,] latitudeMap)
+        {
+            for (int r = 0; r < RowCount; r++)
+                for (int c = 0; c < ColumnCount; c++)
+                {
+                    //bool special = TileIsSpecial(x, y);
+                    //TODO: figure out special tiles
+
+                    //churn through the two maps and make...A WORLD!
+                    switch (elevationMap[r, c])
+                    {
+                        case 0: 
+                        {
+                            Board[r, c] = new GameTile(r, c, LandType.Ocean); break;//new Ocean(x, y, special); break;
+                        }
+                        case 1:
+                            {
+                                switch (latitudeMap[r, c])
+                                {
+                                    case 0: Board[r, c] = new GameTile(r, c, LandType.Desert); break; //_tiles[x, y] = new Desert(x, y, special); break;
+                                    case 1: Board[r, c] = new GameTile(r, c, LandType.Plains); break; //_tiles[x, y] = new Plains(x, y, special); break;
+                                    case 2: Board[r, c] = new GameTile(r, c, LandType.Tundra); break; //_tiles[x, y] = new Tundra(x, y, special); break;
+                                    case 3: Board[r, c] = new GameTile(r, c, LandType.Arctic); break; //_tiles[x, y] = new Arctic(x, y, special); break;
+                                }
+                            }
+                            break;
+                        case 2: Board[r, c] = new GameTile(r, c, LandType.Hills); break; //_tiles[x, y] = new Hills(x, y, special); break;
+                        default: Board[r, c] = new GameTile(r, c, LandType.Mountain); break; //_tiles[x, y] = new Mountains(x, y, special); break;
+                    }
+                }
+        }
 
         /// <summary>
         /// Return a game tile at a row and column index.

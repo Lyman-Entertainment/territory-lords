@@ -6,7 +6,7 @@
         {
             base.MoneyBonus = 1;
             base.BuildCost = 5;
-            base.AcceptableBuildLocations.Add(LandType.Hill);
+            base.AcceptableBuildLocations.Add(LandType.Hills);
             base.AcceptableBuildLocations.Add(LandType.Mountain);
         }
     }

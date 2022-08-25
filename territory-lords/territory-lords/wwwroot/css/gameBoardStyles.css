@@ -21,6 +21,7 @@
     width: 50px;
     height: 50px;
     display: inline-block;
+    position:relative;
 }
 
     .game-board-tile:not(.Ocean) {
@@ -109,45 +110,56 @@
 .Ocean-elbow-top-left {
     background: url(/Images/TER257.PIC_256_resized.png) -300px -500px;
 }
-
-.Grass {
-    background: url(/Images/TER257.PIC_256_resized.png) 0px -50px, url(/Images/Layer2Sprite.png) 0px -200px;
+.Arctic {
+    background: url(/Images/TER257.PIC_256_resized.png) 0px -350px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
-
 .Desert {
     background: url(/Images/TER257.PIC_256_resized.png) 0px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
-
-.Jungle {
-    background: url(/Images/TER257.PIC_256_resized.png) 0px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
-
 .Forrest {
     background: url(/Images/TER257.PIC_256_resized.png) 0px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
-
-.Hill {
+.Grassland {
+    background: url(/Images/TER257.PIC_256_resized.png) 0px -100px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.Hills {
     background: url(/Images/TER257.PIC_256_resized.png) 0px -200px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
-
+.Jungle {
+    background: url(/Images/TER257.PIC_256_resized.png) 0px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
 .Mountain {
     background: url(/Images/TER257.PIC_256_resized.png) 0px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
-
-.Unit {
-    width: 100%;
-    height: 100%;
-    
+.Plains {
+    background: url(/Images/TER257.PIC_256_resized.png) 0px -50px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.River {
+    background: url(/Images/TER257.PIC_256_resized.png) -750px -550px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.Swamp {
+    background: url(/Images/TER257.PIC_256_resized.png) 0px -400px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.Tundra {
+    background: url(/Images/TER257.PIC_256_resized.png) 0px -300px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
 
 
+.Unit{
+    width: 100%;
+    height: 100%;
+    position:absolute;
+}
+.Unit img{
+    border:2px solid;
+    margin-top:2px;
+    margin-left:2px;
+}
 .Malitia {
     width: 90%;
     height: 90%;
     object-position: -53px -507px;
     object-fit: none;
-    background-color:tan;
-    border: 2px solid black;
     border-radius:5px;
 }
 
@@ -156,8 +168,6 @@
     height: 90%;
     object-position: -103px -507px;
     object-fit: none;
-    background-color: pink;
-    border: 2px solid deeppink;
     border-radius: 5px;
 }
 
@@ -166,8 +176,6 @@
     height: 90%;
     object-position: -153px -507px;
     object-fit: none;
-    background-color: dodgerblue;
-    border: 2px solid darkblue;
     border-radius: 5px;
 }
 
@@ -176,8 +184,6 @@
     height: 90%;
     object-position: -303px -505px;
     object-fit: none;
-    background-color: cyan;
-    border: 2px solid darkblue;
     border-radius: 5px;
 }
 
@@ -186,7 +192,51 @@
     height: 90%;
     object-position: -502px -507px;
     object-fit: none;
-    background-color: white;
-    border: 2px solid black;
     border-radius: 5px;
+}
+
+
+.Tile-improvement {
+    width: 100%;
+    height: 100%;
+    position:absolute;
+}
+
+.City {
+    width: 100%;
+    height: 100%;
+    object-position: -602px -352px;
+    object-fit: none;
+    border-radius: 5px;
+    border:2px solid black !important;
+}
+.Factory {
+    width: 100%;
+    height: 100%;
+    object-position: -150px -97px;
+    object-fit: none;
+}
+.Farm {
+    width: 100%;
+    height: 100%;
+    object-position: -200px -100px;
+    object-fit: none;
+}
+.Fort {
+    width: 100%;
+    height: 100%;
+    object-position: -702px -351px;
+    object-fit: none;
+}
+.LumberMill {
+    width: 100%;
+    height: 100%;
+    object-position: -753px -353px;
+    object-fit: none;
+}
+.Mine {
+    width: 100%;
+    height: 100%;
+    object-position: -250px -100px;
+    object-fit: none;
 }

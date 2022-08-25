@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using territory_lords.Data.Cache;
 using territory_lords.Data.Models;
+using territory_lords.Data.Models.Improvements;
 using territory_lords.Data.Models.Units;
 
 namespace territory_lords.Shared
@@ -81,31 +82,40 @@ namespace territory_lords.Shared
                 var g = GameHubConnection;
             }
 
-            //this needs to happen at the end because we want to send a tile update with a unit
-            var authUser = (await AuthStateProvider.GetAuthenticationStateAsync()).User;
-            var possibleGuidString = authUser.FindFirst(c => c.Type.Contains("objectidentifier"))?.Value;
-            if (possibleGuidString != null)
-            {
-                //add them to the board as well as track them here
-                CurrentPlayerGuid = new Guid(possibleGuidString);
-                Player? addedPlayer = TheGameBoard.AddPlayerToGame(CurrentPlayerGuid.Value, authUser.Identity.Name);
-                if (addedPlayer != null)
-                {
-                    
-                    //TODO: the other players need to know this user joined
+            ////this needs to happen at the end because we want to send a tile update with a unit
+            //var authUser = (await AuthStateProvider.GetAuthenticationStateAsync()).User;
+            //var possibleGuidString = authUser.FindFirst(c => c.Type.Contains("objectidentifier"))?.Value;
+            //if (possibleGuidString != null)
+            //{
+            //    //add them to the board as well as track them here
+            //    CurrentPlayerGuid = new Guid(possibleGuidString);
+            //    Player? addedPlayer = TheGameBoard.AddPlayerToGame(CurrentPlayerGuid.Value, authUser.Identity.Name);
+            //    if (addedPlayer != null)
+            //    {
 
-                    //TODO: create a unit and put it on the board and send an update
-                    //this isn't the way to do it but is the way I'm doing it for now to test it
-                    var newUnit = new Malitia(addedPlayer);
-                    var aTile = TheGameBoard.GetGameTileAtIndex(3, 3);
-                    newUnit.RowIndex = 3;
-                    newUnit.ColumnIndex = 3;
-                    aTile.Unit = newUnit;
-                    BoardCache.UpdateGameCache(TheGameBoard);
-                    SendTileUpdate(aTile);
+            //        //TODO: the other players need to know this user joined
+
+            //        //TODO: create a city for the player
+            //        var city = new City(addedPlayer);
+            //        var cityTile = TheGameBoard.GetGameTileAtIndex(2, 3);
+            //        //city.RowIndex = 3;
+            //        //city.ColumnIndex = 3;
+            //        cityTile.Improvement = city;
+            //        BoardCache.UpdateGameCache(TheGameBoard);
+            //        SendTileUpdate(cityTile);
+
+            //        //TODO: create a unit and put it on the board and send an update
+            //        //this isn't the way to do it but is the way I'm doing it for now to test it
+            //        var newUnit = new Malitia(addedPlayer);
+            //        var aTile = TheGameBoard.GetGameTileAtIndex(3, 3);
+            //        newUnit.RowIndex = 3;
+            //        newUnit.ColumnIndex = 3;
+            //        aTile.Unit = newUnit;
+            //        BoardCache.UpdateGameCache(TheGameBoard);
+            //        SendTileUpdate(aTile);
                     
-                }
-            }
+            //    }
+            //}
 
         }
 
