@@ -116,7 +116,7 @@
 .Desert {
     background: url(/Images/TER257.PIC_256_resized.png) 0px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
-.Forrest {
+.Forest {
     background: url(/Images/TER257.PIC_256_resized.png) 0px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
 .Grassland {
@@ -128,7 +128,7 @@
 .Jungle {
     background: url(/Images/TER257.PIC_256_resized.png) 0px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
-.Mountain {
+.Mountains {
     background: url(/Images/TER257.PIC_256_resized.png) 0px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
 .Plains {

@@ -8,7 +8,7 @@
             base.BuildCost = 10;
             base.AcceptableBuildLocations.Add(LandType.Grassland);
             base.AcceptableBuildLocations.Add(LandType.Hills);
-            base.AcceptableBuildLocations.Add(LandType.Forrest);
+            base.AcceptableBuildLocations.Add(LandType.Forest);
             base.AcceptableBuildLocations.Add(LandType.Jungle);
             base.AcceptableBuildLocations.Add(LandType.Desert);
         }

@@ -6,7 +6,7 @@
         {
             base.MoneyBonus = 1;
             base.BuildCost = 5;
-            base.AcceptableBuildLocations.Add(LandType.Forrest);
+            base.AcceptableBuildLocations.Add(LandType.Forest);
             base.AcceptableBuildLocations.Add(LandType.Jungle);
         }
     }

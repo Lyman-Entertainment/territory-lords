@@ -67,6 +67,7 @@
 
     protected override void OnInitialized()
     {
+        //setup a bunch of random values to start the user off
         var random = new Random();
         GameId = Guid.NewGuid().ToString();
         Columns = (byte)random.Next(minColumnRows, maxColumnRows);

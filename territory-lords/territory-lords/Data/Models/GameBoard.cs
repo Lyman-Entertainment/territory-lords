@@ -41,7 +41,7 @@ namespace territory_lords.Data.Models
             Firebrick
         };
 
-        public GameBoard(string gameBoardId, int rows = 20, int columns = 20, int landMass = 1, int temperature = 1, int climate = 1, int age = 1)
+        public GameBoard(string gameBoardId, int rows = 25, int columns = 25, int landMass = 2, int temperature = 2, int climate = 2, int age = 2)
         {
             //because there is a border of 1 ocean around everything we need to actually make the incoming rows and columns bigger by 2 to make that border
             rows += 2;
@@ -61,67 +61,16 @@ namespace territory_lords.Data.Models
             InitBoard();
         }
 
+        /// <summary>
+        /// Initialize the Gameboard, really it builds it
+        /// </summary>
         private void InitBoard()
         {
             var elevationMap = GenerateElevationMap();
             var latitudeMap = TemperatureAdjustments();
             MergeElevationAndLatitudeMaps(elevationMap, latitudeMap);
+            ClimateAdjustments();
 
-            /*** old code to make random map ***/
-            //for (int r = 0; r < this.RowCount; r++)
-            //{
-            //    for (int c = 0; c < this.ColumnCount; c++)
-            //    {
-            //        LandType tileLandType = LandType.Ocean;
-
-            //        //we want a 1 game tile ocean boarder around the whole thing so land never reaches and edge
-            //        //find a better way to do this check. This is fine for now
-            //        if (!(r == 0 || r == this.RowCount - 1 || c == 0 || c == this.ColumnCount - 1))
-            //        {
-            //            tileLandType = LandTypeFacotry.GetRandomLandType();
-            //        }
-
-            //        ////fill with some bogus player owned tiles
-            //        //Player? fillPlayerForNow = null;
-            //        //if (r >= 6 && r <= 8 && c >= 6 && c <= 8)
-            //        //{
-            //        //    fillPlayerForNow = Players[0];
-            //        //}
-            //        ////this some Capture stuff right here.
-            //        //if (r >= 1 && r <= 3 && c >= 1 && c <= 3)
-            //        //{
-            //        //    fillPlayerForNow = Players[1];
-            //        //}
-
-            //        //GameTile gameSquare = Board[r, c] = new GameTile
-            //        //{
-            //        //    OwningPlayer = fillPlayerForNow,
-            //        //    LandType = tileLandType,
-            //        //    Improvement = "castle",
-            //        //    Unit = GetRandomUnitType(),
-            //        //    RowIndex = r,
-            //        //    ColumnIndex = c
-            //        //};
-
-            //        Board[r, c] = new GameTile
-            //        {
-            //            OwningPlayer = null,
-            //            LandType = tileLandType,
-            //            Improvement = null,
-            //            Unit = null,
-            //            RowIndex = r,
-            //            ColumnIndex = c
-            //        };
-
-            //        //no units in the ocean or players owning the ocean for now
-            //        if (Board[r, c].LandType == LandType.Ocean)
-            //        {
-            //            Board[r, c].Unit = null;
-            //            Board[r, c].OwningPlayer = null;
-            //        }
-            //    }
-            //}
-            /*** old code to make random map ***/
         }
 
         /// <summary>
@@ -187,6 +136,7 @@ namespace territory_lords.Data.Models
             }
 
             //TODO: remove narrow passages
+            //maybe, I kind of like the narrow passages
 
             return elevation;
         }
@@ -258,9 +208,90 @@ namespace territory_lords.Data.Models
                             }
                             break;
                         case 2: Board[r, c] = new GameTile(r, c, LandType.Hills); break; //_tiles[x, y] = new Hills(x, y, special); break;
-                        default: Board[r, c] = new GameTile(r, c, LandType.Mountain); break; //_tiles[x, y] = new Mountains(x, y, special); break;
+                        default: Board[r, c] = new GameTile(r, c, LandType.Mountains); break; //_tiles[x, y] = new Mountains(x, y, special); break;
                     }
                 }
+        }
+
+        /// <summary>
+        /// Takes the world map and changes tiles based on the world specs
+        /// </summary>
+        private void ClimateAdjustments()
+        {
+            int wetness, latitude;
+
+            for (int r = 0; r < RowCount; r++)
+            {
+                int rr = (int)(((float)r / RowCount) * 50);//why 50?
+
+                //reset wetness for each row
+                wetness = 0;
+                latitude = Math.Abs(25 - rr);//why 25?
+
+                for (int c = 0; c < ColumnCount; c++)
+                {
+                    if (Board[r, c].LandType == LandType.Ocean )
+                    {
+                        int wy = latitude - 12;//why 12?
+                        if (wy < 0) wy = -wy;
+                        wy += (Climate * 4);//why 4?
+                        if (wy > wetness) wetness++;
+                    }
+                    else if (wetness > 0)
+                    {
+                        //bool special = TileIsSpecial(r, c);
+                        int rainfall = RandomNumGen.Next(10 - (Climate * 2));//why 2?
+                        wetness -= rainfall;
+
+                        switch (Board[r,c].LandType)
+                        {
+                            case LandType.Plains: Board[r, c].LandType = LandType.Grassland;break;
+                            case LandType.Tundra: Board[r, c].LandType = LandType.Arctic; break;
+                            case LandType.Hills: Board[r, c].LandType = LandType.Forest; break;
+                            case LandType.Desert: Board[r, c].LandType = LandType.Plains; break;
+                            case LandType.Mountains: wetness -= 3; break;//why 3?
+
+                        }
+                    }
+                }
+
+                //now do a second run through but backwards to change things more and differently
+                //reset things
+                wetness = 0;
+                latitude = Math.Abs(25 - rr);
+
+                for (int c = ColumnCount -1; c > 0; c--)
+                {
+                    //if we're on an ocean tile pick up water
+                    if (Board[r,c].LandType == LandType.Ocean)
+                    {
+                        int wy = (latitude / 2) + Climate;
+                        if (wy > wetness) wetness++;
+                    }
+                    else if (wetness > 0)
+                    {
+                        //bool special = TileIsSpecial(r, c);
+                        int rainfall = RandomNumGen.Next(10 - (Climate * 2));//why 7? why 2?
+                        wetness -= rainfall;
+
+                        switch(Board[r,c].LandType)
+                        {
+                            case LandType.Swamp:
+                                Board[r, c].LandType = LandType.Forest;break;
+                            case LandType.Plains:
+                                Board[r, c].LandType = LandType.Grassland;break;
+                            case LandType.Grassland:
+                                Board[r, c].LandType = LandType.Jungle;break;
+                            case LandType.Hills:
+                                Board[r, c].LandType = LandType.Forest;break;
+                            case LandType.Mountains:
+                                Board[r, c].LandType = LandType.Forest;wetness -= 3;break;//why 3?
+                            case LandType.Desert:
+                                Board[r, c].LandType = LandType.Plains;break;
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
