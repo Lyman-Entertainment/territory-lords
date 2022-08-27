@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -21,6 +22,7 @@ namespace territory_lords.Data.Models
         public GameTile[,] Board { get; set; }
         public List<Player> Players { get; set; } = new List<Player>();
         private static readonly Random RandomNumGen = new();
+        private ILogger<GameBoard> logger = LoggerFactory.Create(options => { options.AddConsole(); }).CreateLogger<GameBoard>();
 
         //TODO: handle this differently or more better or something. Creating enums inside this class feels odd
         private enum TileColorsToChooseFrom
@@ -41,8 +43,9 @@ namespace territory_lords.Data.Models
             Firebrick
         };
 
-        public GameBoard(string gameBoardId, int rows = 25, int columns = 25, int landMass = 2, int temperature = 2, int climate = 2, int age = 2)
+        public GameBoard(string gameBoardId, int rows = 25, int columns = 25, int landMass = 1, int temperature = 1, int climate = 1, int age = 1)
         {
+            //Console.WriteLine("Constructing game board");
             //because there is a border of 1 ocean around everything we need to actually make the incoming rows and columns bigger by 2 to make that border
             rows += 2;
             columns += 2;
@@ -57,20 +60,53 @@ namespace territory_lords.Data.Models
             RowCount = rows;//do we need this, can't this be figured out by getting the length of the different directions of the Board?
             ColumnCount = columns;
             Board = new GameTile[rows, columns];
-
-            InitBoard();
         }
 
         /// <summary>
         /// Initialize the Gameboard, really it builds it
         /// </summary>
-        private void InitBoard()
+        public void InitBoard()
         {
+            logger.LogDebug("Initializing Board");
+            //Console.WriteLine("Initializing Board");
+            //Console.WriteLine($"Rows: {RowCount}");
+            //Console.WriteLine($"Columns: {ColumnCount}");
+            //Console.WriteLine($"LandMass: {LandMass}");
+            //Console.WriteLine($"Temperature: {Temperature}");
+            //Console.WriteLine($"Climate: {Climate}"); 
+            //Console.WriteLine($"Age: {Age}");
             var elevationMap = GenerateElevationMap();
             var latitudeMap = TemperatureAdjustments();
-            MergeElevationAndLatitudeMaps(elevationMap, latitudeMap);
+            MergeElevationAndLatitudeMaps(elevationMap, latitudeMap); 
+            var mountains = (from GameTile tile in Board where tile.LandType == LandType.Mountains select 1).Sum();
+            //Console.WriteLine($"Mountain Count:{mountains}");
+            var hills = (from GameTile tile in Board where tile.LandType == LandType.Hills select 1).Sum();
+            //Console.WriteLine($"HIll Count:{hills}");
             ClimateAdjustments();
-
+            AgeAdjustments();
+            var allTiles = RowCount * ColumnCount;
+            //Console.WriteLine($"allTiles Count:{allTiles}");
+            mountains = (from GameTile tile in Board where tile.LandType == LandType.Mountains select 1).Sum();
+            //Console.WriteLine($"Mountain Count:{mountains}");
+            hills = (from GameTile tile in Board where tile.LandType == LandType.Hills select 1).Sum();
+            //Console.WriteLine($"HIll Count:{hills}");
+            var arctic = (from GameTile tile in Board where tile.LandType == LandType.Arctic select 1).Sum();
+            //Console.WriteLine($"arctic Count:{arctic}");
+            var tundra = (from GameTile tile in Board where tile.LandType == LandType.Tundra select 1).Sum();
+            //Console.WriteLine($"tundra Count:{tundra}");
+            var ocean = (from GameTile tile in Board where tile.LandType == LandType.Ocean select 1).Sum();
+            //Console.WriteLine($"ocean Count:{ocean}");
+            var plains = (from GameTile tile in Board where tile.LandType == LandType.Plains select 1).Sum();
+            //Console.WriteLine($"plains Count:{plains}");
+            var grassland = (from GameTile tile in Board where tile.LandType == LandType.Grassland select 1).Sum();
+            //Console.WriteLine($"grassland Count:{grassland}");
+            var jungle = (from GameTile tile in Board where tile.LandType == LandType.Jungle select 1).Sum();
+            //Console.WriteLine($"jungle Count:{jungle}");
+            var desert = (from GameTile tile in Board where tile.LandType == LandType.Desert select 1).Sum();
+            //Console.WriteLine($"desert Count:{desert}");
+            var swamp = (from GameTile tile in Board where tile.LandType == LandType.Swamp select 1).Sum();
+            //Console.WriteLine($"swamp Count:{swamp}");
+            CreateRivers();
         }
 
         /// <summary>
@@ -79,14 +115,20 @@ namespace territory_lords.Data.Models
         /// <returns></returns>
         private bool[,] GenerateLandChunk()
         {
+            logger.LogDebug("Generating land chunks");
+            //Console.WriteLine("Generating land chunks");
+
             //var randomNumGen = new Random();
             int rowBuffer = 3, colBuffer = 4;//we don't want to start right up against the edge so create a buffer zone for starting
 
             bool[,] stencil = new bool[RowCount, ColumnCount];
-            int r = RandomNumGen.Next(rowBuffer, RowCount - rowBuffer);
-            int c = RandomNumGen.Next(colBuffer, ColumnCount - colBuffer);
-            int maxElevationChanges = RandomNumGen.Next(1, 64);//why 1-64?
-
+            int r = RandomNumGen.Next(rowBuffer, RowCount - (rowBuffer+1));
+            int c = RandomNumGen.Next(colBuffer, ColumnCount - (colBuffer+1));
+            int maxElevationChanges = RandomNumGen.Next(1, 40);// (int)((RowCount*ColumnCount)/62.5));//why 1-64? 80*50/62.5=64//using the board dimensions since it can be less than 80 wide by 50 tall
+            
+            logger.LogDebug($"Max Elevation Changes: {maxElevationChanges}");
+            //Console.WriteLine($"Max Elevation Changes: {maxElevationChanges}");
+            
             for (int i = 0; i < maxElevationChanges; i++)
             {
                 //create a starter patch
@@ -104,7 +146,7 @@ namespace territory_lords.Data.Models
                 }
 
                 //if at any point we're outside our "buffered bounds" break out
-                if (r < rowBuffer || c < colBuffer || r > RowCount - rowBuffer || c > ColumnCount - colBuffer)
+                if (r < rowBuffer || c < colBuffer || r > RowCount - (rowBuffer + 1) || c > ColumnCount - (colBuffer + 1))
                     break;
             }
             //return the whole map with a section of tiles as trues
@@ -117,22 +159,33 @@ namespace territory_lords.Data.Models
         /// <returns></returns>
         private int[,] GenerateElevationMap()
         {
+            logger.LogDebug("Generating Elevation map");
+            //Console.WriteLine("Generating Elevation map");
             //we need an elevation map to know where ocean,plains,hills,mountains are
             int[,] elevation = new int[RowCount, ColumnCount];
-
-            //why 12.5? Why + 2? Taken from civ clone code.
-            int landMassSize = (int)((RowCount * ColumnCount)/12.5) * (LandMass + 2);
-
+            int maxMountainsForArea = 1;
+            
+            int landMassSize = (int)((RowCount * ColumnCount)/12.5) * (LandMass + 2);//why 12.5? Why + 2? Taken from civ clone code.
+            logger.LogDebug($"Land Mass Size: {landMassSize}");
+            //Console.WriteLine($"Land Mass Size: {landMassSize}");
             //so long as we haven't surpased our land mass size, which seems a bit arbitrary keep generating land
-            while((from int tile in elevation where tile > 0 select 1).Sum() < landMassSize)
+            while ((from int tile in elevation where tile > 0 select 1).Sum() < landMassSize)
             {
+                int tilesWithLand = (from int tile in elevation where tile > 0 select 1).Sum();
                 bool[,] chunk = GenerateLandChunk();
+
+                //loooooops
                 for (int r = 0; r < RowCount; r++)
+                {
                     for (int c = 0; c < ColumnCount; c++)
                     {
-                            if (chunk[r, c])
-                                elevation[r, c]++;
+                        if (chunk[r, c])
+                        {
+                            elevation[r, c]++;
+                        }
+
                     }
+                } 
             }
 
             //TODO: remove narrow passages
@@ -147,12 +200,14 @@ namespace territory_lords.Data.Models
         /// <returns></returns>
         private int[,] TemperatureAdjustments()
         {
+            logger.LogDebug("Making Temperature Adjustments");
+            //Console.WriteLine("Making Temperature Adjustments");
             int[,] latitude = new int[RowCount,ColumnCount];
 
             for (int r = 0; r < RowCount; r++)
                 for (int c = 0; c < ColumnCount; c++)
                 {
-                    int l = (int)(((float)r / RowCount) * 50) - 29;//why 50? why 29? What is this trying to represent?
+                    int l = (int)(((float)r / RowCount) * RowCount) - (RowCount/2 + 4);//why 50? why 29? What is this trying to represent?
                     l += RandomNumGen.Next(7);
                     if (l < 0) l = -l;
                     l += 1 - Temperature;//why 1?
@@ -183,6 +238,9 @@ namespace territory_lords.Data.Models
         /// <param name="latitudeMap"></param>
         private void MergeElevationAndLatitudeMaps(int[,] elevationMap, int[,] latitudeMap)
         {
+            logger.LogDebug("Merging Elevation and Latitude maps");
+            //Console.WriteLine("Merging Elevation and Latitude maps");
+
             for (int r = 0; r < RowCount; r++)
                 for (int c = 0; c < ColumnCount; c++)
                 {
@@ -207,7 +265,7 @@ namespace territory_lords.Data.Models
                                 }
                             }
                             break;
-                        case 2: Board[r, c] = new GameTile(r, c, LandType.Hills); break; //_tiles[x, y] = new Hills(x, y, special); break;
+                        case 2:Board[r, c] = new GameTile(r, c, LandType.Hills); break; //_tiles[x, y] = new Hills(x, y, special); break;
                         default: Board[r, c] = new GameTile(r, c, LandType.Mountains); break; //_tiles[x, y] = new Mountains(x, y, special); break;
                     }
                 }
@@ -218,21 +276,24 @@ namespace territory_lords.Data.Models
         /// </summary>
         private void ClimateAdjustments()
         {
+            logger.LogDebug("Adjusting for climate");
+            //Console.WriteLine("Adjusting for climate");
+
             int wetness, latitude;
 
             for (int r = 0; r < RowCount; r++)
             {
-                int rr = (int)(((float)r / RowCount) * 50);//why 50?
+                int rr = (int)(((float)r / RowCount) * RowCount);//why 50?
 
                 //reset wetness for each row
                 wetness = 0;
-                latitude = Math.Abs(25 - rr);//why 25?
+                latitude = Math.Abs(RowCount/2 - rr);//why 25? Initial civ map height was 50, 25 is half way, or the equator
 
                 for (int c = 0; c < ColumnCount; c++)
                 {
                     if (Board[r, c].LandType == LandType.Ocean )
                     {
-                        int wy = latitude - 12;//why 12?
+                        int wy = latitude - RowCount/4;//why 12?
                         if (wy < 0) wy = -wy;
                         wy += (Climate * 4);//why 4?
                         if (wy > wetness) wetness++;
@@ -240,7 +301,7 @@ namespace territory_lords.Data.Models
                     else if (wetness > 0)
                     {
                         //bool special = TileIsSpecial(r, c);
-                        int rainfall = RandomNumGen.Next(10 - (Climate * 2));//why 2?
+                        int rainfall = RandomNumGen.Next(7 - (Climate * 2));//why 2?
                         wetness -= rainfall;
 
                         switch (Board[r,c].LandType)
@@ -258,7 +319,7 @@ namespace territory_lords.Data.Models
                 //now do a second run through but backwards to change things more and differently
                 //reset things
                 wetness = 0;
-                latitude = Math.Abs(25 - rr);
+                latitude = Math.Abs(RowCount/2 - rr);
 
                 for (int c = ColumnCount -1; c > 0; c--)
                 {
@@ -271,7 +332,7 @@ namespace territory_lords.Data.Models
                     else if (wetness > 0)
                     {
                         //bool special = TileIsSpecial(r, c);
-                        int rainfall = RandomNumGen.Next(10 - (Climate * 2));//why 7? why 2?
+                        int rainfall = RandomNumGen.Next(7 - (Climate * 2));//why 7? why 2?
                         wetness -= rainfall;
 
                         switch(Board[r,c].LandType)
@@ -292,6 +353,203 @@ namespace territory_lords.Data.Models
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Adjusts the age of the tiles on the board/map. It makes more mountains and hills the more times it runs
+        /// </summary>
+        private void AgeAdjustments()
+        {
+            logger.LogDebug("Adjusting for Age");
+            //Console.WriteLine("Adjusting for Age");
+
+            //I'm not sure how this does erosion. when we set tile land types we turn 2 flat types into hills and we turn hills into mountains.
+            //But we only turn mountains into water if it's not corner next to water.
+            //Seems like we're actually going up, not down in land height
+
+            int rRan = 0;
+            int cRan = 0;
+            int ageRepeat = (int)(((float)(600) * (1 + Age) / (80*50)) * (ColumnCount * RowCount));//why 800? Why 80 * 50? That was the size of civ 1 boards, but why hard code it?
+            //Console.WriteLine($"Times to repeat age adjustment: {ageRepeat}");
+
+            for (int i = 0; i < ageRepeat; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    rRan = RandomNumGen.Next(RowCount);
+                    cRan = RandomNumGen.Next(ColumnCount);
+                }
+                else
+                {
+                    switch (RandomNumGen.Next(8))//why 8? that's the number of potential neighbor tiles?
+                    {
+                        case 0: { rRan--; cRan--; break; }
+                        case 1: { cRan--; break; }
+                        case 2: { rRan++; cRan--; break; }
+                        case 3: { rRan--; break; }
+                        case 4: { rRan++; break; }
+                        case 5: { rRan--; cRan++; break; }
+                        case 6: { cRan++; break; }
+                        default: { rRan++; cRan++; break; }
+                    }
+
+                    //keep us in bounds
+                    if (cRan < 0) cRan = 1;
+                    if (rRan < 0) rRan = 1;
+                    if (cRan >= ColumnCount) cRan = ColumnCount - 2;
+                    if (rRan >= RowCount) rRan = RowCount - 2;
+                }
+
+                //bool special = TileIsSpecial(r,c);
+                switch(Board[rRan,cRan].LandType)
+                {
+                    case LandType.Forest:
+                        Board[rRan, cRan].LandType = LandType.Jungle;break;
+                    case LandType.Swamp:
+                        Board[rRan, cRan].LandType = LandType.Grassland; break;
+                    case LandType.Plains:
+                        Board[rRan, cRan].LandType = LandType.Hills; break;
+                    case LandType.Tundra:
+                        Board[rRan, cRan].LandType = LandType.Hills; break;
+                    //case LandType.River:
+                    //    Board[rRan, cRan].LandType = LandType.Forest; break;
+                    case LandType.Grassland:
+                        Board[rRan, cRan].LandType = LandType.Forest; break;
+                    case LandType.Jungle:
+                        Board[rRan, cRan].LandType = LandType.Swamp; break;
+                    case LandType.Hills:
+                        Board[rRan, cRan].LandType = LandType.Mountains; break;
+                    case LandType.Desert:
+                        Board[rRan, cRan].LandType = LandType.Plains; break;
+                    case LandType.Arctic:
+                        Board[rRan, cRan].LandType = LandType.Mountains; break;
+                    case LandType.Mountains://make some mountain lakes?
+                        if((rRan == 0 || Board[rRan - 1, cRan -1].LandType != LandType.Ocean) &&
+                                (cRan == 0 || Board[rRan + 1, cRan -1].LandType != LandType.Ocean) &&
+                            (rRan == ( RowCount - 1) || Board[rRan + 1, cRan + 1].LandType != LandType.Ocean) &&
+                            (cRan == ( ColumnCount -1) || Board[rRan -1, cRan + 1].LandType != LandType.Ocean))
+                            Board[rRan, cRan].LandType = LandType.Ocean;
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates rivers in the world dependant on the climate and landmass
+        /// </summary>
+        private void CreateRivers()
+        {
+            logger.LogDebug("Creating Rivers");
+            //Console.WriteLine("Creating Rivers");
+
+            int maxRiverCreationTries = 50;//50 seems like a nice round arbitrary number
+            int minRiverLength = 3;
+            int riverCount = 0;
+
+            for (int i = 0; i < 50 && riverCount < ((Climate + LandMass) * 2) + 6; i++)//haha why 256? why *2? why +6?
+            {
+                logger.LogDebug($"Attempt #{i}");
+                //Console.WriteLine($"Attempt #{i}");
+
+                //copy the world so we can revert? Also... copy the entire world?
+                var tilesBackup = CopyBoard(Board);
+
+                int riverLength = 0;
+                int riverDirection = RandomNumGen.Next(4) * 2;
+                bool nearOcean;
+
+                GameTile? gameTile = null;
+
+
+                //find a poor unsuspecting hill tile that we're later going to turn into a river tile
+                var riverStarters = (from GameTile tile in Board where (tile.LandType == LandType.Mountains) select tile).ToArray();
+                int potentialStarts = riverStarters.Length;
+                if (potentialStarts == 0)
+                {
+                    riverStarters = (from GameTile tile in Board where (tile.LandType == LandType.Hills) select tile).ToArray();
+                    potentialStarts = riverStarters.Length;
+                }
+
+                gameTile = riverStarters[RandomNumGen.Next(potentialStarts)];
+
+                if (gameTile == null)
+                {
+                    return;//we don't have any mountains or hills to choose from so bail out
+                }
+
+                //build the river until we run into the ocean, another river, or a mountain
+                do
+                {
+                    Board[gameTile.RowIndex, gameTile.ColumnIndex].LandType = LandType.River;
+                    int varB = riverDirection;
+                    int varC = RandomNumGen.Next(2);
+                    riverDirection = (((varC - riverLength % 2) * 2 + riverDirection) & 0x07);//multiply by 2 makes right angles, no diagonal river movements
+
+                    riverLength++;
+                    //Console.WriteLine($"River Length: {riverLength}");
+
+                    nearOcean = IsGameTileNearOcean(gameTile.RowIndex, gameTile.ColumnIndex);
+                    switch(riverDirection)
+                    {
+                        case 0:
+                        case 1: gameTile = Board[gameTile.RowIndex, gameTile.ColumnIndex - 1];break;
+                        case 2:
+                        case 3: gameTile = Board[gameTile.RowIndex + 1, gameTile.ColumnIndex];break;
+                        case 4:
+                        case 5: gameTile = Board[gameTile.RowIndex, gameTile.ColumnIndex + 1];break;
+                        case 6:
+                        case 7: gameTile = Board[gameTile.RowIndex - 1, gameTile.ColumnIndex];break;
+                    }
+                }
+                while (!nearOcean && (gameTile.LandType != LandType.Ocean && gameTile.LandType != LandType.River ));//&& gameTile.LandType != LandType.Mountains
+
+                //check our river to make sure it's long enough and ends someplace respectable, if not wipe it and start over
+                if ((nearOcean || gameTile.LandType == LandType.River) && riverLength >= minRiverLength)//arbitrary minlength for rivers
+                {
+                    riverCount++;
+                    //Console.WriteLine($"River Count: {riverCount}");
+                    //turn any Forest tiles around the end of our river into jungle, because river endings mean jungle?
+                    var tilesAround = GetAllGameTileNeighbors(gameTile);
+                    foreach (var tile in tilesAround)
+                    {
+                        if (tile != null)
+                        {
+                            if (tile.LandType == LandType.Forest)
+                                tile.LandType = LandType.Jungle;
+                        }
+                    }
+                }
+                else
+                {
+                    //Console.WriteLine($"Resetting River Try");
+                    Board = CopyBoard(tilesBackup);//reset it our river sucked
+                }
+            }
+        }
+
+        /// <summary>
+        /// Check the surrounding direct neighbors to see if any are ocean tiles
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
+        /// <returns></returns>
+        private bool IsGameTileNearOcean(int row, int column)
+        {
+            var centerTile = GetGameTileAtIndex(row, column);
+            if (centerTile != null)
+            {
+                var directNeighbors = GetGameTileDirectNeighbors(centerTile);
+                foreach (var tile in directNeighbors)
+                {
+                    if(tile != null)
+                    {
+                        if (tile.LandType == LandType.Ocean)
+                            return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -448,5 +706,21 @@ namespace territory_lords.Data.Models
             };
         }
 
+
+        private GameTile[,] CopyBoard(GameTile[,] theBoard)
+        {
+            int rows = theBoard.GetLength(0);
+            int cols = theBoard.GetLength(1);
+            var copiedBoard = new GameTile[rows, cols];
+            for(int r = 0;r < rows;r++)
+                for(int c = 0; c < cols;c++)
+                {
+                    GameTile oldGameTile = theBoard[r, c];
+                    copiedBoard[r,c] = new GameTile(oldGameTile.RowIndex, oldGameTile.ColumnIndex, oldGameTile.LandType);
+                }
+
+            return copiedBoard;
+
+        }
     }
 }

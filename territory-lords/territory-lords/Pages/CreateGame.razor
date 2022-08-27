@@ -1,4 +1,5 @@
 ﻿@page "/creategame"
+@using Microsoft.Extensions.Logging
 @using territory_lords.Data.Cache;
 @inject NavigationManager NavManager
 @inject GameBoardCache BoardCache
@@ -24,9 +25,9 @@
     </div>
     <div class="form-group">
         <label>Land Mass</label>
-        <label>More Islands</label>
+        <label>Islands</label>
         <input @bind=LandMass type="range" min="@minRange" max="@maxRange"/>
-        <label>More Continents</label>
+        <label>Continent</label>
     </div>
     <div class="form-group">
         <label>Temperature</label>
@@ -42,9 +43,9 @@
     </div>
     <div class="form-group">
         <label>Age</label>
-        <label>Mountains</label>
+        <label>Mountainous</label>
         <input @bind=Age type="range" min="@minRange" max="@maxRange"/>
-        <label>Flatter</label>
+        <label>Hillanous</label>
     </div>
     <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Create" Color="Color.Primary" ButtonType="ButtonType.Submit">Create Game</MudButton>
     <div>@GameId</div>
@@ -59,10 +60,10 @@
     private byte Climate;
     private byte Age;
     private bool ShowError = false;
-    private readonly byte minColumnRows = 15;
-    private readonly byte maxColumnRows = 50;
-    private readonly byte minRange = 1;
-    private readonly byte maxRange = 5;
+    private readonly byte minColumnRows = 20;//I think it would be fun to have small worlds like 10 x 10 but the world generation does not appreciate small worlds!
+    private readonly byte maxColumnRows = 80;
+    private readonly byte minRange = 0;
+    private readonly byte maxRange = 2;
     private List<string> errorMessages = new List<string>();
 
     protected override void OnInitialized()
@@ -70,12 +71,12 @@
         //setup a bunch of random values to start the user off
         var random = new Random();
         GameId = Guid.NewGuid().ToString();
-        Columns = (byte)random.Next(minColumnRows, maxColumnRows);
-        Rows = (byte)random.Next(minColumnRows, maxColumnRows);
-        LandMass = (byte)random.Next(minRange, maxRange +1);
-        Temperature = (byte)random.Next(minRange, maxRange +1);
-        Climate = (byte)random.Next(minRange, maxRange +1);
-        Age = (byte)random.Next(minRange, maxRange +1);
+        Columns = (byte)random.Next(minColumnRows, maxColumnRows + 1);
+        Rows = (byte)random.Next(minColumnRows, maxColumnRows + 1);
+        LandMass = (byte)random.Next(minRange, maxRange + 1);
+        Temperature = (byte)random.Next(minRange, maxRange + 1);
+        Climate = (byte)random.Next(minRange, maxRange + 1);
+        Age = (byte)random.Next(minRange, maxRange + 1);
 
     }
     private async Task BuildGame()
@@ -114,7 +115,8 @@
 
 
         //create the game and save it
-        var TheGameBoard = new GameBoard(GameId, Rows, Columns,LandMass,Temperature,Climate,Age);
+        var TheGameBoard = new GameBoard(GameId, Rows, Columns, LandMass, Temperature, Climate, Age);
+        TheGameBoard.InitBoard();
         BoardCache.UpdateGameCache(TheGameBoard);
 
         //redirect the player to the game address

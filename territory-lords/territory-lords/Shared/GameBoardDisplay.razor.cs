@@ -275,85 +275,193 @@ namespace territory_lords.Shared
             //this is for ocean tiles only right now. also this needs to be reworked to be more readalbe and extensible
             //if we're on the edge we need to check if there is an ocean tile in the adjoining tiles not in the corresponding line with the tile we're working with
             //if there is not an ocean tile then set the class to the correct straight ocean sprite
+            //figure out what's around us so we can act accordingly and not look wierd to everyone. Keep it together Kevin!
+            var directNeighbors = TheGameBoard.GetGameTileDirectNeighbors(gameTile);
 
             if (gameTile.LandType == LandType.Ocean)
             {
-                //figure out what's around us so we can act accordingly and not look wierd to everyone. Keep it together Kevin!
-                var directNeighbors = TheGameBoard.GetGameTileDirectNeighbors(gameTile);
-
-                //if all of the direct neighbors are ocean then this is ocean too
-                if ((directNeighbors[0] == null || directNeighbors[0].LandType == LandType.Ocean) && (directNeighbors[1] == null || directNeighbors[1].LandType == LandType.Ocean) && (directNeighbors[2] == null || directNeighbors[2].LandType == LandType.Ocean) && (directNeighbors[3] == null || directNeighbors[3].LandType == LandType.Ocean))
-                {
-                    return "Ocean";
-                }
-                else if ((directNeighbors[0] == null || directNeighbors[0].LandType == LandType.Ocean) && (directNeighbors[1] == null || directNeighbors[1].LandType == LandType.Ocean) && (directNeighbors[2] != null && directNeighbors[2].LandType != LandType.Ocean) && (directNeighbors[3] == null || directNeighbors[3].LandType == LandType.Ocean))
-                {
-                    return "Ocean-top";
-                }
-                else if ((directNeighbors[0] != null && directNeighbors[0].LandType != LandType.Ocean) && (directNeighbors[1] == null || directNeighbors[1].LandType == LandType.Ocean) && (directNeighbors[2] == null || directNeighbors[2].LandType == LandType.Ocean) && (directNeighbors[3] == null || directNeighbors[3].LandType == LandType.Ocean))
-                {
-                    return "Ocean-bottom";
-                }
-                else if ((directNeighbors[0] == null || directNeighbors[0].LandType == LandType.Ocean) && (directNeighbors[1] != null && directNeighbors[1].LandType != LandType.Ocean) && (directNeighbors[2] == null || directNeighbors[2].LandType == LandType.Ocean) && (directNeighbors[3] == null || directNeighbors[3].LandType == LandType.Ocean))
-                {
-                    return "Ocean-left";
-                }
-                else if ((directNeighbors[0] == null || directNeighbors[0].LandType == LandType.Ocean) && (directNeighbors[1] == null || directNeighbors[1].LandType == LandType.Ocean) && (directNeighbors[2] == null || directNeighbors[2].LandType == LandType.Ocean) && (directNeighbors[3] != null || directNeighbors[3].LandType != LandType.Ocean))
-                {
-                    return "Ocean-right";
-                }
-                else if ((directNeighbors[0] != null && directNeighbors[0].LandType != LandType.Ocean) && (directNeighbors[1] != null && directNeighbors[1].LandType != LandType.Ocean) && (directNeighbors[2] != null && directNeighbors[2].LandType != LandType.Ocean) && (directNeighbors[3] != null && directNeighbors[3].LandType != LandType.Ocean))
-                {
-                    return "Ocean-single";
-                }
-                else if ((directNeighbors[0] == null || directNeighbors[0].LandType == LandType.Ocean) && (directNeighbors[1] != null && directNeighbors[1].LandType != LandType.Ocean) && (directNeighbors[2] != null && directNeighbors[2].LandType != LandType.Ocean) && (directNeighbors[3] != null && directNeighbors[3].LandType != LandType.Ocean))
-                {
-                    return "Ocean-bay-top";
-                }
-                else if ((directNeighbors[0] != null && directNeighbors[0].LandType != LandType.Ocean) && (directNeighbors[1] == null || directNeighbors[1].LandType == LandType.Ocean) && (directNeighbors[2] != null && directNeighbors[2].LandType != LandType.Ocean) && (directNeighbors[3] != null && directNeighbors[3].LandType != LandType.Ocean))
-                {
-                    return "Ocean-bay-right";
-                }
-                else if ((directNeighbors[0] != null && directNeighbors[0].LandType != LandType.Ocean) && (directNeighbors[1] != null && directNeighbors[1].LandType != LandType.Ocean) && (directNeighbors[2] == null || directNeighbors[2].LandType == LandType.Ocean) && (directNeighbors[3] != null && directNeighbors[3].LandType != LandType.Ocean))
-                {
-                    return "Ocean-bay-bottom";
-                }
-                else if ((directNeighbors[0] != null && directNeighbors[0].LandType != LandType.Ocean) && (directNeighbors[1] != null && directNeighbors[1].LandType != LandType.Ocean) && (directNeighbors[2] != null && directNeighbors[2].LandType != LandType.Ocean) && (directNeighbors[3] == null || directNeighbors[3].LandType == LandType.Ocean))
-                {
-                    return "Ocean-bay-left";
-                }
-                else if ((directNeighbors[0] != null && directNeighbors[0].LandType != LandType.Ocean) && (directNeighbors[1] == null || directNeighbors[1].LandType == LandType.Ocean) && (directNeighbors[2] != null && directNeighbors[2].LandType != LandType.Ocean) && (directNeighbors[3] == null || directNeighbors[3].LandType == LandType.Ocean))
-                {
-                    return "Ocean-channel-horizontal";
-                }
-                else if ((directNeighbors[0] == null || directNeighbors[0].LandType == LandType.Ocean) && (directNeighbors[1] != null && directNeighbors[1].LandType != LandType.Ocean) && (directNeighbors[2] == null || directNeighbors[2].LandType == LandType.Ocean) && (directNeighbors[3] != null && directNeighbors[3].LandType != LandType.Ocean))
-                {
-                    return "Ocean-channel-vertical";
-                }
-                else if ((directNeighbors[0] == null || directNeighbors[0].LandType == LandType.Ocean) && (directNeighbors[1] == null || directNeighbors[1].LandType == LandType.Ocean) && (directNeighbors[2] != null && directNeighbors[2].LandType != LandType.Ocean) && (directNeighbors[3] != null && directNeighbors[3].LandType != LandType.Ocean))
-                {
-                    return "Ocean-elbow-top-right";
-                }
-                else if ((directNeighbors[0] != null && directNeighbors[0].LandType != LandType.Ocean) && (directNeighbors[1] == null || directNeighbors[1].LandType == LandType.Ocean) && (directNeighbors[2] == null || directNeighbors[2].LandType == LandType.Ocean) && (directNeighbors[3] != null && directNeighbors[3].LandType != LandType.Ocean))
-                {
-                    return "Ocean-elbow-bottom-right";
-                }
-                else if ((directNeighbors[0] != null && directNeighbors[0].LandType != LandType.Ocean) && (directNeighbors[1] != null && directNeighbors[1].LandType != LandType.Ocean) && (directNeighbors[2] == null || directNeighbors[2].LandType == LandType.Ocean) && (directNeighbors[3] == null || directNeighbors[3].LandType == LandType.Ocean))
-                {
-                    return "Ocean-elbow-bottom-left";
-                }
-                else if ((directNeighbors[0] != null && directNeighbors[0].LandType != LandType.Ocean) && (directNeighbors[1] != null && directNeighbors[1].LandType != LandType.Ocean) && (directNeighbors[2] == null || directNeighbors[2].LandType == LandType.Ocean) && (directNeighbors[3] == null || directNeighbors[3].LandType == LandType.Ocean))
-                {
-                    return "Ocean-elbow-bottom-left";
-                }
-                else if ((directNeighbors[0] == null || directNeighbors[0].LandType == LandType.Ocean) && (directNeighbors[1] != null && directNeighbors[1].LandType != LandType.Ocean) && (directNeighbors[2] != null && directNeighbors[2].LandType != LandType.Ocean) && (directNeighbors[3] == null || directNeighbors[3].LandType == LandType.Ocean))
-                {
-                    return "Ocean-elbow-top-left";
-                }
+                return GetCorrectOceanCssClass(directNeighbors);  
             }
+
+            if (gameTile.LandType == LandType.River)
+            {
+                return GetCorrectRiverCssClass(directNeighbors);
+            }
+                
 
             //just return the basic name other wise for now
             return gameTile.LandType.ToString("G");
+        }
+
+        private string GetCorrectRiverCssClass(GameTile[] neighbors)
+        {
+            if (IsWaterTile(neighbors[0]) && IsWaterTile(neighbors[1]) && IsWaterTile(neighbors[2]) && IsWaterTile(neighbors[3]))
+            {
+                return "River-cross";
+            }
+            //we should probably check for connecting to Ocean first
+            else if ((IsWaterTile(neighbors[0])) && (IsNotWaterTile(neighbors[1])) && (IsWaterTile(neighbors[2])) && (IsNotWaterTile(neighbors[3])))
+            {
+                return "River-straight-vertical";
+            }
+            else if ((IsNotWaterTile(neighbors[0])) && (IsWaterTile(neighbors[1])) && (IsNotWaterTile(neighbors[2])) && (IsWaterTile(neighbors[3])))
+            {
+                return "River-straight-horizontal";
+            }
+            else if ((IsNotWaterTile(neighbors[0])) && (IsWaterTile(neighbors[1])) && (IsWaterTile(neighbors[2])) && (IsNotWaterTile(neighbors[3])))
+            {
+                return "River-bend-south-east";
+            }
+            else if ((IsNotWaterTile(neighbors[0])) && (IsNotWaterTile(neighbors[1])) && (IsWaterTile(neighbors[2])) && (IsWaterTile(neighbors[3])))
+            {
+                return "River-bend-south-west";
+            }
+            else if ((IsWaterTile(neighbors[0])) && (IsNotWaterTile(neighbors[1])) && (IsNotWaterTile(neighbors[2])) && (IsWaterTile(neighbors[3])))
+            {
+                return "River-bend-north-west";
+            }
+            else if ((IsWaterTile(neighbors[0])) && (IsWaterTile(neighbors[1])) && (IsNotWaterTile(neighbors[2])) && (IsNotWaterTile(neighbors[3])))
+            {
+                return "River-bend-north-east";
+            }
+            else if ((IsWaterTile(neighbors[0])) && (IsWaterTile(neighbors[1])) && (IsNotWaterTile(neighbors[2])) && (IsWaterTile(neighbors[3])))
+            {
+                return "River-tee-north";
+            }
+            else if ((IsWaterTile(neighbors[0])) && (IsWaterTile(neighbors[1])) && (IsWaterTile(neighbors[2])) && (IsNotWaterTile(neighbors[3])))
+            {
+                return "River-tee-east";
+            }
+            else if ((IsNotWaterTile(neighbors[0])) && (IsWaterTile(neighbors[1])) && (IsWaterTile(neighbors[2])) && (IsWaterTile(neighbors[3])))
+            {
+                return "River-tee-south";
+            }
+            else if ((IsWaterTile(neighbors[0])) && (IsNotWaterTile(neighbors[1])) && (IsWaterTile(neighbors[2])) && (IsWaterTile(neighbors[3])))
+            {
+                return "River-tee-west";
+            }
+            else if ((IsWaterTile(neighbors[0])) && (IsNotWaterTile(neighbors[1])) && (IsNotWaterTile(neighbors[2])) && (IsNotWaterTile(neighbors[3])))
+            {
+                return "River-start-south";
+            }
+            else if ((IsNotWaterTile(neighbors[0])) && (IsWaterTile(neighbors[1])) && (IsNotWaterTile(neighbors[2])) && (IsNotWaterTile(neighbors[3])))
+            {
+                return "River-start-west";
+            }
+            else if ((IsNotWaterTile(neighbors[0])) && (IsNotWaterTile(neighbors[1])) && (IsWaterTile(neighbors[2])) && (IsNotWaterTile(neighbors[3])))
+            {
+                return "River-start-north";
+            }
+            else if ((IsNotWaterTile(neighbors[0])) && (IsNotWaterTile(neighbors[1])) && (IsNotWaterTile(neighbors[2])) && (IsWaterTile(neighbors[3])))
+            {
+                return "River-start-east";
+            }
+
+            //return the river cross, not sure what else to do
+            return "River";
+        }
+
+
+        /// <summary>
+        /// Gets the CSS Stylesheet class for the tile based off of it's direct neighbors for ocean tiles
+        /// </summary>
+        /// <param name="neighbors"></param>
+        /// <returns></returns>
+        private string GetCorrectOceanCssClass(GameTile[] neighbors)
+        {
+            //if all of the direct neighbors are ocean then this is ocean too
+            if ((neighbors[0] == null || neighbors[0].LandType == LandType.Ocean) && (neighbors[1] == null || neighbors[1].LandType == LandType.Ocean) && (neighbors[2] == null || neighbors[2].LandType == LandType.Ocean) && (neighbors[3] == null || neighbors[3].LandType == LandType.Ocean))
+            {
+                return "Ocean";
+            }
+            else if ((neighbors[0] == null || neighbors[0].LandType == LandType.Ocean) && (neighbors[1] == null || neighbors[1].LandType == LandType.Ocean) && (neighbors[2] != null && neighbors[2].LandType != LandType.Ocean) && (neighbors[3] == null || neighbors[3].LandType == LandType.Ocean))
+            {
+                return "Ocean-top";
+            }
+            else if ((neighbors[0] != null && neighbors[0].LandType != LandType.Ocean) && (neighbors[1] == null || neighbors[1].LandType == LandType.Ocean) && (neighbors[2] == null || neighbors[2].LandType == LandType.Ocean) && (neighbors[3] == null || neighbors[3].LandType == LandType.Ocean))
+            {
+                return "Ocean-bottom";
+            }
+            else if ((neighbors[0] == null || neighbors[0].LandType == LandType.Ocean) && (neighbors[1] != null && neighbors[1].LandType != LandType.Ocean) && (neighbors[2] == null || neighbors[2].LandType == LandType.Ocean) && (neighbors[3] == null || neighbors[3].LandType == LandType.Ocean))
+            {
+                return "Ocean-left";
+            }
+            else if ((neighbors[0] == null || neighbors[0].LandType == LandType.Ocean) && (neighbors[1] == null || neighbors[1].LandType == LandType.Ocean) && (neighbors[2] == null || neighbors[2].LandType == LandType.Ocean) && (neighbors[3] != null || neighbors[3].LandType != LandType.Ocean))
+            {
+                return "Ocean-right";
+            }
+            else if ((neighbors[0] != null && neighbors[0].LandType != LandType.Ocean) && (neighbors[1] != null && neighbors[1].LandType != LandType.Ocean) && (neighbors[2] != null && neighbors[2].LandType != LandType.Ocean) && (neighbors[3] != null && neighbors[3].LandType != LandType.Ocean))
+            {
+                return "Ocean-single";
+            }
+            else if ((neighbors[0] == null || neighbors[0].LandType == LandType.Ocean) && (neighbors[1] != null && neighbors[1].LandType != LandType.Ocean) && (neighbors[2] != null && neighbors[2].LandType != LandType.Ocean) && (neighbors[3] != null && neighbors[3].LandType != LandType.Ocean))
+            {
+                return "Ocean-bay-top";
+            }
+            else if ((neighbors[0] != null && neighbors[0].LandType != LandType.Ocean) && (neighbors[1] == null || neighbors[1].LandType == LandType.Ocean) && (neighbors[2] != null && neighbors[2].LandType != LandType.Ocean) && (neighbors[3] != null && neighbors[3].LandType != LandType.Ocean))
+            {
+                return "Ocean-bay-right";
+            }
+            else if ((neighbors[0] != null && neighbors[0].LandType != LandType.Ocean) && (neighbors[1] != null && neighbors[1].LandType != LandType.Ocean) && (neighbors[2] == null || neighbors[2].LandType == LandType.Ocean) && (neighbors[3] != null && neighbors[3].LandType != LandType.Ocean))
+            {
+                return "Ocean-bay-bottom";
+            }
+            else if ((neighbors[0] != null && neighbors[0].LandType != LandType.Ocean) && (neighbors[1] != null && neighbors[1].LandType != LandType.Ocean) && (neighbors[2] != null && neighbors[2].LandType != LandType.Ocean) && (neighbors[3] == null || neighbors[3].LandType == LandType.Ocean))
+            {
+                return "Ocean-bay-left";
+            }
+            else if ((neighbors[0] != null && neighbors[0].LandType != LandType.Ocean) && (neighbors[1] == null || neighbors[1].LandType == LandType.Ocean) && (neighbors[2] != null && neighbors[2].LandType != LandType.Ocean) && (neighbors[3] == null || neighbors[3].LandType == LandType.Ocean))
+            {
+                return "Ocean-channel-horizontal";
+            }
+            else if ((neighbors[0] == null || neighbors[0].LandType == LandType.Ocean) && (neighbors[1] != null && neighbors[1].LandType != LandType.Ocean) && (neighbors[2] == null || neighbors[2].LandType == LandType.Ocean) && (neighbors[3] != null && neighbors[3].LandType != LandType.Ocean))
+            {
+                return "Ocean-channel-vertical";
+            }
+            else if ((neighbors[0] == null || neighbors[0].LandType == LandType.Ocean) && (neighbors[1] == null || neighbors[1].LandType == LandType.Ocean) && (neighbors[2] != null && neighbors[2].LandType != LandType.Ocean) && (neighbors[3] != null && neighbors[3].LandType != LandType.Ocean))
+            {
+                return "Ocean-elbow-top-right";
+            }
+            else if ((neighbors[0] != null && neighbors[0].LandType != LandType.Ocean) && (neighbors[1] == null || neighbors[1].LandType == LandType.Ocean) && (neighbors[2] == null || neighbors[2].LandType == LandType.Ocean) && (neighbors[3] != null && neighbors[3].LandType != LandType.Ocean))
+            {
+                return "Ocean-elbow-bottom-right";
+            }
+            else if ((neighbors[0] != null && neighbors[0].LandType != LandType.Ocean) && (neighbors[1] != null && neighbors[1].LandType != LandType.Ocean) && (neighbors[2] == null || neighbors[2].LandType == LandType.Ocean) && (neighbors[3] == null || neighbors[3].LandType == LandType.Ocean))
+            {
+                return "Ocean-elbow-bottom-left";
+            }
+            else if ((neighbors[0] != null && neighbors[0].LandType != LandType.Ocean) && (neighbors[1] != null && neighbors[1].LandType != LandType.Ocean) && (neighbors[2] == null || neighbors[2].LandType == LandType.Ocean) && (neighbors[3] == null || neighbors[3].LandType == LandType.Ocean))
+            {
+                return "Ocean-elbow-bottom-left";
+            }
+            else if ((neighbors[0] == null || neighbors[0].LandType == LandType.Ocean) && (neighbors[1] != null && neighbors[1].LandType != LandType.Ocean) && (neighbors[2] != null && neighbors[2].LandType != LandType.Ocean) && (neighbors[3] == null || neighbors[3].LandType == LandType.Ocean))
+            {
+                return "Ocean-elbow-top-left";
+            }
+
+            //I guess if we didn't find anything then just return the default ocean class
+            return "Ocean";
+        }
+
+
+        /// <summary>
+        /// Return wiether or not this tile has water on it
+        /// </summary>
+        /// <param name="gameTile"></param>
+        /// <returns></returns>
+        private bool IsWaterTile(GameTile gameTile)
+        {
+            return (gameTile.LandType == LandType.Ocean || gameTile.LandType == LandType.River);
+        }
+
+        /// <summary>
+        /// Return wiether or not this tile does not have water on it
+        /// </summary>
+        /// <param name="gameTile"></param>
+        /// <returns></returns>
+        private bool IsNotWaterTile(GameTile gameTile)
+        {
+            return !IsWaterTile(gameTile);
         }
 
         public async ValueTask DisposeAsync()

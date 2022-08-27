@@ -1,4 +1,5 @@
 ﻿@page "/Map/{gameBoardId}"
+@using Microsoft.Extensions.Logging
 @using territory_lords.Data.Cache;
 @using Microsoft.AspNetCore.WebUtilities;
 @using territory_lords.Data.Models;
@@ -26,6 +27,7 @@
         if(TheGameBoard == null)
         {
             TheGameBoard = new GameBoard(GameBoardId);
+            TheGameBoard.InitBoard();
             BoardCache.UpdateGameCache(TheGameBoard);
         }
 

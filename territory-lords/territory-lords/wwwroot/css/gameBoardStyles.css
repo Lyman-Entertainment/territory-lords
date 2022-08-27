@@ -134,9 +134,6 @@
 .Plains {
     background: url(/Images/TER257.PIC_256_resized.png) 0px -50px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
-.River {
-    background: url(/Images/TER257.PIC_256_resized.png) -750px -550px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
 .Swamp {
     background: url(/Images/TER257.PIC_256_resized.png) 0px -400px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
@@ -144,11 +141,59 @@
     background: url(/Images/TER257.PIC_256_resized.png) 0px -300px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
 
+.River {
+    background: url(/Images/Layer2Sprite.png) -0px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.River-cross {
+    background: url(/Images/Layer2Sprite.png) -750px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.River-straight-horizontal {
+    background: url(/Images/Layer2Sprite.png) -500px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.River-straight-vertical {
+    background: url(/Images/Layer2Sprite.png) -250px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.River-bend-south-east {
+    background: url(/Images/Layer2Sprite.png) -300px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.River-bend-south-west {
+    background: url(/Images/Layer2Sprite.png) -600px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.River-bend-north-west {
+    background: url(/Images/Layer2Sprite.png) -450px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.River-bend-north-east {
+    background: url(/Images/Layer2Sprite.png) -150px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.River-tee-north {
+    background: url(/Images/Layer2Sprite.png) -550px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.River-tee-east {
+    background: url(/Images/Layer2Sprite.png) -350px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.River-tee-south {
+    background: url(/Images/Layer2Sprite.png) -700px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.River-tee-west {
+    background: url(/Images/Layer2Sprite.png) -650px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.River-start-north {
+    background: url(/Images/Layer2Sprite.png) -200px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.River-start-east {
+    background: url(/Images/Layer2Sprite.png) -400px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.River-start-south {
+    background: url(/Images/Layer2Sprite.png) -50px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.River-start-west {
+    background: url(/Images/Layer2Sprite.png) -100px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
 
-.Unit{
+.Unit {
     width: 100%;
     height: 100%;
-    position:absolute;
+    position: absolute;
 }
 .Unit img{
     border:2px solid;
