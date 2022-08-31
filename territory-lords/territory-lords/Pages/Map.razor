@@ -5,6 +5,7 @@
 @using territory_lords.Data.Models;
 @inject NavigationManager NavManager
 @inject GameBoardCache BoardCache
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @attribute [Authorize]
 
 <h1>Game @GameBoardId</h1>
@@ -20,7 +21,7 @@
 
     GameBoard? TheGameBoard;
 
-    protected override void OnParametersSet()
+    protected async override Task OnParametersSetAsync()
     {
         TheGameBoard = BoardCache.GetGameBoard(GameBoardId);
 
@@ -31,6 +32,21 @@
             BoardCache.UpdateGameCache(TheGameBoard);
         }
 
+        //var authUser = (await AuthenticationStateProvider.GetAuthenticationStateAsync().ConfigureAwait(false)).User;
+        //var possibleGuidString = authUser.FindFirst(c => c.Type.Contains("objectidentifier"))?.Value;
+        //if (possibleGuidString != null)
+        //{
+        //    //add them to the board and update the board cache. This really should be handled by something else
+        //    var playerGuid = new Guid(possibleGuidString);
+        //    Player? addedPlayer = TheGameBoard.AddPlayerToGame(playerGuid, authUser.Identity.Name);
+        //    if (addedPlayer != null)
+        //    {
+        //        //add in a settler somewhere
+        //        var settler = new Data.Models.Units.Settler(addedPlayer);
+        //        TheGameBoard.InsertUnitToMap(settler);
+        //        BoardCache.UpdateGameCache(TheGameBoard);
+        //    }
+        //}
     }
 
     private string GetRandomGameBoardIdURL()

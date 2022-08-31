@@ -17,10 +17,12 @@
     </div>
     <div class="form-group">
         <label>Game Board Size:</label>
-        <label>Columns:</label>
-        <input @bind="Columns" type="number" min="@minColumnRows" max="@maxColumnRows" />
+        
         <label>Rows:</label>
         <input @bind="Rows"  type="number" min="@minColumnRows" max="@maxColumnRows"  />
+
+        <label>Columns:</label>
+        <input @bind="Columns" type="number" min="@minColumnRows" max="@maxColumnRows" />
        
     </div>
     <div class="form-group">

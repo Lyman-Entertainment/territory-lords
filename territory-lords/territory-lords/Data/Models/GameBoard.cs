@@ -43,6 +43,7 @@ namespace territory_lords.Data.Models
             Firebrick
         };
 
+        //TODO: Separate the building of the world from the GameBoard. The GameBoard is simply that, the GameBoard. There should be a world generating class that returns the Board outside of this.
         public GameBoard(string gameBoardId, int rows = 25, int columns = 25, int landMass = 1, int temperature = 1, int climate = 1, int age = 1)
         {
             //Console.WriteLine("Constructing game board");
@@ -707,6 +708,11 @@ namespace territory_lords.Data.Models
         }
 
 
+        /// <summary>
+        /// Churn through every tile and make a new tile that has the same coordinates and land type. Now you have a copy with no references pointing to the same place.
+        /// </summary>
+        /// <param name="theBoard"></param>
+        /// <returns></returns>
         private GameTile[,] CopyBoard(GameTile[,] theBoard)
         {
             int rows = theBoard.GetLength(0);
@@ -721,6 +727,19 @@ namespace territory_lords.Data.Models
 
             return copiedBoard;
 
+        }
+
+        /// <summary>
+        /// Probably just for now putting a unit on the board
+        /// </summary>
+        /// <param name="newUnit"></param>
+        public GameTile InsertUnitToMap(IUnit newUnit)
+        {
+            var grassland = (from GameTile tile in Board where tile.LandType == LandType.Grassland select tile).ToArray();
+            var randomTile = grassland[RandomNumGen.Next(grassland.Length)];
+            randomTile.Unit = newUnit;
+
+            return randomTile;
         }
     }
 }

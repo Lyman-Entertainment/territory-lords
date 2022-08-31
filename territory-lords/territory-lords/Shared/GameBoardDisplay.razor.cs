@@ -82,40 +82,39 @@ namespace territory_lords.Shared
                 var g = GameHubConnection;
             }
 
-            ////this needs to happen at the end because we want to send a tile update with a unit
-            //var authUser = (await AuthStateProvider.GetAuthenticationStateAsync()).User;
-            //var possibleGuidString = authUser.FindFirst(c => c.Type.Contains("objectidentifier"))?.Value;
-            //if (possibleGuidString != null)
-            //{
-            //    //add them to the board as well as track them here
-            //    CurrentPlayerGuid = new Guid(possibleGuidString);
-            //    Player? addedPlayer = TheGameBoard.AddPlayerToGame(CurrentPlayerGuid.Value, authUser.Identity.Name);
-            //    if (addedPlayer != null)
-            //    {
+            //this needs to happen at the end because we want to send a tile update with a unit
+            var authUser = (await AuthStateProvider.GetAuthenticationStateAsync()).User;
+            var possibleGuidString = authUser.FindFirst(c => c.Type.Contains("objectidentifier"))?.Value;
+            if (possibleGuidString != null)
+            {
+                //add them to the board as well as track them here
+                CurrentPlayerGuid = new Guid(possibleGuidString);
+                Player? addedPlayer = TheGameBoard.AddPlayerToGame(CurrentPlayerGuid.Value, authUser.Identity.Name);
+                if (addedPlayer != null)
+                {
 
-            //        //TODO: the other players need to know this user joined
+                    //TODO: the other players need to know this user joined
 
-            //        //TODO: create a city for the player
-            //        var city = new City(addedPlayer);
-            //        var cityTile = TheGameBoard.GetGameTileAtIndex(2, 3);
-            //        //city.RowIndex = 3;
-            //        //city.ColumnIndex = 3;
-            //        cityTile.Improvement = city;
-            //        BoardCache.UpdateGameCache(TheGameBoard);
-            //        SendTileUpdate(cityTile);
+                    ////TODO: create a city for the player
+                    //var city = new City(addedPlayer);
+                    //var cityTile = TheGameBoard.GetGameTileAtIndex(2, 3);
+                    ////city.RowIndex = 3;
+                    ////city.ColumnIndex = 3;
+                    //cityTile.Improvement = city;
+                    //BoardCache.UpdateGameCache(TheGameBoard);
+                    //SendTileUpdate(cityTile);
 
-            //        //TODO: create a unit and put it on the board and send an update
-            //        //this isn't the way to do it but is the way I'm doing it for now to test it
-            //        var newUnit = new Malitia(addedPlayer);
-            //        var aTile = TheGameBoard.GetGameTileAtIndex(3, 3);
-            //        newUnit.RowIndex = 3;
-            //        newUnit.ColumnIndex = 3;
-            //        aTile.Unit = newUnit;
-            //        BoardCache.UpdateGameCache(TheGameBoard);
-            //        SendTileUpdate(aTile);
-                    
-            //    }
-            //}
+                    //TODO: create a unit and put it on the board and send an update
+                    //this isn't the way to do it but is the way I'm doing it for now to test it
+                    var settler = new Settler(addedPlayer);
+                    var settlerTile = TheGameBoard.InsertUnitToMap(settler);
+                    var malitia = new Malitia(addedPlayer);
+                    var malitiaTile = TheGameBoard.InsertUnitToMap(malitia);
+                    BoardCache.UpdateGameCache(TheGameBoard);
+                    SendTileUpdate(settlerTile);
+                    SendTileUpdate(malitiaTile);
+                }
+            }
 
         }
 
@@ -277,20 +276,241 @@ namespace territory_lords.Shared
             //if there is not an ocean tile then set the class to the correct straight ocean sprite
             //figure out what's around us so we can act accordingly and not look wierd to everyone. Keep it together Kevin!
             var directNeighbors = TheGameBoard.GetGameTileDirectNeighbors(gameTile);
-
-            if (gameTile.LandType == LandType.Ocean)
+            var cssClass = gameTile.LandType.ToString("g");
+            switch (gameTile.LandType)
             {
-                return GetCorrectOceanCssClass(directNeighbors);  
+                //all of these functions need to be refacored. This doesn't seem like a great way to do this
+                case LandType.Ocean:
+                    cssClass = GetCorrectOceanCssClass(directNeighbors);break;
+                case LandType.River:
+                    cssClass = GetCorrectRiverCssClass(directNeighbors); break;
+                case LandType.Mountains:
+                    cssClass = GetCorrectMountainCssClass(directNeighbors); break;
+                case LandType.Hills:
+                    cssClass = GetCorrectHillsCssClass(directNeighbors);break;
+                case LandType.Jungle:
+                    cssClass = GetCorrectJungleCssClass(directNeighbors);break;
+
             }
 
-            if (gameTile.LandType == LandType.River)
-            {
-                return GetCorrectRiverCssClass(directNeighbors);
-            }
-                
 
-            //just return the basic name other wise for now
-            return gameTile.LandType.ToString("G");
+            return cssClass;
+        }
+
+        private string GetCorrectJungleCssClass(GameTile[] neighbors)
+        {
+            var jungle = LandType.Jungle;
+            //if no neighbors are hills than this is just a single hill all by it's lonesome self
+            if ((neighbors[0].LandType != jungle) && (neighbors[1].LandType != jungle) && (neighbors[2].LandType != jungle) && (neighbors[3].LandType != jungle))
+            {
+                return "Jungle";
+            }
+            else if ((neighbors[0].LandType == jungle) && (neighbors[1].LandType == jungle) && (neighbors[2].LandType == jungle) && (neighbors[3].LandType == jungle))
+            {
+                return "Jungle-cross";
+            }
+            else if ((neighbors[0].LandType == jungle) && (neighbors[1].LandType != jungle) && (neighbors[2].LandType == jungle) && (neighbors[3].LandType != jungle))
+            {
+                return "Jungle-straight-vertical";
+            }
+            else if ((neighbors[0].LandType != jungle) && (neighbors[1].LandType == jungle) && (neighbors[2].LandType != jungle) && (neighbors[3].LandType == jungle))
+            {
+                return "Jungle-straight-horizontal";
+            }
+            else if ((neighbors[0].LandType == jungle) && (neighbors[1].LandType == jungle) && (neighbors[2].LandType != jungle) && (neighbors[3].LandType != jungle))
+            {
+                return "Jungle-bend-north-east";
+            }
+            else if ((neighbors[0].LandType != jungle) && (neighbors[1].LandType == jungle) && (neighbors[2].LandType == jungle) && (neighbors[3].LandType != jungle))
+            {
+                return "Jungle-bend-south-east";
+            }
+            else if ((neighbors[0].LandType != jungle) && (neighbors[1].LandType != jungle) && (neighbors[2].LandType == jungle) && (neighbors[3].LandType == jungle))
+            {
+                return "Jungle-bend-south-west";
+            }
+            else if ((neighbors[0].LandType == jungle) && (neighbors[1].LandType != jungle) && (neighbors[2].LandType != jungle) && (neighbors[3].LandType == jungle))
+            {
+                return "Jungle-bend-north-west";
+            }
+            else if ((neighbors[0].LandType == jungle) && (neighbors[1].LandType == jungle) && (neighbors[2].LandType != jungle) && (neighbors[3].LandType == jungle))
+            {
+                return "Jungle-tee-north";
+            }
+            else if ((neighbors[0].LandType == jungle) && (neighbors[1].LandType == jungle) && (neighbors[2].LandType == jungle) && (neighbors[3].LandType != jungle))
+            {
+                return "Jungle-tee-east";
+            }
+            else if ((neighbors[0].LandType != jungle) && (neighbors[1].LandType == jungle) && (neighbors[2].LandType == jungle) && (neighbors[3].LandType == jungle))
+            {
+                return "Jungle-tee-south";
+            }
+            else if ((neighbors[0].LandType == jungle) && (neighbors[1].LandType != jungle) && (neighbors[2].LandType == jungle) && (neighbors[3].LandType == jungle))
+            {
+                return "Jungle-tee-west";
+            }
+            else if ((neighbors[0].LandType != jungle) && (neighbors[1].LandType != jungle) && (neighbors[2].LandType == jungle) && (neighbors[3].LandType != jungle))
+            {
+                return "Jungle-start-north";
+            }
+            else if ((neighbors[0].LandType != jungle) && (neighbors[1].LandType != jungle) && (neighbors[2].LandType != jungle) && (neighbors[3].LandType == jungle))
+            {
+                return "Jungle-start-east";
+            }
+            else if ((neighbors[0].LandType == jungle) && (neighbors[1].LandType != jungle) && (neighbors[2].LandType != jungle) && (neighbors[3].LandType != jungle))
+            {
+                return "Jungle-start-south";
+            }
+            else if ((neighbors[0].LandType != jungle) && (neighbors[1].LandType == jungle) && (neighbors[2].LandType != jungle) && (neighbors[3].LandType != jungle))
+            {
+                return "Jungle-start-west";
+            }
+
+            return "Jungle";
+        }
+
+        private string GetCorrectHillsCssClass(GameTile[] neighbors)
+        {
+            var hills = LandType.Hills;
+            //if no neighbors are hills than this is just a single hill all by it's lonesome self
+            if ((neighbors[0].LandType != hills) && (neighbors[1].LandType != hills) && (neighbors[2].LandType != hills) && (neighbors[3].LandType != hills))
+            {
+                return "Hills";
+            }
+            else if ((neighbors[0].LandType == hills) && (neighbors[1].LandType == hills) && (neighbors[2].LandType == hills) && (neighbors[3].LandType == hills))
+            {
+                return "Hills-cross";
+            }
+            else if ((neighbors[0].LandType == hills) && (neighbors[1].LandType != hills) && (neighbors[2].LandType == hills) && (neighbors[3].LandType != hills))
+            {
+                return "Hills-straight-vertical";
+            }
+            else if ((neighbors[0].LandType != hills) && (neighbors[1].LandType == hills) && (neighbors[2].LandType != hills) && (neighbors[3].LandType == hills))
+            {
+                return "Hills-straight-horizontal";
+            }
+            else if ((neighbors[0].LandType == hills) && (neighbors[1].LandType == hills) && (neighbors[2].LandType != hills) && (neighbors[3].LandType != hills))
+            {
+                return "Hills-bend-north-east";
+            }
+            else if ((neighbors[0].LandType != hills) && (neighbors[1].LandType == hills) && (neighbors[2].LandType == hills) && (neighbors[3].LandType != hills))
+            {
+                return "Hills-bend-south-east";
+            }
+            else if ((neighbors[0].LandType != hills) && (neighbors[1].LandType != hills) && (neighbors[2].LandType == hills) && (neighbors[3].LandType == hills))
+            {
+                return "Hills-bend-south-west";
+            }
+            else if ((neighbors[0].LandType == hills) && (neighbors[1].LandType != hills) && (neighbors[2].LandType != hills) && (neighbors[3].LandType == hills))
+            {
+                return "Hills-bend-north-west";
+            }
+            else if ((neighbors[0].LandType == hills) && (neighbors[1].LandType == hills) && (neighbors[2].LandType != hills) && (neighbors[3].LandType == hills))
+            {
+                return "Hills-tee-north";
+            }
+            else if ((neighbors[0].LandType == hills) && (neighbors[1].LandType == hills) && (neighbors[2].LandType == hills) && (neighbors[3].LandType != hills))
+            {
+                return "Hills-tee-east";
+            }
+            else if ((neighbors[0].LandType != hills) && (neighbors[1].LandType == hills) && (neighbors[2].LandType == hills) && (neighbors[3].LandType == hills))
+            {
+                return "Hills-tee-south";
+            }
+            else if ((neighbors[0].LandType == hills) && (neighbors[1].LandType != hills) && (neighbors[2].LandType == hills) && (neighbors[3].LandType == hills))
+            {
+                return "Hills-tee-west";
+            }
+            else if ((neighbors[0].LandType != hills) && (neighbors[1].LandType != hills) && (neighbors[2].LandType == hills) && (neighbors[3].LandType != hills))
+            {
+                return "Hills-start-north";
+            }
+            else if ((neighbors[0].LandType != hills) && (neighbors[1].LandType != hills) && (neighbors[2].LandType != hills) && (neighbors[3].LandType == hills))
+            {
+                return "Hills-start-east";
+            }
+            else if ((neighbors[0].LandType == hills) && (neighbors[1].LandType != hills) && (neighbors[2].LandType != hills) && (neighbors[3].LandType != hills))
+            {
+                return "Hills-start-south";
+            }
+            else if ((neighbors[0].LandType != hills) && (neighbors[1].LandType == hills) && (neighbors[2].LandType != hills) && (neighbors[3].LandType != hills))
+            {
+                return "Hills-start-west";
+            }
+
+            return "Hills";
+        }
+
+        private string GetCorrectMountainCssClass(GameTile[] neighbors)
+        {
+            var mountains = LandType.Mountains;
+            //if no neighbors are mountains than this is just a single mountain all by it's lonesome self
+            if ((neighbors[0].LandType != mountains) && (neighbors[1].LandType != mountains) && (neighbors[2].LandType != mountains) && (neighbors[3].LandType != mountains))
+            {
+                return "Mountains";
+            }
+            else if ((neighbors[0].LandType == mountains) && (neighbors[1].LandType == mountains) && (neighbors[2].LandType == mountains) && (neighbors[3].LandType == mountains))
+            {
+                return "Mountains-cross";
+            }
+            else if ((neighbors[0].LandType == mountains) && (neighbors[1].LandType != mountains) && (neighbors[2].LandType == mountains) && (neighbors[3].LandType != mountains))
+            {
+                return "Mountains-straight-vertical";
+            }
+            else if ((neighbors[0].LandType != mountains) && (neighbors[1].LandType == mountains) && (neighbors[2].LandType != mountains) && (neighbors[3].LandType == mountains))
+            {
+                return "Mountains-straight-horizontal";
+            }
+            else if ((neighbors[0].LandType == mountains) && (neighbors[1].LandType == mountains) && (neighbors[2].LandType != mountains) && (neighbors[3].LandType != mountains))
+            {
+                return "Mountains-bend-north-east";
+            }
+            else if ((neighbors[0].LandType != mountains) && (neighbors[1].LandType == mountains) && (neighbors[2].LandType == mountains) && (neighbors[3].LandType != mountains))
+            {
+                return "Mountains-bend-south-east";
+            }
+            else if ((neighbors[0].LandType != mountains) && (neighbors[1].LandType != mountains) && (neighbors[2].LandType == mountains) && (neighbors[3].LandType == mountains))
+            {
+                return "Mountains-bend-south-west";
+            }
+            else if ((neighbors[0].LandType == mountains) && (neighbors[1].LandType != mountains) && (neighbors[2].LandType != mountains) && (neighbors[3].LandType == mountains))
+            {
+                return "Mountains-bend-north-west";
+            }
+            else if ((neighbors[0].LandType == mountains) && (neighbors[1].LandType == mountains) && (neighbors[2].LandType != mountains) && (neighbors[3].LandType == mountains))
+            {
+                return "Mountains-tee-north";
+            }
+            else if ((neighbors[0].LandType == mountains) && (neighbors[1].LandType == mountains) && (neighbors[2].LandType == mountains) && (neighbors[3].LandType != mountains))
+            {
+                return "Mountains-tee-east";
+            }
+            else if ((neighbors[0].LandType != mountains) && (neighbors[1].LandType == mountains) && (neighbors[2].LandType == mountains) && (neighbors[3].LandType == mountains))
+            {
+                return "Mountains-tee-south";
+            }
+            else if ((neighbors[0].LandType == mountains) && (neighbors[1].LandType != mountains) && (neighbors[2].LandType == mountains) && (neighbors[3].LandType == mountains))
+            {
+                return "Mountains-tee-west";
+            }
+            else if ((neighbors[0].LandType != mountains) && (neighbors[1].LandType != mountains) && (neighbors[2].LandType == mountains) && (neighbors[3].LandType != mountains))
+            {
+                return "Mountains-start-north";
+            }
+            else if ((neighbors[0].LandType != mountains) && (neighbors[1].LandType != mountains) && (neighbors[2].LandType != mountains) && (neighbors[3].LandType == mountains))
+            {
+                return "Mountains-start-east";
+            }
+            else if ((neighbors[0].LandType == mountains) && (neighbors[1].LandType != mountains) && (neighbors[2].LandType != mountains) && (neighbors[3].LandType != mountains))
+            {
+                return "Mountains-start-south";
+            }
+            else if ((neighbors[0].LandType != mountains) && (neighbors[1].LandType == mountains) && (neighbors[2].LandType != mountains) && (neighbors[3].LandType != mountains))
+            {
+                return "Mountains-start-west";
+            }
+
+            return "Mountains";
         }
 
         private string GetCorrectRiverCssClass(GameTile[] neighbors)
@@ -357,7 +577,7 @@ namespace territory_lords.Shared
                 return "River-start-east";
             }
 
-            //return the river cross, not sure what else to do
+            //return the blank green square
             return "River";
         }
 
