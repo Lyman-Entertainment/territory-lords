@@ -1,6 +1,8 @@
 ﻿@page "/creategame"
 @using Microsoft.Extensions.Logging
-@using territory_lords.Data.Cache;
+@using territory_lords.Data
+@using territory_lords.Data.Cache
+@using territory_lords.Data.Statics
 @inject NavigationManager NavManager
 @inject GameBoardCache BoardCache
 
@@ -50,7 +52,6 @@
         <label>Hillanous</label>
     </div>
     <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Create" Color="Color.Primary" ButtonType="ButtonType.Submit">Create Game</MudButton>
-    <div>@GameId</div>
 </form>
 
 @code {
@@ -81,7 +82,7 @@
         Age = (byte)random.Next(minRange, maxRange + 1);
 
     }
-    private async Task BuildGame()
+    private void BuildGame()
     {
         //need to reset showError at beginning
         ShowError = false;
@@ -117,9 +118,9 @@
 
 
         //create the game and save it
-        var TheGameBoard = new GameBoard(GameId, Rows, Columns, LandMass, Temperature, Climate, Age);
-        TheGameBoard.InitBoard();
-        BoardCache.UpdateGameCache(TheGameBoard);
+        var worldBuilder = new WorldBuilder(GameId, Rows, Columns, LandMass, Temperature, Climate, Age);
+        var theGameBoard = worldBuilder.GenerateWorld();
+        BoardCache.UpdateGameCache(theGameBoard);
 
         //redirect the player to the game address
         NavManager.NavigateTo($"/Map/{GameId}");

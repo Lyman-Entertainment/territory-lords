@@ -1,5 +1,6 @@
 ﻿@page "/Map/{gameBoardId}"
 @using Microsoft.Extensions.Logging
+@using territory_lords.Data
 @using territory_lords.Data.Cache;
 @using Microsoft.AspNetCore.WebUtilities;
 @using territory_lords.Data.Models;
@@ -21,15 +22,15 @@
 
     GameBoard? TheGameBoard;
 
-    protected async override Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
         TheGameBoard = BoardCache.GetGameBoard(GameBoardId);
 
         if(TheGameBoard == null)
         {
-            TheGameBoard = new GameBoard(GameBoardId);
-            TheGameBoard.InitBoard();
-            BoardCache.UpdateGameCache(TheGameBoard);
+            var worldBuilder = new WorldBuilder(GameBoardId);
+            var theGameBoard = worldBuilder.GenerateWorld();
+            BoardCache.UpdateGameCache(theGameBoard);
         }
 
         //var authUser = (await AuthenticationStateProvider.GetAuthenticationStateAsync().ConfigureAwait(false)).User;
