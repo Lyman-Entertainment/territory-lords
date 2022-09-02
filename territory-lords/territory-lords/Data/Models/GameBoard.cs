@@ -12,7 +12,7 @@ namespace territory_lords.Data.Models
         //These should probably be private with some accessors
         public string GameBoardId { get; set; }
         public int RowCount { get => Board.GetLength(0); }
-        public int ColumnCount { get => Board.GetLength(0); }
+        public int ColumnCount { get => Board.GetLength(1); }
         public int LandMass { get; init; }
         public int Temperature { get; init; }
         public int Climate { get; init; }

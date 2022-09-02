@@ -13,44 +13,41 @@
 }
 
 <form @onsubmit="BuildGame">
-    <div class="form-group">
-        <label>Game Id:</label>
-        <input @bind="GameId" size="100" pattern="^[a-zA-Z0-9_-]{1,100}$" minlength="1"/>
-    </div>
-    <div class="form-group">
-        <label>Game Board Size:</label>
-        
-        <label>Rows:</label>
-        <input @bind="Rows"  type="number" min="@minColumnRows" max="@maxColumnRows"  />
-
-        <label>Columns:</label>
-        <input @bind="Columns" type="number" min="@minColumnRows" max="@maxColumnRows" />
-       
-    </div>
-    <div class="form-group">
+    <MudPaper>
+        <MudTextField @bind-Value="@GameId" Label="The Game Id"   
+        Required="true" RequiredError="GameId is required" Variant="Variant.Text"
+        HelperText="This will be the name of your game and the URL to it as well" Margin="Margin.Dense"/>
+    </MudPaper>
+    <MudPaper>
+        <label>World Size:</label>
+        <MudNumericField @bind-Value="@Rows" Label="Height" Variant="Variant.Text" Min="@minColumnRows" Max="@maxColumnRows"/>
+        <MudNumericField @bind-Value="@Columns" Label="Width" Variant="Variant.Text" Min="@minColumnRows" Max="@maxColumnRows"/>
+    </MudPaper>
+    <MudPaper>
         <label>Land Mass</label>
+        <MudSlider @bind-value="@LandMass" Size="Size.Large" Step="1" TickMarks="true" TickMarkLabels="@landMassLabels" Min="@minRange" Max="@maxRange"/>
         <label>Islands</label>
         <input @bind=LandMass type="range" min="@minRange" max="@maxRange"/>
         <label>Continent</label>
-    </div>
-    <div class="form-group">
+    </MudPaper>
+    <MudPaper>
         <label>Temperature</label>
         <label>Colder</label>
         <input @bind=Temperature type="range" min="@minRange" max="@maxRange"/>
         <label>Hotter</label>
-    </div>
-    <div class="form-group">
+    </MudPaper>
+    <MudPaper>
         <label>Climate</label>
         <label>Arid</label>
         <input @bind=Climate type="range" min="@minRange" max="@maxRange"/>
         <label>Wet</label>
-    </div>
-    <div class="form-group">
+    </MudPaper>
+    <MudPaper>
         <label>Age</label>
         <label>Mountainous</label>
         <input @bind=Age type="range" min="@minRange" max="@maxRange"/>
         <label>Hillanous</label>
-    </div>
+    </MudPaper>
     <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Create" Color="Color.Primary" ButtonType="ButtonType.Submit">Create Game</MudButton>
 </form>
 
@@ -58,7 +55,7 @@
     private string GameId = "";
     private byte Columns;
     private byte Rows;
-    private byte LandMass;
+    private int LandMass;
     private byte Temperature;
     private byte Climate;
     private byte Age;
@@ -68,6 +65,7 @@
     private readonly byte minRange = 0;
     private readonly byte maxRange = 2;
     private List<string> errorMessages = new List<string>();
+    private string[] landMassLabels = new string[] { "Islands", "Normal", "Pangea" };
 
     protected override void OnInitialized()
     {
