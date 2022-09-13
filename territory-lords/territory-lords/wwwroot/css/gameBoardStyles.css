@@ -453,3 +453,77 @@
     object-position: -250px -100px;
     object-fit: none;
 }
+
+.Tile-special{
+    width: 100%;
+    height: 100%;
+    position:absolute;
+}
+.Oasis {
+    width: 100%;
+    height: 100%;
+    object-position: -0px -349px;
+    object-fit: none;
+}
+.Horse {
+    width: 100%;
+    height: 100%;
+    object-position: -50px -349px;
+    object-fit: none;
+}
+.Rabbit {
+    width: 100%;
+    height: 100%;
+    object-position: -150px -349px;
+    object-fit: none;
+}
+.Coal {
+    width: 100%;
+    height: 100%;
+    object-position: -200px -349px;
+    object-fit: none;
+}
+.Gold {
+    width: 100%;
+    height: 100%;
+    object-position: -250px -349px;
+    object-fit: none;
+}
+.Deer {
+    width: 100%;
+    height: 100%;
+    object-position: -300px -349px;
+    object-fit: none;
+}
+.Seal {
+    width: 100%;
+    height: 100%;
+    object-position: -350px -349px;
+    object-fit: none;
+}
+.Oil {
+    width: 100%;
+    height: 100%;
+    object-position: -400px -349px;
+    object-fit: none;
+}
+.Gem {
+    width: 100%;
+    height: 100%;
+    object-position: -450px -349px;
+    object-fit: none;
+}
+.Fish {
+    width: 100%;
+    height: 100%;
+    object-position: -500px -349px;
+    object-fit: none;
+}
+.Shield {
+    top: 50%;
+    position: relative;
+    width: 25%;
+    height: 25%;
+    object-position: -482px -135px;
+    object-fit: none;
+}

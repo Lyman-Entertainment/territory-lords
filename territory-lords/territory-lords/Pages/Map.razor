@@ -29,8 +29,8 @@
         if(TheGameBoard == null)
         {
             var worldBuilder = new WorldBuilder(GameBoardId);
-            var theGameBoard = worldBuilder.GenerateWorld();
-            BoardCache.UpdateGameCache(theGameBoard);
+            TheGameBoard = worldBuilder.GenerateWorld();
+            BoardCache.UpdateGameCache(TheGameBoard);
         }
 
         //var authUser = (await AuthenticationStateProvider.GetAuthenticationStateAsync().ConfigureAwait(false)).User;

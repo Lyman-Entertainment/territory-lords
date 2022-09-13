@@ -12,6 +12,7 @@ namespace territory_lords.Data.Models
         public ITileImprovement? Improvement { get; set; }
         public IUnit? Unit { get; set; }
         public Player? OwningPlayer { get; set; }
+        public bool Special { get; set; }
 
         public string ToJson()
         {

@@ -21,7 +21,14 @@
                     {
                         shadowColor = $"box-shadow: inset 0 0 5px 2px {gameTile.OwningPlayer.Colors.TileColor};";
                     }
-                    <div class="game-board-tile @GetCorrectBackgroundCSSClass(gameTile)" style="@shadowColor" @onclick="() => HandleGameBoardSquareClick(gameTile)">
+                    <div class="game-board-tile @GetCorrectBackgroundCssClass(gameTile)" style="@shadowColor" @onclick="() => HandleGameBoardSquareClick(gameTile)">
+                        
+                        @if (gameTile.Special)
+                        {
+                            <div class="Tile-special">
+                                <img class="@GetCorrectSpecialCssClass(gameTile.LandType)" src="/Images/Layer2Sprite.png"/>
+                            </div>
+                        }
 
                         @if (gameTile.Improvement != null)
                         {
@@ -32,7 +39,7 @@
                                 improvementColor = $"background-color: {gameTile.Improvement.OwningPlayer.Colors.TileColor};";
                             }
                             <div class="Tile-improvement">
-                            <img class ="@(gameTile.Improvement.GetType().Name)" style="@improvementColor" src="/Images/Layer2Sprite.png"/>
+                            <img class="@(gameTile.Improvement.GetType().Name)" style="@improvementColor" src="/Images/Layer2Sprite.png"/>
                             </div>
                         }
 

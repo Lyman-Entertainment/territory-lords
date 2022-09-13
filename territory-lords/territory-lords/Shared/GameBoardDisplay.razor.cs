@@ -27,9 +27,11 @@ namespace territory_lords.Shared
         private HubConnection GameHubConnection;
         private IUnit? PlayerActiveUnit = null;
         private Guid? CurrentPlayerGuid = default;
+        private string CurrentPlayerName = string.Empty;
  
         protected override async Task OnInitializedAsync()
         {
+            await base.OnInitializedAsync();
 
             //build a connection to the game hub
             GameHubConnection = new HubConnectionBuilder()
@@ -85,12 +87,22 @@ namespace territory_lords.Shared
 
             //this needs to happen at the end because we want to send a tile update with a unit
             var authUser = (await AuthStateProvider.GetAuthenticationStateAsync()).User;
+            CurrentPlayerName = authUser.Identity.Name ?? "Player";
             var possibleGuidString = authUser.FindFirst(c => c.Type.Contains("objectidentifier"))?.Value;
             if (possibleGuidString != null)
             {
-                //add them to the board as well as track them here
                 CurrentPlayerGuid = new Guid(possibleGuidString);
-                Player? addedPlayer = TheGameBoard.AddPlayerToGame(CurrentPlayerGuid.Value, authUser.Identity.Name);
+            }
+        }
+
+        protected override void OnParametersSet()
+        {
+            base.OnParametersSet();
+
+            if (CurrentPlayerGuid.HasValue)
+            {
+
+                Player? addedPlayer = TheGameBoard.AddPlayerToGame(CurrentPlayerGuid.Value, CurrentPlayerName);
                 if (addedPlayer != null)
                 {
 
@@ -116,7 +128,6 @@ namespace territory_lords.Shared
                     SendTileUpdate(malitiaTile);
                 }
             }
-
         }
 
         private void SendTileUpdate(GameTile gameTile)
@@ -254,8 +265,6 @@ namespace territory_lords.Shared
                         PlayerActiveUnit = null;
                     }
                 }
-
-                
             }
 
             //update the game board cache
@@ -266,13 +275,50 @@ namespace territory_lords.Shared
         }
 
         /// <summary>
+        /// Gets the correct css class for a special tile
+        /// </summary>
+        /// <param name="landType"></param>
+        /// <returns></returns>
+        private string GetCorrectSpecialCssClass(LandType landType)
+        {
+            var cssClass = string.Empty;
+            switch(landType)
+            {
+                case LandType.Desert:
+                    cssClass = "Oasis";break;
+                case LandType.Plains:
+                    cssClass = "Horse";break;
+                case LandType.Forest:
+                    cssClass = "Rabbit"; break;
+                case LandType.Hills:
+                    cssClass = "Coal"; break;
+                case LandType.Mountains:
+                    cssClass = "Gold"; break;
+                case LandType.Tundra:
+                    cssClass = "Deer"; break;
+                case LandType.Arctic:
+                    cssClass = "Seal"; break;
+                case LandType.Swamp:
+                    cssClass = "Oil"; break;
+                case LandType.Jungle:
+                    cssClass = "Gem"; break;
+                case LandType.Ocean:
+                    cssClass = "Fish"; break;
+                case LandType.Grassland:
+                    cssClass = "Shield"; break;
+            }
+
+            return cssClass;
+        }
+
+
+        /// <summary>
         /// Using a gameTile return the correct css class for background display images
         /// </summary>
         /// <param name="gameTile"></param>
         /// <returns></returns>
-        private string GetCorrectBackgroundCSSClass(GameTile gameTile)
+        private string GetCorrectBackgroundCssClass(GameTile gameTile)
         {
-            //this is for ocean tiles only right now. also this needs to be reworked to be more readalbe and extensible
             //if we're on the edge we need to check if there is an ocean tile in the adjoining tiles not in the corresponding line with the tile we're working with
             //if there is not an ocean tile then set the class to the correct straight ocean sprite
             //figure out what's around us so we can act accordingly and not look wierd to everyone. Keep it together Kevin!
@@ -293,8 +339,6 @@ namespace territory_lords.Shared
                     cssClass = GetCorrectJungleCssClass(directNeighbors);break;
 
             }
-
-
             return cssClass;
         }
 

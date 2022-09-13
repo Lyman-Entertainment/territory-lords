@@ -14,6 +14,7 @@ namespace territory_lords.Data
         public int Temperature { get; init; }
         public int Climate { get; init; }
         public int Age { get; init; }
+        private int _specialSeed { get; set; }
         public GameTile[,] Board { get; private set; }
         private static readonly Random RandomNumGen = new();
 
@@ -32,6 +33,7 @@ namespace territory_lords.Data
             RowCount = rows;//do we need this, can't this be figured out by getting the length of the different directions of the Board?
             ColumnCount = columns;
             Board = new GameTile[rows, columns];
+            _specialSeed = RandomNumGen.Next(16);//seed it with a random number
         }
 
         /// <summary>
@@ -46,6 +48,7 @@ namespace territory_lords.Data
             ClimateAdjustments();
             AgeAdjustments();
             CreateRivers();
+            CreateSpecialTiles();
 
             return new GameBoard(GameBoardId, Board, LandMass, Temperature, Climate, Age);
         }
@@ -450,6 +453,18 @@ namespace territory_lords.Data
         }
 
         /// <summary>
+        /// Churns through the tiles making some of the special, based on a super secret and advanced formula
+        /// </summary>
+        private void CreateSpecialTiles()
+        {
+            for (int r = 0; r < RowCount; r++)
+                for (int c = 0; c < ColumnCount; c++)
+                {
+                    Board[r, c].Special = IsGametileSpecial(r, c);
+                }
+        }
+
+        /// <summary>
         /// Check the surrounding direct neighbors to see if any are ocean tiles
         /// </summary>
         /// <param name="row"></param>
@@ -469,6 +484,35 @@ namespace territory_lords.Data
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Figure out if this tile is a special tile and therefore contains special resources
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
+        /// <returns></returns>
+        private bool IsGametileSpecial(int row, int column)
+        {
+            
+            if (row < 2 || row > RowCount - 3) return false;
+            //rivers can't be special. they kind of already are
+            var tile = Board.GetGameTileAtIndex(row, column);
+            if (tile?.LandType == LandType.River) return false;
+
+            return ModTileForSpecial(row, column) == ((column / 4) + 13 + (row / 4) * 11 + _specialSeed) % 16;//some crazy calculation to make special tiles
+            
+        }
+
+        /// <summary>
+        /// Get a mod number for tile to compare to see if it's "special"
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
+        /// <returns></returns>
+        private int ModTileForSpecial(int row, int column)
+        {
+            return (row % 4) * 4 + (column % 4);
         }
 
         /// <summary>
