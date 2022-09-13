@@ -335,83 +335,157 @@ namespace territory_lords.Shared
                     cssClass = GetCorrectMountainCssClass(directNeighbors); break;
                 case LandType.Hills:
                     cssClass = GetCorrectHillsCssClass(directNeighbors);break;
-                case LandType.Jungle:
-                    cssClass = GetCorrectJungleCssClass(directNeighbors);break;
+                case LandType.Desert:
+                    cssClass = GetCorrectDesertCssClass(directNeighbors);break;
+                case LandType.Forest:
+                    cssClass = GetCorrectForestCssClass(directNeighbors); break;
 
             }
             return cssClass;
         }
 
-        private string GetCorrectJungleCssClass(GameTile[] neighbors)
+        private string GetCorrectForestCssClass(GameTile[] neighbors)
         {
-            var jungle = LandType.Jungle;
+            var forest = LandType.Forest;
             //if no neighbors are hills than this is just a single hill all by it's lonesome self
-            if ((neighbors[0].LandType != jungle) && (neighbors[1].LandType != jungle) && (neighbors[2].LandType != jungle) && (neighbors[3].LandType != jungle))
+            if ((neighbors[0].LandType != forest) && (neighbors[1].LandType != forest) && (neighbors[2].LandType != forest) && (neighbors[3].LandType != forest))
             {
-                return "Jungle";
+                return "Forest";
             }
-            else if ((neighbors[0].LandType == jungle) && (neighbors[1].LandType == jungle) && (neighbors[2].LandType == jungle) && (neighbors[3].LandType == jungle))
+            else if ((neighbors[0].LandType == forest) && (neighbors[1].LandType == forest) && (neighbors[2].LandType == forest) && (neighbors[3].LandType == forest))
             {
-                return "Jungle-cross";
+                return "Forest-cross";
             }
-            else if ((neighbors[0].LandType == jungle) && (neighbors[1].LandType != jungle) && (neighbors[2].LandType == jungle) && (neighbors[3].LandType != jungle))
+            else if ((neighbors[0].LandType == forest) && (neighbors[1].LandType != forest) && (neighbors[2].LandType == forest) && (neighbors[3].LandType != forest))
             {
-                return "Jungle-straight-vertical";
+                return "Forest-straight-vertical";
             }
-            else if ((neighbors[0].LandType != jungle) && (neighbors[1].LandType == jungle) && (neighbors[2].LandType != jungle) && (neighbors[3].LandType == jungle))
+            else if ((neighbors[0].LandType != forest) && (neighbors[1].LandType == forest) && (neighbors[2].LandType != forest) && (neighbors[3].LandType == forest))
             {
-                return "Jungle-straight-horizontal";
+                return "Forest-straight-horizontal";
             }
-            else if ((neighbors[0].LandType == jungle) && (neighbors[1].LandType == jungle) && (neighbors[2].LandType != jungle) && (neighbors[3].LandType != jungle))
+            else if ((neighbors[0].LandType == forest) && (neighbors[1].LandType == forest) && (neighbors[2].LandType != forest) && (neighbors[3].LandType != forest))
             {
-                return "Jungle-bend-north-east";
+                return "Forest-bend-north-east";
             }
-            else if ((neighbors[0].LandType != jungle) && (neighbors[1].LandType == jungle) && (neighbors[2].LandType == jungle) && (neighbors[3].LandType != jungle))
+            else if ((neighbors[0].LandType != forest) && (neighbors[1].LandType == forest) && (neighbors[2].LandType == forest) && (neighbors[3].LandType != forest))
             {
-                return "Jungle-bend-south-east";
+                return "Forest-bend-south-east";
             }
-            else if ((neighbors[0].LandType != jungle) && (neighbors[1].LandType != jungle) && (neighbors[2].LandType == jungle) && (neighbors[3].LandType == jungle))
+            else if ((neighbors[0].LandType != forest) && (neighbors[1].LandType != forest) && (neighbors[2].LandType == forest) && (neighbors[3].LandType == forest))
             {
-                return "Jungle-bend-south-west";
+                return "Forest-bend-south-west";
             }
-            else if ((neighbors[0].LandType == jungle) && (neighbors[1].LandType != jungle) && (neighbors[2].LandType != jungle) && (neighbors[3].LandType == jungle))
+            else if ((neighbors[0].LandType == forest) && (neighbors[1].LandType != forest) && (neighbors[2].LandType != forest) && (neighbors[3].LandType == forest))
             {
-                return "Jungle-bend-north-west";
+                return "Forest-bend-north-west";
             }
-            else if ((neighbors[0].LandType == jungle) && (neighbors[1].LandType == jungle) && (neighbors[2].LandType != jungle) && (neighbors[3].LandType == jungle))
+            else if ((neighbors[0].LandType == forest) && (neighbors[1].LandType == forest) && (neighbors[2].LandType != forest) && (neighbors[3].LandType == forest))
             {
-                return "Jungle-tee-north";
+                return "Forest-tee-north";
             }
-            else if ((neighbors[0].LandType == jungle) && (neighbors[1].LandType == jungle) && (neighbors[2].LandType == jungle) && (neighbors[3].LandType != jungle))
+            else if ((neighbors[0].LandType == forest) && (neighbors[1].LandType == forest) && (neighbors[2].LandType == forest) && (neighbors[3].LandType != forest))
             {
-                return "Jungle-tee-east";
+                return "Forest-tee-east";
             }
-            else if ((neighbors[0].LandType != jungle) && (neighbors[1].LandType == jungle) && (neighbors[2].LandType == jungle) && (neighbors[3].LandType == jungle))
+            else if ((neighbors[0].LandType != forest) && (neighbors[1].LandType == forest) && (neighbors[2].LandType == forest) && (neighbors[3].LandType == forest))
             {
-                return "Jungle-tee-south";
+                return "Forest-tee-south";
             }
-            else if ((neighbors[0].LandType == jungle) && (neighbors[1].LandType != jungle) && (neighbors[2].LandType == jungle) && (neighbors[3].LandType == jungle))
+            else if ((neighbors[0].LandType == forest) && (neighbors[1].LandType != forest) && (neighbors[2].LandType == forest) && (neighbors[3].LandType == forest))
             {
-                return "Jungle-tee-west";
+                return "Forest-tee-west";
             }
-            else if ((neighbors[0].LandType != jungle) && (neighbors[1].LandType != jungle) && (neighbors[2].LandType == jungle) && (neighbors[3].LandType != jungle))
+            else if ((neighbors[0].LandType != forest) && (neighbors[1].LandType != forest) && (neighbors[2].LandType == forest) && (neighbors[3].LandType != forest))
             {
-                return "Jungle-start-north";
+                return "Forest-start-north";
             }
-            else if ((neighbors[0].LandType != jungle) && (neighbors[1].LandType != jungle) && (neighbors[2].LandType != jungle) && (neighbors[3].LandType == jungle))
+            else if ((neighbors[0].LandType != forest) && (neighbors[1].LandType != forest) && (neighbors[2].LandType != forest) && (neighbors[3].LandType == forest))
             {
-                return "Jungle-start-east";
+                return "Forest-start-east";
             }
-            else if ((neighbors[0].LandType == jungle) && (neighbors[1].LandType != jungle) && (neighbors[2].LandType != jungle) && (neighbors[3].LandType != jungle))
+            else if ((neighbors[0].LandType == forest) && (neighbors[1].LandType != forest) && (neighbors[2].LandType != forest) && (neighbors[3].LandType != forest))
             {
-                return "Jungle-start-south";
+                return "Forest-start-south";
             }
-            else if ((neighbors[0].LandType != jungle) && (neighbors[1].LandType == jungle) && (neighbors[2].LandType != jungle) && (neighbors[3].LandType != jungle))
+            else if ((neighbors[0].LandType != forest) && (neighbors[1].LandType == forest) && (neighbors[2].LandType != forest) && (neighbors[3].LandType != forest))
             {
-                return "Jungle-start-west";
+                return "Forest-start-west";
             }
 
-            return "Jungle";
+            return "Forest";
+        }
+
+        private string GetCorrectDesertCssClass(GameTile[] neighbors)
+        {
+            var desert = LandType.Desert;
+            //if no neighbors are hills than this is just a single hill all by it's lonesome self
+            if ((neighbors[0].LandType != desert) && (neighbors[1].LandType != desert) && (neighbors[2].LandType != desert) && (neighbors[3].LandType != desert))
+            {
+                return "Desert";
+            }
+            else if ((neighbors[0].LandType == desert) && (neighbors[1].LandType == desert) && (neighbors[2].LandType == desert) && (neighbors[3].LandType == desert))
+            {
+                return "Desert-cross";
+            }
+            else if ((neighbors[0].LandType == desert) && (neighbors[1].LandType != desert) && (neighbors[2].LandType == desert) && (neighbors[3].LandType != desert))
+            {
+                return "Desert-straight-vertical";
+            }
+            else if ((neighbors[0].LandType != desert) && (neighbors[1].LandType == desert) && (neighbors[2].LandType != desert) && (neighbors[3].LandType == desert))
+            {
+                return "Desert-straight-horizontal";
+            }
+            else if ((neighbors[0].LandType == desert) && (neighbors[1].LandType == desert) && (neighbors[2].LandType != desert) && (neighbors[3].LandType != desert))
+            {
+                return "Desert-bend-north-east";
+            }
+            else if ((neighbors[0].LandType != desert) && (neighbors[1].LandType == desert) && (neighbors[2].LandType == desert) && (neighbors[3].LandType != desert))
+            {
+                return "Desert-bend-south-east";
+            }
+            else if ((neighbors[0].LandType != desert) && (neighbors[1].LandType != desert) && (neighbors[2].LandType == desert) && (neighbors[3].LandType == desert))
+            {
+                return "Desert-bend-south-west";
+            }
+            else if ((neighbors[0].LandType == desert) && (neighbors[1].LandType != desert) && (neighbors[2].LandType != desert) && (neighbors[3].LandType == desert))
+            {
+                return "Desert-bend-north-west";
+            }
+            else if ((neighbors[0].LandType == desert) && (neighbors[1].LandType == desert) && (neighbors[2].LandType != desert) && (neighbors[3].LandType == desert))
+            {
+                return "Desert-tee-north";
+            }
+            else if ((neighbors[0].LandType == desert) && (neighbors[1].LandType == desert) && (neighbors[2].LandType == desert) && (neighbors[3].LandType != desert))
+            {
+                return "Desert-tee-east";
+            }
+            else if ((neighbors[0].LandType != desert) && (neighbors[1].LandType == desert) && (neighbors[2].LandType == desert) && (neighbors[3].LandType == desert))
+            {
+                return "Desert-tee-south";
+            }
+            else if ((neighbors[0].LandType == desert) && (neighbors[1].LandType != desert) && (neighbors[2].LandType == desert) && (neighbors[3].LandType == desert))
+            {
+                return "Desert-tee-west";
+            }
+            else if ((neighbors[0].LandType != desert) && (neighbors[1].LandType != desert) && (neighbors[2].LandType == desert) && (neighbors[3].LandType != desert))
+            {
+                return "Desert-start-north";
+            }
+            else if ((neighbors[0].LandType != desert) && (neighbors[1].LandType != desert) && (neighbors[2].LandType != desert) && (neighbors[3].LandType == desert))
+            {
+                return "Desert-start-east";
+            }
+            else if ((neighbors[0].LandType == desert) && (neighbors[1].LandType != desert) && (neighbors[2].LandType != desert) && (neighbors[3].LandType != desert))
+            {
+                return "Desert-start-south";
+            }
+            else if ((neighbors[0].LandType != desert) && (neighbors[1].LandType == desert) && (neighbors[2].LandType != desert) && (neighbors[3].LandType != desert))
+            {
+                return "Desert-start-west";
+            }
+
+            return "Desert";
         }
 
         private string GetCorrectHillsCssClass(GameTile[] neighbors)

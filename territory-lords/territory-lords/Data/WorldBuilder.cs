@@ -14,6 +14,7 @@ namespace territory_lords.Data
         public int Temperature { get; init; }
         public int Climate { get; init; }
         public int Age { get; init; }
+        public int ResourceAbundance { get; set; } = 4;
         private int _specialSeed { get; set; }
         public GameTile[,] Board { get; private set; }
         private static readonly Random RandomNumGen = new();
@@ -67,7 +68,7 @@ namespace territory_lords.Data
             bool[,] stencil = new bool[RowCount, ColumnCount];
             int r = RandomNumGen.Next(rowBuffer, RowCount - (rowBuffer + 1));
             int c = RandomNumGen.Next(colBuffer, ColumnCount - (colBuffer + 1));
-            int maxElevationChanges = RandomNumGen.Next(1, 40);// (int)((RowCount*ColumnCount)/62.5));//why 1-64? 80*50/62.5=64//using the board dimensions since it can be less than 80 wide by 50 tall
+            int maxElevationChanges = RandomNumGen.Next((int)((RowCount*ColumnCount)/62.5));//why 1-64? 80*50/62.5=64//using the board dimensions since it can be less than 80 wide by 50 tall
 
 
             for (int i = 0; i < maxElevationChanges; i++)
@@ -373,7 +374,7 @@ namespace territory_lords.Data
             int minRiverLength = 3;//a river of 1 or 2 is too short
             int riverCount = 0;
 
-            for (int i = 0; i < maxRiverCreationTries && riverCount < (Climate + LandMass) * 2 + 6; i++)//haha why 256? why *2? why +6?
+            for (int i = 0; i < maxRiverCreationTries && riverCount < (Climate + LandMass) * 2 + 6; i++)//haha why *2? why +6?
             {
 
                 //copy the world so we can revert? Also... copy the entire world?
@@ -494,13 +495,14 @@ namespace territory_lords.Data
         /// <returns></returns>
         private bool IsGametileSpecial(int row, int column)
         {
-            
+            //give a buffer from the top and bottom
             if (row < 2 || row > RowCount - 3) return false;
+
             //rivers can't be special. they kind of already are
             var tile = Board.GetGameTileAtIndex(row, column);
             if (tile?.LandType == LandType.River) return false;
 
-            return ModTileForSpecial(row, column) == ((column / 4) + 13 + (row / 4) * 11 + _specialSeed) % 16;//some crazy calculation to make special tiles
+            return ModTileForSpecial(row, column) == ((column / ResourceAbundance) + 13 + (row / ResourceAbundance) * 11 + _specialSeed) % (ResourceAbundance*4);//some crazy calculation to make special tiles
             
         }
 
@@ -512,7 +514,7 @@ namespace territory_lords.Data
         /// <returns></returns>
         private int ModTileForSpecial(int row, int column)
         {
-            return (row % 4) * 4 + (column % 4);
+            return (row % ResourceAbundance) * ResourceAbundance + (column % ResourceAbundance);
         }
 
         /// <summary>

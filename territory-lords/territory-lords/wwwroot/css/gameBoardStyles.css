@@ -110,17 +110,8 @@
 .Arctic {
     background: url(/Images/TER257.PIC_256_resized.png) 0px -350px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
-.Desert {
-    background: url(/Images/TER257.PIC_256_resized.png) 0px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
-.Forest {
-    background: url(/Images/TER257.PIC_256_resized.png) 0px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
 .Grassland {
     background: url(/Images/TER257.PIC_256_resized.png) 0px -100px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
-.Hills {
-    background: url(/Images/TER257.PIC_256_resized.png) 0px -200px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
 .Plains {
     background: url(/Images/TER257.PIC_256_resized.png) 0px -50px, url(/Images/Layer2Sprite.png) 0px -200px;
@@ -130,6 +121,133 @@
 }
 .Tundra {
     background: url(/Images/TER257.PIC_256_resized.png) 0px -300px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.Jungle {
+    background: url(/Images/TER257.PIC_256_resized.png) 0px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.Desert {
+    background: url(/Images/TER257.PIC_256_resized.png) 0px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.Desert-cross {
+    background: url(/Images/TER257.PIC_256_resized.png) -750px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Desert-straight-vertical {
+    background: url(/Images/TER257.PIC_256_resized.png) -250px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Desert-straight-horizontal {
+    background: url(/Images/TER257.PIC_256_resized.png) -500px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Desert-bend-north-east {
+    background: url(/Images/TER257.PIC_256_resized.png) -150px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Desert-bend-south-east {
+    background: url(/Images/TER257.PIC_256_resized.png) -300px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Desert-bend-south-west {
+    background: url(/Images/TER257.PIC_256_resized.png) -600px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Desert-bend-north-west {
+    background: url(/Images/TER257.PIC_256_resized.png) -450px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Desert-tee-north {
+    background: url(/Images/TER257.PIC_256_resized.png) -550px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Desert-tee-east {
+    background: url(/Images/TER257.PIC_256_resized.png) -350px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Desert-tee-south {
+    background: url(/Images/TER257.PIC_256_resized.png) -700px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Desert-tee-west {
+    background: url(/Images/TER257.PIC_256_resized.png) -650px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Desert-start-north {
+    background: url(/Images/TER257.PIC_256_resized.png) -200px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Desert-start-east {
+    background: url(/Images/TER257.PIC_256_resized.png) -400px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Desert-start-south {
+    background: url(/Images/TER257.PIC_256_resized.png) -50px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Desert-start-west {
+    background: url(/Images/TER257.PIC_256_resized.png) -100px 0px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.Forest {
+    background: url(/Images/TER257.PIC_256_resized.png) 0px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+.Forest-cross {
+    background: url(/Images/TER257.PIC_256_resized.png) -750px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Forest-straight-vertical {
+    background: url(/Images/TER257.PIC_256_resized.png) -250px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Forest-straight-horizontal {
+    background: url(/Images/TER257.PIC_256_resized.png) -500px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Forest-bend-north-east {
+    background: url(/Images/TER257.PIC_256_resized.png) -150px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Forest-bend-south-east {
+    background: url(/Images/TER257.PIC_256_resized.png) -300px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Forest-bend-south-west {
+    background: url(/Images/TER257.PIC_256_resized.png) -600px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Forest-bend-north-west {
+    background: url(/Images/TER257.PIC_256_resized.png) -450px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Forest-tee-north {
+    background: url(/Images/TER257.PIC_256_resized.png) -550px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Forest-tee-east {
+    background: url(/Images/TER257.PIC_256_resized.png) -350px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Forest-tee-south {
+    background: url(/Images/TER257.PIC_256_resized.png) -700px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Forest-tee-west {
+    background: url(/Images/TER257.PIC_256_resized.png) -650px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Forest-start-north {
+    background: url(/Images/TER257.PIC_256_resized.png) -200px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Forest-start-east {
+    background: url(/Images/TER257.PIC_256_resized.png) -400px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Forest-start-south {
+    background: url(/Images/TER257.PIC_256_resized.png) -50px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
+}
+
+.Forest-start-west {
+    background: url(/Images/TER257.PIC_256_resized.png) -100px -150px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
 .Mountains {
     background: url(/Images/TER257.PIC_256_resized.png) 0px -250px, url(/Images/Layer2Sprite.png) 0px -200px;
@@ -289,68 +407,7 @@
 .Hills-start-west {
     background: url(/Images/TER257.PIC_256_resized.png) -100px -200px, url(/Images/Layer2Sprite.png) 0px -200px;
 }
-.Jungle {
-    background: url(/Images/TER257.PIC_256_resized.png) 0px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
-.Jungle-cross {
-    background: url(/Images/TER257.PIC_256_resized.png) -750px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
 
-.Jungle-straight-vertical {
-    background: url(/Images/TER257.PIC_256_resized.png) -250px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
-
-.Jungle-straight-horizontal {
-    background: url(/Images/TER257.PIC_256_resized.png) -500px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
-
-.Jungle-bend-north-east {
-    background: url(/Images/TER257.PIC_256_resized.png) -150px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
-
-.Jungle-bend-south-east {
-    background: url(/Images/TER257.PIC_256_resized.png) -300px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
-
-.Jungle-bend-south-west {
-    background: url(/Images/TER257.PIC_256_resized.png) -600px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
-
-.Jungle-bend-north-west {
-    background: url(/Images/TER257.PIC_256_resized.png) -450px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
-
-.Jungle-tee-north {
-    background: url(/Images/TER257.PIC_256_resized.png) -550px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
-
-.Jungle-tee-east {
-    background: url(/Images/TER257.PIC_256_resized.png) -350px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
-
-.Jungle-tee-south {
-    background: url(/Images/TER257.PIC_256_resized.png) -700px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
-
-.Jungle-tee-west {
-    background: url(/Images/TER257.PIC_256_resized.png) -650px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
-
-.Jungle-start-north {
-    background: url(/Images/TER257.PIC_256_resized.png) -200px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
-
-.Jungle-start-east {
-    background: url(/Images/TER257.PIC_256_resized.png) -400px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
-
-.Jungle-start-south {
-    background: url(/Images/TER257.PIC_256_resized.png) -50px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
-
-.Jungle-start-west {
-    background: url(/Images/TER257.PIC_256_resized.png) -100px -450px, url(/Images/Layer2Sprite.png) 0px -200px;
-}
 .Unit {
     width: 100%;
     height: 100%;
