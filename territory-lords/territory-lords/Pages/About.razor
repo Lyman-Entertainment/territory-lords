@@ -5,42 +5,56 @@
 @inject IHttpContextAccessor httpContextAccessor
 @inject NavigationManager NavManager
 
-<h1>About</h1>
+<MudContainer>
 
+    <MudText Typo="Typo.h2">Inspiration</MudText>
+    <MudPaper Elevation="2" Class="pa-4 mx-2 mt-2 mb-6">
+        <MudPaper Elevation="0">
+            <MudText Typo="Typo.body1">
+                I played the Civilization game from the 90's a lot growing up. I wanted to learn Blazor Server so I thought why not use it as a chance to learn and doing something crazy and fun.
+            </MudText>
+        </MudPaper>
+    </MudPaper>
 
-<section>
-    <h2>Inspiration</h2>
-    <p>
-        I played the Civilization game from the 90's a lot growing up. I wanted to learn Blazor Server so I thought why not use it as a chance to learn and doing something crazy and fun.
-    </p>
-</section>
-<section>
-    <h2>Links to Civilization games</h2>
-    <p>
-        The first Civilization was probably the first computer game I really remember playing and understanding. Maybe Dune II, but still, this game is fantastic.
-        <a href="https://civilization.com/civilization-1/">Civilization I</a>
-    </p>
-    <p>
-        The second Civilization wasn't my thing. The graphics turned me off and I don't remember really playing it at all. I'm sure it was a fantastic game still.
-        <a href="https://civilization.com/civilization-2/">Civilization II</a>
-    </p>
-    <p>
-        The third Civilization, I was back in. This time I was in to the graphics, city view, and the game play was great. Also, hello space ship!
-        <a href="https://civilization.com/civilization-3/">Civilization III</a>
-    </p>
-    <p>
-        The forth Civilization and it's expantions were where I spent my time and money. This was the first time in 3D and I loved it.
-        <a href="https://civilization.com/civilization-4/">Civilization IV</a>
-    </p>
-    <p>
-        The fifth Civilization brought us hexes. The game world had so much more color and life. It seemed like such a living world that I wanted to explore.
-        <a href="https://civilization.com/civilization-5/">Civilization V</a>
-    </p>
-    <p>
-        The sixth Civilization brought city buildings out of the city to make building more a part of the game. I own every expansion. Doesn't mean I'm any good at this game though.
-        <a href="https://civilization.com/civilization-6/">Civilization VI</a>
-    </p>
-</section>
+    <MudText Typo="Typo.h2">Links to Civilization games</MudText>
+    <MudPaper Elevation="3" Class="pa-4 ma-2">
+        <MudPaper Elevation="0">
+            The first Civilization was probably the first computer game I really remember playing and understanding. Maybe Dune II, but still, this game is fantastic.
+        </MudPaper>
+        <MudLink href="https://civilization.com/civilization-1/">Civilization I</MudLink>
+    </MudPaper>
+    <MudPaper Elevation="3" Class="pa-4 ma-2">
+        <MudPaper Elevation="0">
+            The second Civilization wasn't my thing. The graphics turned me off and I don't remember really playing it at all. I'm sure it was a fantastic game still.
+        </MudPaper>
+        <MudLink href="https://civilization.com/civilization-2/">Civilization II</MudLink>
+    </MudPaper>
+    <MudPaper Elevation="3" Class="pa-4 ma-2">
+        <MudPaper Elevation="0">
+            The third Civilization, I was back in. This time I was in to the graphics, city view, and the game play was great. Also, hello space ship!
+        </MudPaper>
+        <MudLink href="https://civilization.com/civilization-3/">Civilization III</MudLink>
+    </MudPaper>
+    <MudPaper Elevation="3" Class="pa-4 ma-2">
+        <MudPaper Elevation="0">
+            The forth Civilization and it's expantions were where I spent my time and money. This was the first time in 3D and I loved it.
+        </MudPaper>
+        <MudLink href="https://civilization.com/civilization-4/">Civilization IV</MudLink>
+    </MudPaper>
+    <MudPaper Elevation="3" Class="pa-4 ma-2">
+        <MudPaper Elevation="0">
+            The fifth Civilization brought us hexes. The game world had so much more color and life. It seemed like such a living world that I wanted to explore.
+        </MudPaper>
+        <MudLink href="https://civilization.com/civilization-5/">Civilization V</MudLink>
+    </MudPaper>
+    <MudPaper Elevation="3" Class="pa-4 ma-2">
+        <MudPaper Elevation="0">
+            The sixth Civilization brought city buildings out of the city to make building more a part of the game. I own every expansion. Doesn't mean I'm any good at this game though.
+        </MudPaper>
+        <MudLink href="https://civilization.com/civilization-6/">Civilization VI</MudLink>
+    </MudPaper>
+</MudContainer>
+
 
 @code {
 

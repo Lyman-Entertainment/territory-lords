@@ -12,60 +12,57 @@
     <MudAlert Severity="Severity.Error" Variant="Variant.Filled">@string.Join(";", errorMessages)</MudAlert>
 }
 
-<form @onsubmit="BuildGame">
-    <MudPaper>
-        <MudTextField @bind-Value="@GameId" Label="The Game Id"   
-        Required="true" RequiredError="GameId is required" Variant="Variant.Text"
-        HelperText="This will be the name of your game and the URL to it as well" Margin="Margin.Dense"/>
-    </MudPaper>
-    <MudPaper>
-        <label>World Size:</label>
-        <MudNumericField @bind-Value="@Rows" Label="Height" Variant="Variant.Text" Min="@minColumnRows" Max="@maxColumnRows"/>
-        <MudNumericField @bind-Value="@Columns" Label="Width" Variant="Variant.Text" Min="@minColumnRows" Max="@maxColumnRows"/>
-    </MudPaper>
-    <MudPaper>
-        <label>Land Mass</label>
-        <MudSlider @bind-value="@LandMass" Size="Size.Large" Step="1" TickMarks="true" TickMarkLabels="@landMassLabels" Min="@minRange" Max="@maxRange"/>
-        <label>Islands</label>
-        <input @bind=LandMass type="range" min="@minRange" max="@maxRange"/>
-        <label>Continent</label>
-    </MudPaper>
-    <MudPaper>
-        <label>Temperature</label>
-        <label>Colder</label>
-        <input @bind=Temperature type="range" min="@minRange" max="@maxRange"/>
-        <label>Hotter</label>
-    </MudPaper>
-    <MudPaper>
-        <label>Climate</label>
-        <label>Arid</label>
-        <input @bind=Climate type="range" min="@minRange" max="@maxRange"/>
-        <label>Wet</label>
-    </MudPaper>
-    <MudPaper>
-        <label>Age</label>
-        <label>Mountainous</label>
-        <input @bind=Age type="range" min="@minRange" max="@maxRange"/>
-        <label>Hillanous</label>
-    </MudPaper>
-    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Create" Color="Color.Primary" ButtonType="ButtonType.Submit">Create Game</MudButton>
-</form>
+<MudContainer>
+    <MudForm @onsubmit="BuildGame">
+        <MudPaper>
+            <MudTextField @bind-Value="@GameId" Label="The Game Id"   
+            Required="true" RequiredError="GameId is required" Variant="Variant.Text"
+            HelperText="This will be the name of your game and the URL to it as well" Margin="Margin.Dense"/>
+        </MudPaper>
+        <MudPaper>
+            <label>World Size:</label>
+            <MudNumericField @bind-Value="@Rows" Label="Height" Variant="Variant.Text" Min="@minColumnRows" Max="@maxColumnRows"/>
+            <MudNumericField @bind-Value="@Columns" Label="Width" Variant="Variant.Text" Min="@minColumnRows" Max="@maxColumnRows"/>
+        </MudPaper>
+        <MudPaper>
+            <label>Land Masses</label>
+            <MudSlider @bind-value="@LandMass" Size="Size.Large" Step="1" TickMarks="true" TickMarkLabels="@landMassLabels" Min="@minRange" Max="@maxRange"/>
+        </MudPaper>
+        <MudPaper>
+            <label>Temperature</label>
+            <MudSlider @bind-value="@Temperature" Size="Size.Large" Step="1" TickMarks="true" TickMarkLabels="@temperatureLabels" Min="@minRange" Max="@maxRange"/>
+        </MudPaper>
+        <MudPaper>
+            <label>Climate</label>
+            <MudSlider @bind-value="@Climate" Size="Size.Large" Step="1" TickMarks="true" TickMarkLabels="@climateLabels" Min="@minRange" Max="@maxRange"/>
+        </MudPaper>
+        <MudPaper>
+            <label>Age</label>
+            <MudSlider @bind-value="@Age" Size="Size.Large" Step="1" TickMarks="true" TickMarkLabels="@ageLabels" Min="@minRange" Max="@maxRange"/>
+        </MudPaper>
+        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Create" Color="Color.Primary" ButtonType="ButtonType.Submit">Create Game</MudButton>
+    </MudForm>
+</MudContainer>
 
 @code {
     private string GameId = "";
     private byte Columns;
     private byte Rows;
     private int LandMass;
-    private byte Temperature;
-    private byte Climate;
-    private byte Age;
+    private int Temperature;
+    private int Climate;
+    private int Age;
     private bool ShowError = false;
     private readonly byte minColumnRows = 20;//I think it would be fun to have small worlds like 10 x 10 but the world generation does not appreciate small worlds!
     private readonly byte maxColumnRows = 80;
     private readonly byte minRange = 0;
     private readonly byte maxRange = 2;
     private List<string> errorMessages = new List<string>();
-    private string[] landMassLabels = new string[] { "Islands", "Normal", "Pangea" };
+    private string[] landMassLabels = new string[] { "Small", "Normal", "Large" };
+    private string[] temperatureLabels = new string[] { "Cold", "Temperate", "Warm" };
+    private string[] climateLabels = new string[] { "Arid", "Normal", "Wet" };
+    private string[] ageLabels = new string[] { "3 Bill", "4 Bill", "5 Bill" };
+
 
     protected override void OnInitialized()
     {
