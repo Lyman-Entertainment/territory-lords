@@ -6,7 +6,7 @@
 @inject NavigationManager NavManager
 @inject GameBoardCache BoardCache
 
-<h3>CreateGame</h3>
+<MudText Typo="Typo.h3" Class="mx-auto">CreateGame</MudText>
 @if(ShowError)
 {
     <MudAlert Severity="Severity.Error" Variant="Variant.Filled">@string.Join(";", errorMessages)</MudAlert>
@@ -14,29 +14,29 @@
 
 <MudContainer>
     <MudForm @onsubmit="BuildGame">
-        <MudPaper>
+        <MudPaper Class="pa-6 mt-2 mb-4">
             <MudTextField @bind-Value="@GameId" Label="The Game Id"   
             Required="true" RequiredError="GameId is required" Variant="Variant.Text"
             HelperText="This will be the name of your game and the URL to it as well" Margin="Margin.Dense"/>
         </MudPaper>
-        <MudPaper>
+        <MudPaper Class="pa-6 mt-2 mb-4">
             <label>World Size:</label>
-            <MudNumericField @bind-Value="@Rows" Label="Height" Variant="Variant.Text" Min="@minColumnRows" Max="@maxColumnRows"/>
+            <MudNumericField @bind-Value="@Rows" Label="Height" Variant="Variant.Text" Min="@minColumnRows" Max="@maxColumnRows" />
             <MudNumericField @bind-Value="@Columns" Label="Width" Variant="Variant.Text" Min="@minColumnRows" Max="@maxColumnRows"/>
         </MudPaper>
-        <MudPaper>
+        <MudPaper Class="pa-6 mt-2 mb-4">
             <label>Land Masses</label>
             <MudSlider @bind-value="@LandMass" Size="Size.Large" Step="1" TickMarks="true" TickMarkLabels="@landMassLabels" Min="@minRange" Max="@maxRange"/>
         </MudPaper>
-        <MudPaper>
+        <MudPaper Class="pa-6 mt-2 mb-4">
             <label>Temperature</label>
             <MudSlider @bind-value="@Temperature" Size="Size.Large" Step="1" TickMarks="true" TickMarkLabels="@temperatureLabels" Min="@minRange" Max="@maxRange"/>
         </MudPaper>
-        <MudPaper>
+        <MudPaper Class="pa-6 mt-2 mb-4">
             <label>Climate</label>
             <MudSlider @bind-value="@Climate" Size="Size.Large" Step="1" TickMarks="true" TickMarkLabels="@climateLabels" Min="@minRange" Max="@maxRange"/>
         </MudPaper>
-        <MudPaper>
+        <MudPaper Class="pa-6 mt-2 mb-4">
             <label>Age</label>
             <MudSlider @bind-value="@Age" Size="Size.Large" Step="1" TickMarks="true" TickMarkLabels="@ageLabels" Min="@minRange" Max="@maxRange"/>
         </MudPaper>

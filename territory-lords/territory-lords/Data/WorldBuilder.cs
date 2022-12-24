@@ -179,8 +179,6 @@ namespace territory_lords.Data
             for (int r = 0; r < RowCount; r++)
                 for (int c = 0; c < ColumnCount; c++)
                 {
-                    //bool special = TileIsSpecial(x, y);
-                    //TODO: figure out special tiles
 
                     //churn through the two maps and make...A WORLD!
                     switch (elevationMap[r, c])
@@ -332,7 +330,6 @@ namespace territory_lords.Data
                     if (rRan >= RowCount) rRan = RowCount - 2;
                 }
 
-                //bool special = TileIsSpecial(r,c);
                 switch (Board[rRan, cRan].LandType)
                 {
                     case LandType.Forest:
@@ -447,7 +444,6 @@ namespace territory_lords.Data
                 }
                 else
                 {
-                    //Console.WriteLine($"Resetting River Try");
                     Board = CopyBoard(tilesBackup);//reset it our river sucked
                 }
             }

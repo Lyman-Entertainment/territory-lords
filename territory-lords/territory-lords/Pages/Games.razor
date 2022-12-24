@@ -1,0 +1,44 @@
+﻿@page "/Games"
+@using Microsoft.Extensions.Logging
+@using territory_lords.Data
+@using territory_lords.Data.Cache;
+@using Microsoft.AspNetCore.WebUtilities;
+@using territory_lords.Data.Models;
+@using System.Collections.Generic;
+@inject NavigationManager NavManager
+@inject GameBoardCache BoardCache
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@attribute [Authorize]
+
+
+<h3>Games</h3>
+<MudSimpleTable Dense="true" Hover="true" Bordered="true" Style="overflow-x: auto;">
+    <thead>
+      <tr>
+          <th>
+              Game Id
+          </th>
+      </tr>
+    </thead>
+    <tbody>
+        @foreach (var gameId in gameIds)
+        {
+            <tr>
+                <td>
+                    <MudNavLink Href="@($"/Map/{gameId}")" Icon="@Icons.Rounded.BubbleChart">@gameId</MudNavLink>
+                </td>
+            </tr>
+        }
+    </tbody>
+</MudSimpleTable>
+@code {
+    IEnumerable<string> gameIds;
+
+    protected override Task OnParametersSetAsync()
+    {
+        gameIds = BoardCache.GetIdsToPlayerGames();
+
+
+        return base.OnParametersSetAsync();
+    }
+}
