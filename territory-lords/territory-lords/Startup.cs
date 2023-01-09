@@ -40,8 +40,7 @@ namespace territory_lords
             //****Azure B2C****//
             services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
                     .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAdB2C"));
-            //services.AddAuthentication(options => options.)
-            //        .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAdB2C"));
+
 
             services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
             {
