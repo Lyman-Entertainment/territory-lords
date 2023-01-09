@@ -10,6 +10,7 @@ using territory_lords.Data.Cache;
 using territory_lords.Data.Models;
 using territory_lords.Data.Models.Improvements;
 using territory_lords.Data.Models.Units;
+using territory_lords.Data.Models.Board;
 using territory_lords.Data.Statics.Extensions;
 
 namespace territory_lords.Shared
@@ -64,7 +65,7 @@ namespace territory_lords.Shared
                     }
                     
 
-                    TheGameBoard.Board[gameTile.RowIndex, gameTile.ColumnIndex] = gameTile;
+                    TheGameBoard.GameTileLayer[gameTile.RowIndex, gameTile.ColumnIndex] = gameTile;
                     StateHasChanged();
                 }
 
@@ -187,7 +188,7 @@ namespace territory_lords.Shared
                         {
                             //they are swapping the active unit and selected units positions
                             //put the clicked on unit into the square where the active unit currently is
-                            GameTile? oldTile = TheGameBoard.Board.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex);
+                            GameTile? oldTile = TheGameBoard.GameTileLayer.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex);
                             selectedUnit.ColumnIndex = PlayerActiveUnit.ColumnIndex;
                             selectedUnit.RowIndex = PlayerActiveUnit.RowIndex; 
                             selectedUnit.Active = false;//turn off active
@@ -217,7 +218,7 @@ namespace territory_lords.Shared
                             //this is the EXACT same code as moving a unit
                             //TODO: Make moving a unit a method to call
                             //clear the unit at the old coordinates
-                            GameTile? oldTile = TheGameBoard.Board.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex);
+                            GameTile? oldTile = TheGameBoard.GameTileLayer.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex);
                             if (oldTile != null)
                             {
                                 oldTile.Unit = null;
@@ -247,7 +248,7 @@ namespace territory_lords.Shared
                     if (PlayerActiveUnit != null)
                     {
                         //clear the unit at the old coordinates
-                        GameTile? oldTile = TheGameBoard.Board.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex);
+                        GameTile? oldTile = TheGameBoard.GameTileLayer.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex);
                         if (oldTile != null)
                         {
                             oldTile.Unit = null;
@@ -322,7 +323,7 @@ namespace territory_lords.Shared
             //if we're on the edge we need to check if there is an ocean tile in the adjoining tiles not in the corresponding line with the tile we're working with
             //if there is not an ocean tile then set the class to the correct straight ocean sprite
             //figure out what's around us so we can act accordingly and not look wierd to everyone. Keep it together Kevin!
-            var directNeighbors = TheGameBoard.Board.GetGameTileDirectNeighbors(gameTile.RowIndex,gameTile.ColumnIndex);
+            var directNeighbors = TheGameBoard.GameTileLayer.GetGameTileDirectNeighbors(gameTile.RowIndex,gameTile.ColumnIndex);
             var cssClass = gameTile.LandType.ToString("g");
             switch (gameTile.LandType)
             {

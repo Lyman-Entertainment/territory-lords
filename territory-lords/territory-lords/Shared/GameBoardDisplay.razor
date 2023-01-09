@@ -1,4 +1,5 @@
-﻿
+﻿@using territory_lords.Data.Models.Board
+
 
 <div id="BoardWrapper">
     <div id="PlayerList">
@@ -15,7 +16,7 @@
             <div class="game-board-row">
                 @for (int c = 0; c < TheGameBoard.ColumnCount; c++)
                 {
-                    GameTile gameTile = TheGameBoard.Board[r, c];
+                    GameTile gameTile = TheGameBoard.GameTileLayer[r, c];
                     var shadowColor = "";
                     if (gameTile.OwningPlayer != null)
                     {

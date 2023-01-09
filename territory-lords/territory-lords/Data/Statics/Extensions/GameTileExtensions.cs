@@ -1,4 +1,5 @@
 ﻿using territory_lords.Data.Models;
+using territory_lords.Data.Models.Board;
 
 namespace territory_lords.Data.Statics.Extensions
 {

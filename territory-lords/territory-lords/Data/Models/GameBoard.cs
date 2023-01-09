@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using territory_lords.Data.Models.Units;
 using territory_lords.Data.Statics;
+using territory_lords.Data.Models.Board;
 
 namespace territory_lords.Data.Models
 {
@@ -11,13 +12,16 @@ namespace territory_lords.Data.Models
     {
         //These should probably be private with some accessors
         public string GameBoardId { get; set; }
-        public int RowCount { get => Board.GetLength(0); }
-        public int ColumnCount { get => Board.GetLength(1); }
+        public int RowCount { get => GameTileLayer.GetLength(0); }
+        public int ColumnCount { get => GameTileLayer.GetLength(1); }
         public int LandMass { get; init; }
         public int Temperature { get; init; }
         public int Climate { get; init; }
         public int Age { get; init; }
-        public GameTile[,] Board { get; set; }
+        /// <summary>
+        /// What would be the physical board in a real game. This is what holds the land and it's properties
+        /// </summary>
+        public GameTile[,] GameTileLayer { get; set; }
         public List<Player> Players { get; set; } = new List<Player>();
         private static readonly Random RandomNumGen = new();
 
@@ -32,7 +36,7 @@ namespace territory_lords.Data.Models
             Age = age;
 
             GameBoardId = gameBoardId;
-            Board = gameTiles;
+            GameTileLayer = gameTiles;
         }
         
 
@@ -91,7 +95,7 @@ namespace territory_lords.Data.Models
         /// <param name="newUnit"></param>
         public GameTile InsertUnitToMap(IUnit newUnit)
         {
-            var grassland = (from GameTile tile in Board where tile.LandType == LandType.Grassland select tile).ToArray();
+            var grassland = (from GameTile tile in GameTileLayer where tile.LandType == LandType.Grassland select tile).ToArray();
             var randomTile = grassland[RandomNumGen.Next(grassland.Length)];
             randomTile.Unit = newUnit;
 
