@@ -21,12 +21,12 @@ namespace territory_lords.Data.Models
         /// <summary>
         /// What would be the physical board in a real game. This is what holds the land and it's properties
         /// </summary>
-        public GameTile[,] GameTileLayer { get; set; }
+        public GameBoardTile[,] GameTileLayer { get; set; }
+        public UnitTile[,] UnitTileLayer { get; set; }
         public List<Player> Players { get; set; } = new List<Player>();
         private static readonly Random RandomNumGen = new();
 
-        //TODO: Separate the building of the world from the GameBoard. The GameBoard is simply that, the GameBoard. There should be a world generating class that returns the Board outside of this.
-        public GameBoard(string gameBoardId, GameTile[,] gameTiles, int landMass, int temperature, int climate, int age)
+        public GameBoard(string gameBoardId, GameBoardTile[,] gameTiles, int landMass, int temperature, int climate, int age)
         {
 
             //these should only be 1-3, maybe check that here
@@ -37,6 +37,7 @@ namespace territory_lords.Data.Models
 
             GameBoardId = gameBoardId;
             GameTileLayer = gameTiles;
+            UnitTileLayer = new UnitTile[gameTiles.GetLength(0), gameTiles.GetLength(1)];
         }
         
 
@@ -61,7 +62,7 @@ namespace territory_lords.Data.Models
             if (!Players.Any(p => p.Id == playerId))
             {
 
-                Player newPlayer = new Player
+                Player newPlayer = new()
                 {
                     Id = playerId,
                     Name = playerName,
@@ -90,16 +91,23 @@ namespace territory_lords.Data.Models
         
 
         /// <summary>
-        /// Probably just for now putting a unit on the board
+        /// Probably just for now putting a unit on the board in a random spot
         /// </summary>
         /// <param name="newUnit"></param>
-        public GameTile InsertUnitToMap(IUnit newUnit)
+        public UnitTile InsertUnitToRandomSpotOnMap(Player owningPlayer, IUnit newUnit)
         {
-            var grassland = (from GameTile tile in GameTileLayer where tile.LandType == LandType.Grassland select tile).ToArray();
+            var grassland = (from GameBoardTile tile in GameTileLayer where tile.LandType == LandType.Grassland select tile).ToArray();
             var randomTile = grassland[RandomNumGen.Next(grassland.Length)];
-            randomTile.Unit = newUnit;
+            var createdUnitTile = new UnitTile(owningPlayer)
+            {
+                Unit = newUnit,
+                ColumnIndex = randomTile.ColumnIndex,
+                RowIndex = randomTile.RowIndex
+            };
 
-            return randomTile;
+            UnitTileLayer[createdUnitTile.RowIndex, createdUnitTile.ColumnIndex] = createdUnitTile;
+
+            return createdUnitTile;
         }
     }
 }

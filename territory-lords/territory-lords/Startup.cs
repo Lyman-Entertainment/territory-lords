@@ -85,7 +85,7 @@ namespace territory_lords
             services.AddHttpClient();
             services.AddScoped<TokenProvider>();
             services.AddMudServices();
-
+            services.AddLogging();
             services.AddHttpContextAccessor();
         }
 

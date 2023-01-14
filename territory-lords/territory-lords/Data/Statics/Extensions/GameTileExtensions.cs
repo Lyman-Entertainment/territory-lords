@@ -5,7 +5,7 @@ namespace territory_lords.Data.Statics.Extensions
 {
     public static class GameTileExtensions
     {
-        public static GameTile? GetGameTileAtIndex(this GameTile[,] gameTiles, int rowIndex, int columnIndex)
+        public static GameBoardTile? GetGameTileAtIndex(this GameBoardTile[,] gameTiles, int rowIndex, int columnIndex)
         {
             //we're outside the board bounds
             if (rowIndex < 0 || columnIndex < 0 || rowIndex > gameTiles.GetLength(0) - 1 || columnIndex > gameTiles.GetLength(1) - 1)
@@ -17,9 +17,9 @@ namespace territory_lords.Data.Statics.Extensions
             return gameTiles[rowIndex, columnIndex];
         }
 
-        public static GameTile?[] GetGameTileDirectNeighbors(this GameTile[,] gameTiles, int rowIndex, int columnIndex)
+        public static GameBoardTile?[] GetGameTileDirectNeighbors(this GameBoardTile[,] gameTiles, int rowIndex, int columnIndex)
         {
-            var neighbors = new GameTile?[4];
+            var neighbors = new GameBoardTile?[4];
             //get to the north
             neighbors[0] = gameTiles.GetGameTileAtIndex(rowIndex - 1, columnIndex);
             //get to the east
@@ -32,9 +32,9 @@ namespace territory_lords.Data.Statics.Extensions
             return neighbors;
         }
 
-        public static GameTile?[] GetGameTileCornerNeighbors(this GameTile[,] gameTiles, int rowIndex, int columnIndex)
+        public static GameBoardTile?[] GetGameTileCornerNeighbors(this GameBoardTile[,] gameTiles, int rowIndex, int columnIndex)
         {
-            var neighbors = new GameTile?[4];
+            var neighbors = new GameBoardTile?[4];
             //top right
             neighbors[0] = gameTiles.GetGameTileAtIndex(rowIndex + 1, columnIndex + 1);
             //bottom right
@@ -48,9 +48,9 @@ namespace territory_lords.Data.Statics.Extensions
         }
 
 
-        public static GameTile?[] GetAllGameTileNeighbors(this GameTile[,] gameTiles, int rowIndex, int columnIndex)
+        public static GameBoardTile?[] GetAllGameTileNeighbors(this GameBoardTile[,] gameTiles, int rowIndex, int columnIndex)
         {
-            var neighbors = new GameTile?[8];
+            var neighbors = new GameBoardTile?[8];
             //get to the north
             neighbors[0] = gameTiles.GetGameTileAtIndex(rowIndex - 1, columnIndex);
             //top right

@@ -1,4 +1,5 @@
 ﻿@using territory_lords.Data.Models.Board
+@using territory_lords.Data.Models.Units
 
 
 <div id="BoardWrapper">
@@ -16,13 +17,16 @@
             <div class="game-board-row">
                 @for (int c = 0; c < TheGameBoard.ColumnCount; c++)
                 {
-                    GameTile gameTile = TheGameBoard.GameTileLayer[r, c];
+                    GameBoardTile gameTile = TheGameBoard.GameTileLayer[r, c];
+                    UnitTile? unitTile = TheGameBoard.UnitTileLayer[r, c];
+
                     var shadowColor = "";
                     if (gameTile.OwningPlayer != null)
                     {
                         shadowColor = $"box-shadow: inset 0 0 5px 2px {gameTile.OwningPlayer.Colors.TileColor};";
                     }
-                    <div class="game-board-tile @GetCorrectBackgroundCssClass(gameTile)" style="@shadowColor" @onclick="() => HandleGameBoardSquareClick(gameTile)">
+
+                    <div class="game-board-tile @GetCorrectBackgroundCssClass(gameTile)" style="@shadowColor" @onclick="() => HandleGameBoardSquareClick(gameTile)" @onclick:stopPropagation="true">
                         
                         @if (gameTile.Special)
                         {
@@ -44,12 +48,12 @@
                             </div>
                         }
 
-                        @if(gameTile.Unit != null)
+                        @if(unitTile.Unit != null)
                         {
-                            var unitColor = $"background-color: {gameTile.Unit.OwningPlayer.Colors.TileColor}; border-color:{gameTile.Unit.OwningPlayer.Colors.BorderColor}";
+                            var unitColor = $"background-color: {unitTile.OwningPlayer.Colors.TileColor}; border-color:{unitTile.OwningPlayer.Colors.BorderColor}";
                             
-                            <div class="Unit  @(gameTile.Unit.Active ? "Active" : "")">
-                            <img class ="@(gameTile.Unit.GetType().Name)" style="@unitColor" src="/Images/Layer2Sprite.png"/>
+                            <div class="Unit @(unitTile.Active ? "Active" : "")" @onclick="() => HandleUnitTileClick(unitTile)" >
+                            <img class ="@(unitTile.Unit.GetType().Name)" style="@unitColor" src="/Images/Layer2Sprite.png"/>
                             </div>
                         }
                     </div>

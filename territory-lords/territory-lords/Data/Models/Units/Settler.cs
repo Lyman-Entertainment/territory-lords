@@ -2,14 +2,13 @@
 {
     public class Settler : BaseUnit, IUnit
     {
-        public Settler(Player player) : base(player)
+        public Settler() : base()
         {
-            base.Price = 1;
+            base.Price = 4;
             base.Maintenance = 1;
             base.Attack = 0;
-            base.Defense = 0;
+            base.Defense = 1;
             base.MoveDistance = 1;
-            base.Active = false;
         }
     }
 }

@@ -16,9 +16,14 @@ namespace territory_lords.Hubs
         {
             //what should go in a ctor of a hub?
         }
-        public async Task SendTileUpdate(string gameBoardId,string serializedGameTile)
+        public async Task SendGameBoardTileUpdate(string gameBoardId,string serializedGameTile)
         {
-            await Clients.Others.SendAsync("TileUpdate",gameBoardId, serializedGameTile);
+            await Clients.Others.SendAsync("GameBoardTileUpdate",gameBoardId, serializedGameTile);
+        }
+
+        public async Task SendUnitTileUpdate(string gameBoardId, string serializedGameTile)
+        {
+            await Clients.Others.SendAsync("UnitTileUpdate", gameBoardId, serializedGameTile);
         }
     }
 }
