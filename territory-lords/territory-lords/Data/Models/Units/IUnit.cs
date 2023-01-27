@@ -12,11 +12,5 @@ namespace territory_lords.Data.Models.Units
         public byte Attack { get;  set; }
         public byte Defense { get;  set; }
         public byte MoveDistance { get; set; }
-        public bool Active { get; set; }
-        public Player OwningPlayer { get; set; } 
-        public int ColumnIndex { get; set; }
-        public int RowIndex { get; set; }
-        
-    
     }
 }

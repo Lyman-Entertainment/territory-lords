@@ -1,5 +1,6 @@
 ﻿using System;
 using territory_lords.Data.Models;
+using territory_lords.Data.Models.Board;
 using System.Linq;
 using territory_lords.Data.Statics.Extensions;
 
@@ -16,7 +17,7 @@ namespace territory_lords.Data
         public int Age { get; init; }
         public int ResourceAbundance { get; set; } = 4;
         private int _specialSeed { get; set; }
-        public GameTile[,] Board { get; private set; }
+        public GameBoardTile[,] Board { get; private set; }
         private static readonly Random RandomNumGen = new();
 
         public WorldBuilder(string gameBoardId, int rows = 25, int columns = 25, int landMass = 1, int temperature = 1, int climate = 1, int age = 1)
@@ -33,7 +34,7 @@ namespace territory_lords.Data
             GameBoardId = gameBoardId;
             RowCount = rows;//do we need this, can't this be figured out by getting the length of the different directions of the Board?
             ColumnCount = columns;
-            Board = new GameTile[rows, columns];
+            Board = new GameBoardTile[rows, columns];
             _specialSeed = RandomNumGen.Next(16);//seed it with a random number
         }
 
@@ -185,21 +186,21 @@ namespace territory_lords.Data
                     {
                         case 0:
                             {
-                                Board[r, c] = new GameTile(r, c, LandType.Ocean); break;//new Ocean(x, y, special); break;
+                                Board[r, c] = new GameBoardTile(r, c, LandType.Ocean); break;//new Ocean(x, y, special); break;
                             }
                         case 1:
                             {
                                 switch (latitudeMap[r, c])
                                 {
-                                    case 0: Board[r, c] = new GameTile(r, c, LandType.Desert); break; //_tiles[x, y] = new Desert(x, y, special); break;
-                                    case 1: Board[r, c] = new GameTile(r, c, LandType.Plains); break; //_tiles[x, y] = new Plains(x, y, special); break;
-                                    case 2: Board[r, c] = new GameTile(r, c, LandType.Tundra); break; //_tiles[x, y] = new Tundra(x, y, special); break;
-                                    case 3: Board[r, c] = new GameTile(r, c, LandType.Arctic); break; //_tiles[x, y] = new Arctic(x, y, special); break;
+                                    case 0: Board[r, c] = new GameBoardTile(r, c, LandType.Desert); break; //_tiles[x, y] = new Desert(x, y, special); break;
+                                    case 1: Board[r, c] = new GameBoardTile(r, c, LandType.Plains); break; //_tiles[x, y] = new Plains(x, y, special); break;
+                                    case 2: Board[r, c] = new GameBoardTile(r, c, LandType.Tundra); break; //_tiles[x, y] = new Tundra(x, y, special); break;
+                                    case 3: Board[r, c] = new GameBoardTile(r, c, LandType.Arctic); break; //_tiles[x, y] = new Arctic(x, y, special); break;
                                 }
                             }
                             break;
-                        case 2: Board[r, c] = new GameTile(r, c, LandType.Hills); break; //_tiles[x, y] = new Hills(x, y, special); break;
-                        default: Board[r, c] = new GameTile(r, c, LandType.Mountains); break; //_tiles[x, y] = new Mountains(x, y, special); break;
+                        case 2: Board[r, c] = new GameBoardTile(r, c, LandType.Hills); break; //_tiles[x, y] = new Hills(x, y, special); break;
+                        default: Board[r, c] = new GameBoardTile(r, c, LandType.Mountains); break; //_tiles[x, y] = new Mountains(x, y, special); break;
                     }
                 }
         }
@@ -381,15 +382,15 @@ namespace territory_lords.Data
                 int riverDirection = RandomNumGen.Next(4) * 2;
                 bool nearOcean;
 
-                GameTile? gameTile = null;
+                GameBoardTile? gameTile = null;
 
 
                 //find a poor unsuspecting mountain tile that we're later going to turn into a river tile
-                var riverStarters = (from GameTile tile in Board where tile.LandType == LandType.Mountains select tile).ToArray();
+                var riverStarters = (from GameBoardTile tile in Board where tile.LandType == LandType.Mountains select tile).ToArray();
                 int potentialStarts = riverStarters.Length;
                 if (potentialStarts == 0)
                 {
-                    riverStarters = (from GameTile tile in Board where tile.LandType == LandType.Hills select tile).ToArray();
+                    riverStarters = (from GameBoardTile tile in Board where tile.LandType == LandType.Hills select tile).ToArray();
                     potentialStarts = riverStarters.Length;
                 }
 
@@ -518,16 +519,16 @@ namespace territory_lords.Data
         /// </summary>
         /// <param name="theBoard"></param>
         /// <returns></returns>
-        private GameTile[,] CopyBoard(GameTile[,] theBoard)
+        private GameBoardTile[,] CopyBoard(GameBoardTile[,] theBoard)
         {
             int rows = theBoard.GetLength(0);
             int cols = theBoard.GetLength(1);
-            var copiedBoard = new GameTile[rows, cols];
+            var copiedBoard = new GameBoardTile[rows, cols];
             for (int r = 0; r < rows; r++)
                 for (int c = 0; c < cols; c++)
                 {
-                    GameTile oldGameTile = theBoard[r, c];
-                    copiedBoard[r, c] = new GameTile(oldGameTile.RowIndex, oldGameTile.ColumnIndex, oldGameTile.LandType);
+                    GameBoardTile oldGameTile = theBoard[r, c];
+                    copiedBoard[r, c] = new GameBoardTile(oldGameTile.RowIndex, oldGameTile.ColumnIndex, oldGameTile.LandType);
                 }
 
             return copiedBoard;

@@ -7,14 +7,13 @@ namespace territory_lords.Data.Models.Units
 {
     public class Calvary : BaseUnit, IUnit
     {
-        public Calvary(Player player) : base(player)
+        public Calvary() : base()
         {
-            base.Price = 1;
+            base.Price = 2;
             base.Maintenance = 1;
-            base.Attack = 1;
+            base.Attack = 2;
             base.Defense = 1;
-            base.MoveDistance = 1;
-            base.Active = false;
+            base.MoveDistance = 2;
         }
     }
 }
