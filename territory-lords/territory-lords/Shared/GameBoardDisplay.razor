@@ -48,7 +48,7 @@
                             </div>
                         }
 
-                        @if(unitTile.Unit != null)
+                        @if(unitTile?.Unit != null)
                         {
                             var unitColor = $"background-color: {unitTile.OwningPlayer.Colors.TileColor}; border-color:{unitTile.OwningPlayer.Colors.BorderColor}";
                             
