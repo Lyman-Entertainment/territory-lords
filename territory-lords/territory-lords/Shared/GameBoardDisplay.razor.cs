@@ -10,9 +10,9 @@ using territory_lords.Data.Cache;
 using territory_lords.Data.Models;
 using territory_lords.Data.Models.Improvements;
 using territory_lords.Data.Models.Units;
-using territory_lords.Data.Models.Board;
 using territory_lords.Data.Statics.Extensions;
 using Microsoft.Extensions.Logging;
+using territory_lords.Data.Models.Tiles;
 
 namespace territory_lords.Shared
 {
@@ -50,17 +50,21 @@ namespace territory_lords.Shared
 
 
             //What to do when a UnitTile update event comes in
-            GameHubConnection.On<string,string>("UnitTileUpdate", (gameBoardId, serializedUnitTile) =>
+            GameHubConnection.On<string,string>("UnitUpdate", (gameBoardId, serializedUnit) =>
             {
-                Logger.LogInformation("{currentPlayer} is receiving a tile update", CurrentPlayerName);
+                Logger.LogInformation("{currentPlayer} is receiving a unit update", CurrentPlayerName);
 
                 //TODO need to find a way that other games messages won't even come here. Still should probably make sure the gameID matches, but if there are 100 games going that's going to be a lot of messages that don't pertain to this game
                 if (gameBoardId == TheGameBoard.GameBoardId)
                 {
-                    UnitTile unitTile = JsonConvert.DeserializeObject<UnitTile>(serializedUnitTile, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
-                    Logger.LogInformation("{currentPlayer} is processing a received UnitTileUpdate update: {unitTile}", CurrentPlayerName, serializedUnitTile); 
-                    
-                    TheGameBoard.UnitTileLayer[unitTile.RowIndex, unitTile.ColumnIndex] = unitTile;
+                    IUnit unit = JsonConvert.DeserializeObject<IUnit>(serializedUnit, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
+                    Logger.LogInformation("{currentPlayer} is processing a received Unit update: {unit}", CurrentPlayerName, serializedUnit);
+
+                    //int unitIndex = TheGameBoard.UnitBag.FindIndex(u => u.Id == unit.Id);
+                    //if (unitIndex == -1)
+                    //{
+                    //    TheGameBoard.UnitBag[unitIndex] = unit;
+                    //}
                     StateHasChanged();
                 }
 
@@ -136,22 +140,26 @@ namespace territory_lords.Shared
 
                     //TODO: the other players need to know this user joined
 
-                    ////TODO: create a city for the player
-                    //var city = new City(addedPlayer);
-                    //var cityTile = TheGameBoard.GetGameTileAtIndex(2, 3);
-                    ////city.RowIndex = 3;
-                    ////city.ColumnIndex = 3;
-                    //cityTile.Improvement = city;
-                    //BoardCache.UpdateGameCache(TheGameBoard);
-                    //SendTileUpdate(cityTile);
+                    //TODO: create a city for the player
+                    var cityTile = TheGameBoard.InsertCityToMountainSpotOnMap(addedPlayer);
+                    BoardCache.UpdateGameCache(TheGameBoard);
+                    SendGameBoardTileUpdate(cityTile);
 
                     //TODO: create a unit and put it on the board and send an update
                     //this isn't the way to do it but is the way I'm doing it for now to test it
-                    var settlerTile = TheGameBoard.InsertUnitToRandomSpotOnMap(addedPlayer, new Settler());
-                    var malitiaTile = TheGameBoard.InsertUnitToRandomSpotOnMap(addedPlayer, new Malitia());
+                    var settlerUnit = TheGameBoard.InsertUnitToRandomSpotOnMap(addedPlayer, Data.Statics.UnitName.Settler);
+                    var malitiaUnit = TheGameBoard.InsertUnitToRandomSpotOnMap(addedPlayer, Data.Statics.UnitName.Malitia);
+                    var phalanxUnit = TheGameBoard.InsertUnitToRandomSpotOnMap(addedPlayer, Data.Statics.UnitName.Phalanx);
+                    var calvaryUnit = TheGameBoard.InsertUnitToRandomSpotOnMap(addedPlayer, Data.Statics.UnitName.Calvary);
+                    var legionUnit = TheGameBoard.InsertUnitToRandomSpotOnMap(addedPlayer, Data.Statics.UnitName.Legion);
+                    var chariotUnit = TheGameBoard.InsertUnitToRandomSpotOnMap(addedPlayer, Data.Statics.UnitName.Chariot);
                     BoardCache.UpdateGameCache(TheGameBoard);
-                    SendUnitTileUpdate(settlerTile);
-                    SendUnitTileUpdate(malitiaTile);
+                    SendUnitUpdate(settlerUnit);
+                    SendUnitUpdate(malitiaUnit);
+                    SendUnitUpdate(phalanxUnit);
+                    SendUnitUpdate(calvaryUnit);
+                    SendUnitUpdate(legionUnit);
+                    SendUnitUpdate(chariotUnit);
                 }
             }
         }
@@ -163,11 +171,11 @@ namespace territory_lords.Shared
             GameHubConnection.SendAsync("GameBoardTileUpdate", TheGameBoard.GameBoardId, jsonTile);
         }
 
-        private void SendUnitTileUpdate(UnitTile unitTile)
+        private void SendUnitUpdate(IUnit unit)
         {
-            var jsonTile = unitTile.ToJson();
-            Logger.LogInformation("{CurrentPlayer} is sending a UnitTile update: {unitTile}", CurrentPlayerName, jsonTile);
-            GameHubConnection.SendAsync("SendUnitTileUpdate", TheGameBoard.GameBoardId, jsonTile);
+            var jsonUnit = unit.ToJson();
+            Logger.LogInformation("{CurrentPlayer} is sending a Unit update: {unit}", CurrentPlayerName, jsonUnit);
+            GameHubConnection.SendAsync("SendUnitUpdate", TheGameBoard.GameBoardId, jsonUnit);
         }
 
         public bool IsConnected =>
@@ -178,12 +186,30 @@ namespace territory_lords.Shared
         /// Handles when a unit is clicked on the screen
         /// </summary>
         /// <param name="selectedUnitTile"></param>
-        private void HandleUnitTileClick(UnitTile selectedUnitTile)
+        private void HandleUnitTileClick(IUnit selectedUnit)
         {
-            Logger.LogInformation("{CurrentPlayer} is clicking a UnitTile: {unitTile}", CurrentPlayerName, selectedUnitTile.ToJson());
-            if (selectedUnitTile == null)
-            {
+            Logger.LogInformation("{CurrentPlayer} is clicking a Unit: {SelectedUnit}", CurrentPlayerName, selectedUnit.ToJson());
 
+            //Either the player is selecting a unit
+            //Deselecting a unit
+            //Attacking an enemy unit
+            //Moving to a space where one of their units already exists
+            if (selectedUnit.OwningPlayer.Id == CurrentPlayerGuid)
+            {
+                if(PlayerActiveUnit == null)//selecting a unit. What to do if multiple units are on the same tile?
+                {
+                    selectedUnit.Active = true;//set it to be active
+                    PlayerActiveUnit = selectedUnit;
+                }
+                else if(PlayerActiveUnit == selectedUnit)//deselecting the unit
+                {
+                    PlayerActiveUnit.Active = false;//unset the current active
+                    PlayerActiveUnit = null;
+                }
+            }
+            else
+            {
+                //they are selecting a unit that is not theirs
             }
         }
 
@@ -203,7 +229,16 @@ namespace territory_lords.Shared
             }
             else
             {
-               
+               //if a unit is currently selected then move that unit to this tile
+               if(PlayerActiveUnit != null)
+               {
+                    PlayerActiveUnit.Coordinate = new GameBoardCoordinate(selectedGameTile.RowIndex, selectedGameTile.ColumnIndex);
+                    SendUnitUpdate(PlayerActiveUnit);
+                    PlayerActiveUnit.Active = false;
+                    PlayerActiveUnit = null;
+               }
+
+
                 ////if there is a unit on this tile we need to figure out if it's the player's unit to select it as active or an enemy unit the player is attacking
                 //if(selectedGameTile.Unit != null)
                 //{

@@ -21,9 +21,9 @@ namespace territory_lords.Hubs
             await Clients.Others.SendAsync("GameBoardTileUpdate",gameBoardId, serializedGameTile);
         }
 
-        public async Task SendUnitTileUpdate(string gameBoardId, string serializedGameTile)
+        public async Task SendUnitUpdate(string gameBoardId, string serializedGameTile)
         {
-            await Clients.Others.SendAsync("UnitTileUpdate", gameBoardId, serializedGameTile);
+            await Clients.Others.SendAsync("UnitUpdate", gameBoardId, serializedGameTile);
         }
     }
 }
