@@ -1,6 +1,6 @@
-﻿@using territory_lords.Data.Models.Board
+﻿@using territory_lords.Data.Models.Tiles
 @using territory_lords.Data.Models.Units
-
+@using territory_lords.Data.Statics.Extensions
 
 <div id="BoardWrapper">
     <div id="PlayerList">
@@ -11,6 +11,17 @@
             </div>
         }
     </div>
+    <div>
+        @if(PlayerActiveUnit != null)
+        {
+            <div>
+                @PlayerActiveUnit.ToString()
+            </div>
+            <div>
+                @TheGameBoard.UnitBag.Count()
+            </div>
+        }
+    </div>
     <div id="BoardContainer">
         @for (int r = 0; r < TheGameBoard.RowCount; r++)
         {
@@ -18,7 +29,8 @@
                 @for (int c = 0; c < TheGameBoard.ColumnCount; c++)
                 {
                     GameBoardTile gameTile = TheGameBoard.GameTileLayer[r, c];
-                    UnitTile? unitTile = TheGameBoard.UnitTileLayer[r, c];
+                    //UnitTile? unitTile = TheGameBoard.UnitTileLayer[r, c];
+                    var unitsAtTile = TheGameBoard.UnitBag.Where(u => u.Coordinate.IsAtPoint(r, c));
 
                     var shadowColor = "";
                     if (gameTile.OwningPlayer != null)
@@ -26,7 +38,7 @@
                         shadowColor = $"box-shadow: inset 0 0 5px 2px {gameTile.OwningPlayer.Colors.TileColor};";
                     }
 
-                    <div class="game-board-tile @GetCorrectBackgroundCssClass(gameTile)" style="@shadowColor" @onclick="() => HandleGameBoardSquareClick(gameTile)" @onclick:stopPropagation="true">
+                    <div class="game-board-tile @GetCorrectBackgroundCssClass(gameTile)" style="@shadowColor" @onclick="() => HandleGameBoardSquareClick(gameTile)">
                         
                         @if (gameTile.Special)
                         {
@@ -47,14 +59,19 @@
                             <img class="@(gameTile.Improvement.GetType().Name)" style="@improvementColor" src="/Images/Layer2Sprite.png"/>
                             </div>
                         }
-
-                        @if(unitTile?.Unit != null)
+                        
+                        
+                        @if(unitsAtTile.Count() > 0)
                         {
-                            var unitColor = $"background-color: {unitTile.OwningPlayer.Colors.TileColor}; border-color:{unitTile.OwningPlayer.Colors.BorderColor}";
+                            foreach (var unit in unitsAtTile)
+                            {
+                                var unitColor = $"background-color: {unit.OwningPlayer.Colors.TileColor}; border-color:{unit.OwningPlayer.Colors.BorderColor}";
+                                bool unitAcitve = unit.Active && unit.OwningPlayer.Id == CurrentPlayerGuid;
+                                <div class="Unit @(unitAcitve ? "Active" : "")" @onclick="() => HandleUnitTileClick(unit)"  @onclick:stopPropagation="true">
+                                    <img class ="@(unit.GetType().Name)" style="@unitColor" src="/Images/Layer2Sprite.png"/>
+                                </div>
+                            }
                             
-                            <div class="Unit @(unitTile.Active ? "Active" : "")" @onclick="() => HandleUnitTileClick(unitTile)" >
-                            <img class ="@(unitTile.Unit.GetType().Name)" style="@unitColor" src="/Images/Layer2Sprite.png"/>
-                            </div>
                         }
                     </div>
                 }

@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using territory_lords.Data.Models.Units;
 using territory_lords.Data.Statics;
-using territory_lords.Data.Models.Board;
+using territory_lords.Data.Models.Tiles;
+using territory_lords.Data.Statics.Extensions;
 
 namespace territory_lords.Data.Models
 {
@@ -22,7 +23,11 @@ namespace territory_lords.Data.Models
         /// What would be the physical board in a real game. This is what holds the land and it's properties
         /// </summary>
         public GameBoardTile[,] GameTileLayer { get; set; }
-        public UnitTile[,] UnitTileLayer { get; set; }
+
+        /// <summary>
+        /// A list of units. This will probably need to change as having a list of units that needs to be sorted or searched all the time will suck
+        /// </summary>
+        public  List<IUnit> UnitBag { get; set; }
         public List<Player> Players { get; set; } = new List<Player>();
         private static readonly Random RandomNumGen = new();
 
@@ -37,7 +42,7 @@ namespace territory_lords.Data.Models
 
             GameBoardId = gameBoardId;
             GameTileLayer = gameTiles;
-            UnitTileLayer = new UnitTile[gameTiles.GetLength(0), gameTiles.GetLength(1)];
+            UnitBag = new();
         }
         
 
@@ -88,26 +93,61 @@ namespace territory_lords.Data.Models
         }
 
 
-        
+        public GameBoardTile InsertCityToMountainSpotOnMap(Player owningPlayer)
+        {
+            var mountains = (from GameBoardTile tile in GameTileLayer where tile.LandType == LandType.Mountains select tile).ToArray();
+            var randomTile = mountains[RandomNumGen.Next(mountains.Length)];
+            while (UnitBag.Where(u => u.Coordinate.IsAtPoint(randomTile.RowIndex, randomTile.ColumnIndex)).Count() > 0)
+            {
+                randomTile = mountains[RandomNumGen.Next(mountains.Length)];
+            }
+            var city = new Data.Models.Improvements.City(owningPlayer);
+            randomTile.Improvement = city;
+            return randomTile;
+        }
 
         /// <summary>
         /// Probably just for now putting a unit on the board in a random spot
         /// </summary>
         /// <param name="newUnit"></param>
-        public UnitTile InsertUnitToRandomSpotOnMap(Player owningPlayer, IUnit newUnit)
+        [Obsolete("Only for development purposes")]
+        public IUnit InsertUnitToRandomSpotOnMap(Player owningPlayer, UnitName unitName)
         {
             var grassland = (from GameBoardTile tile in GameTileLayer where tile.LandType == LandType.Grassland select tile).ToArray();
             var randomTile = grassland[RandomNumGen.Next(grassland.Length)];
-            var createdUnitTile = new UnitTile(owningPlayer)
+            while(UnitBag.Where(u => u.Coordinate.IsAtPoint(randomTile.RowIndex,randomTile.ColumnIndex)).Count() > 0)
             {
-                Unit = newUnit,
-                ColumnIndex = randomTile.ColumnIndex,
-                RowIndex = randomTile.RowIndex
-            };
+                randomTile = grassland[RandomNumGen.Next(grassland.Length)];
+            }
 
-            UnitTileLayer[createdUnitTile.RowIndex, createdUnitTile.ColumnIndex] = createdUnitTile;
+            IUnit returnUnit;
+            switch (unitName)
+            {
+                case UnitName.Settler:
+                    returnUnit = new Settler(new GameBoardCoordinate(randomTile.RowIndex, randomTile.ColumnIndex), owningPlayer, RandomNumGen.Next());
+                    break;
+                case UnitName.Malitia:
+                    returnUnit = new Malitia(new GameBoardCoordinate(randomTile.RowIndex, randomTile.ColumnIndex), owningPlayer, RandomNumGen.Next());
+                    break;
+                case UnitName.Phalanx:
+                    returnUnit = new Phalanx(new GameBoardCoordinate(randomTile.RowIndex, randomTile.ColumnIndex), owningPlayer, RandomNumGen.Next());
+                    break;
+                case UnitName.Calvary:
+                    returnUnit = new Calvary(new GameBoardCoordinate(randomTile.RowIndex, randomTile.ColumnIndex), owningPlayer, RandomNumGen.Next());
+                    break;
+                case UnitName.Legion:
+                    returnUnit = new Legion(new GameBoardCoordinate(randomTile.RowIndex, randomTile.ColumnIndex), owningPlayer, RandomNumGen.Next());
+                    break;
+                case UnitName.Chariot:
+                    returnUnit = new Chariot(new GameBoardCoordinate(randomTile.RowIndex, randomTile.ColumnIndex), owningPlayer, RandomNumGen.Next());
+                    break;
+                default:
+                    throw new ArgumentException("No Unit Matches Enum Type");
+            }
 
-            return createdUnitTile;
+            UnitBag.Add(returnUnit);
+
+            return returnUnit;
         }
     }
 }
