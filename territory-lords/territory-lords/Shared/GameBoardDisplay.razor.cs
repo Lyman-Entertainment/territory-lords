@@ -141,9 +141,13 @@ namespace territory_lords.Shared
                     //TODO: the other players need to know this user joined
 
                     //TODO: create a city for the player
-                    var cityTile = TheGameBoard.InsertCityToMountainSpotOnMap(addedPlayer);
-                    BoardCache.UpdateGameCache(TheGameBoard);
-                    SendGameBoardTileUpdate(cityTile);
+                    for (int i = 0; i < 3; i++)
+                    {
+                        var cityTile = TheGameBoard.InsertCityToMountainSpotOnMap(addedPlayer);
+                        BoardCache.UpdateGameCache(TheGameBoard);
+                        SendGameBoardTileUpdate(cityTile);
+                    }
+
 
                     //TODO: create a unit and put it on the board and send an update
                     //this isn't the way to do it but is the way I'm doing it for now to test it
