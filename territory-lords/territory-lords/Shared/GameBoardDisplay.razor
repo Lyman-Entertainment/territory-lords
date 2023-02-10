@@ -31,6 +31,7 @@
                     GameBoardTile gameTile = TheGameBoard.GameTileLayer[r, c];
                     //UnitTile? unitTile = TheGameBoard.UnitTileLayer[r, c];
                     var unitsAtTile = TheGameBoard.UnitBag.Where(u => u.Coordinate.IsAtPoint(r, c));
+                    var cityAtTile = TheGameBoard.CityLayer.GetValueOrDefault(new GameBoardCoordinate(r, c));
 
                     var shadowColor = "";
                     if (gameTile.OwningPlayer != null)
@@ -49,7 +50,7 @@
 
                         @if (gameTile.Improvement != null)
                         {
-                            var improvementColor = string.Empty;
+                            @*var improvementColor = string.Empty;
                             //cities need borders. Should maybe make this a property of improvements so the piece itself will know
                             @if (gameTile.Improvement.GetType().Name == "City")
                             {
@@ -57,10 +58,19 @@
                             }
                             <div class="Tile-improvement">
                             <img class="@(gameTile.Improvement.GetType().Name)" style="@improvementColor" src="/Images/Layer2Sprite.png"/>
-                            </div>
+                            </div>*@
                         }
                         
-                        
+                        @if (cityAtTile != null)
+                        {
+                            var improvementColor = $"background-color: {cityAtTile.OwningPlayer.Colors.TileColor};";
+                            <div class="Tile-city">
+                                <img class="City" style="@improvementColor" src="/Images/Layer2Sprite.png"/>
+                                <div class="City-size">@cityAtTile.Size</div>
+                                <div class="City-name">@cityAtTile.Name</div>
+                            </div>
+                        }
+
                         @if(unitsAtTile.Count() > 0)
                         {
                             foreach (var unit in unitsAtTile)

@@ -465,11 +465,10 @@
     border-radius: 5px;
 }
 
-
-.Tile-improvement {
+.Tile-city {
     width: 100%;
     height: 100%;
-    position:absolute;
+    position: absolute;
 }
 
 .City {
@@ -478,8 +477,34 @@
     object-position: -602px -352px;
     object-fit: none;
     border-radius: 5px;
-    border:2px solid black !important;
+    border: 2px solid black !important;
 }
+.City-size {
+    position: relative;
+    top: -46px;
+    font-weight: bold;
+    font-size: 25px;
+    color: white;
+    text-shadow: 0 0 5px #fff;
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: black;
+}
+.City-name {
+    position: absolute;
+    top: -18px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: cyan;
+    -webkit-text-stroke-width: 0.4px;
+    -webkit-text-stroke-color: black;
+}
+
+.Tile-improvement {
+    width: 100%;
+    height: 100%;
+    position:absolute;
+}
+
 .Factory {
     width: 100%;
     height: 100%;

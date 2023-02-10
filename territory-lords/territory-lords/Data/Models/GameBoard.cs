@@ -28,6 +28,19 @@ namespace territory_lords.Data.Models
         /// A list of units. This will probably need to change as having a list of units that needs to be sorted or searched all the time will suck
         /// </summary>
         public  List<IUnit> UnitBag { get; set; }
+        
+        /// <summary>
+        /// A list of units at each coordinate. There might be no list at a coordinate, which means there's no units there, just as an empty list would
+        /// </summary>
+        public Dictionary<GameBoardCoordinate,List<IUnit>> UnitLayer { get; set; }
+
+
+        /// <summary>
+        /// A list of cities. This might be ok in a bag like this as there may not ever be enough cities to really make it a problem
+        /// </summary>
+        public Dictionary<GameBoardCoordinate,City> CityLayer { get; set; }
+
+
         public List<Player> Players { get; set; } = new List<Player>();
         private static readonly Random RandomNumGen = new();
 
@@ -43,6 +56,7 @@ namespace territory_lords.Data.Models
             GameBoardId = gameBoardId;
             GameTileLayer = gameTiles;
             UnitBag = new();
+            CityLayer = new();
         }
         
 
@@ -95,14 +109,18 @@ namespace territory_lords.Data.Models
 
         public GameBoardTile InsertCityToMountainSpotOnMap(Player owningPlayer)
         {
-            var mountains = (from GameBoardTile tile in GameTileLayer where tile.LandType == LandType.Mountains select tile).ToArray();
+            var mountains = (from GameBoardTile tile in GameTileLayer where tile.LandType == LandType.Mountains || tile.LandType == LandType.Hills select tile).ToArray();
             var randomTile = mountains[RandomNumGen.Next(mountains.Length)];
+            //If there are units here then find another one. We don't know how to mix units and cities yet
             while (UnitBag.Where(u => u.Coordinate.IsAtPoint(randomTile.RowIndex, randomTile.ColumnIndex)).Count() > 0)
             {
                 randomTile = mountains[RandomNumGen.Next(mountains.Length)];
             }
-            var city = new Data.Models.Improvements.City(owningPlayer);
-            randomTile.Improvement = city;
+
+            //this might crash as the spot in the dictionary might already be taken but I'm not that concerned as it's just a development function
+            var city = new City(RandomNumGen.Next(1001),randomTile.RowIndex, randomTile.ColumnIndex, owningPlayer, RandomNumGen.Next(1,11));
+            CityLayer.Add(new GameBoardCoordinate(randomTile.RowIndex, randomTile.ColumnIndex), city);
+
             return randomTile;
         }
 
