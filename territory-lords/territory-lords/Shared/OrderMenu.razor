@@ -1,0 +1,30 @@
+﻿@if (DisplayMenu)
+{
+    <div id="unitOrderMenu" style="background-color:white; width:200px;position:fixed;z-index:1300;top:0;right:0;">
+        <MudList Clickable="true">
+            <MudListItem Icon="@Icons.Material.Filled.AddRoad">Build Road</MudListItem>
+            <MudListItem Icon="@Icons.Material.Filled.Water">Build Farm</MudListItem>
+            <MudListItem Icon="@Icons.Material.Filled.Nature">Build Mine</MudListItem>
+            <MudListItem Icon="@Icons.Material.Filled.Castle">Build Fortress</MudListItem>
+            <MudListItem Icon="@Icons.Material.Filled.Co2">Build Factory</MudListItem>
+            <MudListItem Icon="@Icons.Material.Filled.Forest">Build Lumbermill</MudListItem>
+            <MudListItem Icon="@Icons.Material.Filled.Home" OnClick="@InvokeParentMethod">Build City</MudListItem>
+        </MudList>
+    </div>
+}
+
+
+
+@code {
+    [Parameter]
+    public bool DisplayMenu { get; set; } = false;
+
+    [Parameter]
+    public Action BoardMenuClickHandler { get; set; }
+
+    private void InvokeParentMethod()
+    {
+        var debugTest = true;
+        BoardMenuClickHandler?.Invoke();
+    }
+}

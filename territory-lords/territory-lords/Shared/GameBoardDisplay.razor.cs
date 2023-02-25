@@ -31,6 +31,8 @@ namespace territory_lords.Shared
         private IUnit? PlayerActiveUnit = null;
         private Guid? CurrentPlayerGuid = default;
         private string CurrentPlayerName = string.Empty;
+        private bool _unitOrderMenuOpen = false;
+
 
         //public GameBoardDisplay(ILogger<GameBoardDisplay> logger)
         //{
@@ -204,17 +206,45 @@ namespace territory_lords.Shared
                 {
                     selectedUnit.Active = true;//set it to be active
                     PlayerActiveUnit = selectedUnit;
+                    BuildUnitMenu(selectedUnit);
                 }
                 else if(PlayerActiveUnit == selectedUnit)//deselecting the unit
                 {
                     PlayerActiveUnit.Active = false;//unset the current active
                     PlayerActiveUnit = null;
+                    DestroyUnitMenu();
                 }
             }
             else
             {
                 //they are selecting a unit that is not theirs
             }
+        }
+
+        private void HandleOrderMenuClick()
+        {
+
+            DestroyUnitMenu();
+
+            
+            if (PlayerActiveUnit != null)
+            {
+                var coords = PlayerActiveUnit.Coordinate;
+                var city = new City(1, coords.RowIndex, coords.ColumnIndex, PlayerActiveUnit.OwningPlayer, 1);
+
+                PlayerActiveUnit.Active = false;
+                PlayerActiveUnit = null;
+
+                //a settler will need to be destroyed in this testing scenario
+
+                TheGameBoard.CityLayer.Add(coords, city);
+                BoardCache.UpdateGameCache(TheGameBoard);
+                //var cityTile = TheGameBoad.
+                //SendGameBoardTileUpdate(cityTile);
+
+            }
+
+            StateHasChanged();
         }
 
         //At some point I think this should be handled by a game manager or something
@@ -240,7 +270,8 @@ namespace territory_lords.Shared
                     SendUnitUpdate(PlayerActiveUnit);
                     PlayerActiveUnit.Active = false;
                     PlayerActiveUnit = null;
-               }
+                    DestroyUnitMenu();
+                }
 
 
                 ////if there is a unit on this tile we need to figure out if it's the player's unit to select it as active or an enemy unit the player is attacking
@@ -897,6 +928,20 @@ namespace territory_lords.Shared
         public async ValueTask DisposeAsync()
         {
             await GameHubConnection.DisposeAsync();
+        }
+
+        private void BuildUnitMenu(IUnit selectedUnit)
+        {
+            _unitOrderMenuOpen = true;
+        }
+
+        private void DestroyUnitMenu()
+        {
+            _unitOrderMenuOpen = false;
+        }
+        void ToggleOrderMenu()
+        {
+            _unitOrderMenuOpen = !_unitOrderMenuOpen;
         }
     }
 }
