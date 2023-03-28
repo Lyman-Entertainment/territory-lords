@@ -118,8 +118,13 @@ namespace territory_lords.Data.Models
             }
 
             //this might crash as the spot in the dictionary might already be taken but I'm not that concerned as it's just a development function
-            var city = new City(RandomNumGen.Next(1001),randomTile.RowIndex, randomTile.ColumnIndex, owningPlayer, RandomNumGen.Next(1,11));
-            CityLayer.Add(new GameBoardCoordinate(randomTile.RowIndex, randomTile.ColumnIndex), city);
+            var cityCoordinate = new GameBoardCoordinate(randomTile.RowIndex, randomTile.ColumnIndex);
+            if (!CityLayer.ContainsKey(cityCoordinate))//just move along if one already exists, it's for testing anyways
+            {
+                var city = new City(RandomNumGen.Next(1001), randomTile.RowIndex, randomTile.ColumnIndex, owningPlayer, RandomNumGen.Next(1, 11));
+                CityLayer.Add(cityCoordinate, city);
+            }
+            
 
             return randomTile;
         }

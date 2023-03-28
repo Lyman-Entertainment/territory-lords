@@ -1,7 +1,7 @@
 ﻿
 #BoardWrapper {
     overflow: auto;
-    padding: 50px;
+    padding: 25px;
     text-align: center;
     background-image: url("/Images/ocean.jpg");
 }

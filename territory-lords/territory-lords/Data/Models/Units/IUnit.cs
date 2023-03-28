@@ -16,7 +16,7 @@ namespace territory_lords.Data.Models.Units
         public byte Defense { get;  set; }
         public byte MoveDistance { get; set; }
         public GameBoardCoordinate Coordinate { get; set; }
-        public Player OwningPlayer { get; set; }
+        public Player? OwningPlayer { get; set; }
         public string ToJson();
         
     }

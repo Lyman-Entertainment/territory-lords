@@ -3,7 +3,10 @@
 @using territory_lords.Data.Statics.Extensions
 
 <div id="BoardWrapper">
-    <div id="PlayerList">
+
+    <OrderMenu DisplayMenu=@_unitOrderMenuOpen BoardMenuClickHandler=@HandleOrderMenuClick/>
+    
+   @* <div id="PlayerList">
         @foreach (Player player in TheGameBoard.Players)
         {
             <div>
@@ -21,7 +24,7 @@
                 @TheGameBoard.UnitBag.Count()
             </div>
         }
-    </div>
+    </div>*@
     <div id="BoardContainer">
         @for (int r = 0; r < TheGameBoard.RowCount; r++)
         {
