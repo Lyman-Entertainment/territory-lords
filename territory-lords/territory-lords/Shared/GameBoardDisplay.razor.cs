@@ -59,14 +59,26 @@ namespace territory_lords.Shared
                 //TODO need to find a way that other games messages won't even come here. Still should probably make sure the gameID matches, but if there are 100 games going that's going to be a lot of messages that don't pertain to this game
                 if (gameBoardId == TheGameBoard.GameBoardId)
                 {
-                    IUnit unit = JsonConvert.DeserializeObject<IUnit>(serializedUnit, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
+                    IUnit incomingUnit = JsonConvert.DeserializeObject<IUnit>(serializedUnit, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
                     Logger.LogInformation("{currentPlayer} is processing a received Unit update: {unit}", CurrentPlayerName, serializedUnit);
-
+                    if(incomingUnit != null)
+                    {
+                        //if the unit coming in is at the same coordinates as this PlayerActiveUnit then we need to set that to null
+                        if (PlayerActiveUnit != null
+                            && PlayerActiveUnit.Coordinate.ColumnIndex == incomingUnit.Coordinate.ColumnIndex
+                            && PlayerActiveUnit.Coordinate.RowIndex == incomingUnit.Coordinate.RowIndex)
+                        {
+                            PlayerActiveUnit.Active = false;
+                            PlayerActiveUnit = null;
+                            DestroyUnitMenu();
+                        }
+                    }
                     //int unitIndex = TheGameBoard.UnitBag.FindIndex(u => u.Id == unit.Id);
                     //if (unitIndex == -1)
                     //{
                     //    TheGameBoard.UnitBag[unitIndex] = unit;
                     //}
+
                     StateHasChanged();
                 }
 
@@ -195,14 +207,14 @@ namespace territory_lords.Shared
         private void HandleUnitTileClick(IUnit selectedUnit)
         {
             Logger.LogInformation("{CurrentPlayer} is clicking a Unit: {SelectedUnit}", CurrentPlayerName, selectedUnit.ToJson());
-
+            var seletedUnitOriginalCoords = selectedUnit.Coordinate;
             //Either the player is selecting a unit
             //Deselecting a unit
             //Attacking an enemy unit
             //Moving to a space where one of their units already exists
             if (selectedUnit.OwningPlayer.Id == CurrentPlayerGuid)
             {
-                if(PlayerActiveUnit == null)//selecting a unit. What to do if multiple units are on the same tile?
+                if (PlayerActiveUnit == null)//selecting a unit. What to do if multiple units are on the same tile?
                 {
                     selectedUnit.Active = true;//set it to be active
                     PlayerActiveUnit = selectedUnit;
@@ -214,11 +226,45 @@ namespace territory_lords.Shared
                     PlayerActiveUnit = null;
                     DestroyUnitMenu();
                 }
+                else
+                {
+                    //they are swapping the active unit and selected units positions
+                    //put the clicked on unit into the square where the active unit currently is.
+                    //One day we'll make it so multiple units can be on the same tile
+                    selectedUnit.Coordinate = PlayerActiveUnit.Coordinate;
+                    PlayerActiveUnit.Coordinate = seletedUnitOriginalCoords;
+                    
+                    SendUnitUpdate(PlayerActiveUnit);
+                    //SendUnitUpdate(selectedUnit);
+
+                    //then set the active unit to be nothing because we just moved a unit
+                    PlayerActiveUnit.Active = false;
+                    PlayerActiveUnit = null;
+                    DestroyUnitMenu();
+                }
             }
             else
             {
-                //they are selecting a unit that is not theirs
+                //they are selecting a unit that is not theirs to attack
+                //TODO: Need to do an attack roll to see who wins. Right now the attacking unit just wins regardless of attack vs defense rating
+                if (PlayerActiveUnit != null)//selecting a unit. What to do if multiple units are on the same tile?
+                {
+                    PlayerActiveUnit.Coordinate = seletedUnitOriginalCoords;
+                    //also delete the selected unit. This needs to be a method
+                    var deadUnit = TheGameBoard.UnitBag.Where(u => u.Id == selectedUnit.Id).FirstOrDefault();
+                    if (deadUnit != null)
+                    {
+                        TheGameBoard.UnitBag.Remove(deadUnit);
+                        SendUnitUpdate(deadUnit);
+                    }
+                    SendUnitUpdate(PlayerActiveUnit);
+                    PlayerActiveUnit.Active = false;
+                    PlayerActiveUnit = null;
+                    DestroyUnitMenu();
+                }
             }
+
+            
         }
 
         private void HandleOrderMenuClick()
@@ -226,24 +272,31 @@ namespace territory_lords.Shared
 
             DestroyUnitMenu();
 
-            
-            if (PlayerActiveUnit != null)
+            //TODO: this will need to be updated. As of right now if you click any menu option this happens.
+            if (PlayerActiveUnit != null && PlayerActiveUnit.GetType() == typeof(Settler))
             {
                 var coords = PlayerActiveUnit.Coordinate;
-                var city = new City(1, coords.RowIndex, coords.ColumnIndex, PlayerActiveUnit.OwningPlayer, 1);
+                GameBoardTile? tile = TheGameBoard.GameTileLayer.GetGameTileAtIndex(coords.RowIndex, coords.ColumnIndex);
+                if(tile != null)
+                {
+                    var city = new City(1, coords.RowIndex, coords.ColumnIndex, PlayerActiveUnit.OwningPlayer, 1);
 
-                PlayerActiveUnit.Active = false;
-                PlayerActiveUnit = null;
+                    //a settler will need to be destroyed in this scenario
+                    var settler = TheGameBoard.UnitBag.Where(u => u.Id == PlayerActiveUnit.Id).FirstOrDefault();
+                    if(settler != null)
+                    {
+                        TheGameBoard.UnitBag.Remove(settler);
+                        SendUnitUpdate(settler);
+                    }
 
-                //a settler will need to be destroyed in this testing scenario
+                    PlayerActiveUnit.Active = false;
+                    PlayerActiveUnit = null;
+                    TheGameBoard.CityLayer.Add(coords, city);
+                    BoardCache.UpdateGameCache(TheGameBoard);
 
-                TheGameBoard.CityLayer.Add(coords, city);
-                BoardCache.UpdateGameCache(TheGameBoard);
-                //var cityTile = TheGameBoad.
-                //SendGameBoardTileUpdate(cityTile);
-
+                    SendGameBoardTileUpdate(tile);
+                }
             }
-
             StateHasChanged();
         }
 
@@ -272,119 +325,6 @@ namespace territory_lords.Shared
                     PlayerActiveUnit = null;
                     DestroyUnitMenu();
                 }
-
-
-                ////if there is a unit on this tile we need to figure out if it's the player's unit to select it as active or an enemy unit the player is attacking
-                //if(selectedGameTile.Unit != null)
-                //{
-                    
-                //    var selectedUnit = selectedGameTile.Unit;
-                //    //doesn't seem like we should need to do this but whatever for now it's fine
-                //    selectedUnit.ColumnIndex = selectedGameTile.ColumnIndex;
-                //    selectedUnit.RowIndex = selectedGameTile.RowIndex;
-
-                //    //this is their own unit
-                //    if (selectedUnit.OwningPlayer?.Id == CurrentPlayerGuid)
-                //    {
-                //        //there are 3 scenarios here.
-                //        //1. they are selecting a unit to be active. Meaning there is no active unit
-                //        //2. they are deselecting the active unit. Meaning they are clicking on the active unit
-                //        //3. they have an active unit and are wanting the two units to switch places
-
-                //        if (PlayerActiveUnit == null)
-                //        {
-                //            //they are selecting a unit
-                //            selectedUnit.Active = true;
-                //            PlayerActiveUnit = selectedUnit;
-                //        }
-                //        else if(PlayerActiveUnit.Equals(selectedUnit))
-                //        {
-                //            //they are de-selecting a unit
-                //            selectedUnit.Active = false;
-                //            PlayerActiveUnit = null;
-                //        }
-                //        else
-                //        {
-                //            //they are swapping the active unit and selected units positions
-                //            //put the clicked on unit into the square where the active unit currently is
-                //            GameBoardTile? oldTile = TheGameBoard.GameTileLayer.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex);
-                //            selectedUnit.ColumnIndex = PlayerActiveUnit.ColumnIndex;
-                //            selectedUnit.RowIndex = PlayerActiveUnit.RowIndex; 
-                //            selectedUnit.Active = false;//turn off active
-
-                //            oldTile.Unit = selectedUnit;
-                //            SendTileUpdate(oldTile);
-
-
-                //            //now put the active unit into the clicked on square
-                //            selectedGameTile.Unit = PlayerActiveUnit;
-                //            selectedGameTile.Unit.ColumnIndex = selectedGameTile.ColumnIndex;
-                //            selectedGameTile.Unit.RowIndex = selectedGameTile.RowIndex;
-                //            selectedGameTile.Unit.Active = false;
-
-                //            //then set the active unit to be nothing because we just moved a unit
-                //            PlayerActiveUnit = null;
-
-
-                //        }
-                //    }
-                //    else//this is not their own unit
-                //    {
-                //        //for right now we don't care if the unit is in range
-                //        //TODO: make sure the unit can move here
-                //        if (PlayerActiveUnit != null)
-                //        {
-                //            //this is the EXACT same code as moving a unit
-                //            //TODO: Make moving a unit a method to call
-                //            //clear the unit at the old coordinates
-                //            GameBoardTile? oldTile = TheGameBoard.GameTileLayer.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex);
-                //            if (oldTile != null)
-                //            {
-                //                oldTile.Unit = null;
-                //                //send an update to everyone
-                //                SendTileUpdate(oldTile);
-                //            }
-
-                //            //update the unit to be in the new place
-                //            selectedGameTile.Unit = PlayerActiveUnit;
-                //            selectedGameTile.Unit.ColumnIndex = selectedGameTile.ColumnIndex;
-                //            selectedGameTile.Unit.RowIndex = selectedGameTile.RowIndex;
-                //            selectedGameTile.Unit.Active = false;
-
-                //            //then set the active unit to be nothing because we just moved a unit
-                //            PlayerActiveUnit = null;
-                //        }
-                            
-                //    }
-
-                    
-
-                    
-                //}
-                //else //this is an empty tile that they might be moving a unit to
-                //{
-                    
-                //    if (PlayerActiveUnit != null)
-                //    {
-                //        //clear the unit at the old coordinates
-                //        GameBoardTile? oldTile = TheGameBoard.GameTileLayer.GetGameTileAtIndex(PlayerActiveUnit.RowIndex, PlayerActiveUnit.ColumnIndex);
-                //        if (oldTile != null)
-                //        {
-                //            oldTile.Unit = null;
-                //            //send an update to everyone
-                //            SendTileUpdate(oldTile);
-                //        }
-
-                //        //update the unit to be in the new place
-                //        selectedGameTile.Unit = PlayerActiveUnit;
-                //        selectedGameTile.Unit.ColumnIndex = selectedGameTile.ColumnIndex;
-                //        selectedGameTile.Unit.RowIndex = selectedGameTile.RowIndex;
-                //        selectedGameTile.Unit.Active = false;
-
-                //        //then set the active unit to be nothing because we just moved a unit
-                //        PlayerActiveUnit = null;
-                //    }
-                //}
             }
 
             //update the game board cache
