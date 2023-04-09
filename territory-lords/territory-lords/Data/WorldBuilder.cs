@@ -433,7 +433,7 @@ namespace territory_lords.Data
                     riverCount++;
 
                     //turn any Forest tiles around the end of our river into jungle, because river endings mean jungle?
-                    var tilesAround = Board.GetAllGameTileNeighbors(gameTile.RowIndex, gameTile.ColumnIndex);
+                    var tilesAround = Board.GetAllGameBoardTileNeighbors(gameTile.RowIndex, gameTile.ColumnIndex);
                     foreach (var tile in tilesAround)
                     {
                         if (tile != null)
@@ -471,7 +471,7 @@ namespace territory_lords.Data
         private bool IsGameTileNearOcean(int row, int column)
         {
 
-            var directNeighbors = Board.GetGameTileDirectNeighbors(row, column);
+            var directNeighbors = Board.GetGameBoardTileDirectNeighbors(row, column);
             foreach (var tile in directNeighbors)
             {
                 if (tile != null)
@@ -496,7 +496,7 @@ namespace territory_lords.Data
             if (row < 2 || row > RowCount - 3) return false;
 
             //rivers can't be special. they kind of already are
-            var tile = Board.GetGameTileAtIndex(row, column);
+            var tile = Board.GetGameBoardTileAtIndex(row, column);
             if (tile?.LandType == LandType.River) return false;
 
             return ModTileForSpecial(row, column) == ((column / ResourceAbundance) + 13 + (row / ResourceAbundance) * 11 + _specialSeed) % (ResourceAbundance*4);//some crazy calculation to make special tiles

@@ -2,7 +2,7 @@
 {
     public class Fort : BaseTileImprovement, ITileImprovement
     {
-        public Fort(Player owningPlayer) : base(owningPlayer)
+        public Fort() : base()
         {
             base.MoneyBonus = -1;
             base.BuildCost = 10;
