@@ -18,5 +18,10 @@
             Size = size;
             Name = $"City_{id}";
         }
+
+        public City(int id,GameBoardCoordinate gameBoardCoordinate, Player owner, int size) : this(id, gameBoardCoordinate.RowIndex, gameBoardCoordinate.ColumnIndex, owner, size)
+        {
+            
+        }
     }
 }

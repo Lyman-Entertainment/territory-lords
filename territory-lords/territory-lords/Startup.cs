@@ -21,6 +21,7 @@ using Microsoft.Identity.Web.UI;
 using territory_lords.Data.Models;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
+using territory_lords.Shared;
 
 namespace territory_lords
 {
@@ -81,6 +82,9 @@ namespace territory_lords
 
             //inject our in memory DB/game cache
             services.AddSingleton<GameBoardCache>();
+
+            //Inject the UnitMenuManager
+            services.AddSingleton<UnitOrderManager>();
 
             services.AddHttpClient();
             services.AddScoped<TokenProvider>();

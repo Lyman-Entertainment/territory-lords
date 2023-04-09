@@ -4,27 +4,12 @@
 
 <div id="BoardWrapper">
 
-    <OrderMenu DisplayMenu=@_unitOrderMenuOpen BoardMenuClickHandler=@HandleOrderMenuClick/>
-    
-   @* <div id="PlayerList">
-        @foreach (Player player in TheGameBoard.Players)
-        {
-            <div>
-                @player.Name - @player.Colors.TileColor
-            </div>
-        }
-    </div>
-    <div>
-        @if(PlayerActiveUnit != null)
-        {
-            <div>
-                @PlayerActiveUnit.ToString()
-            </div>
-            <div>
-                @TheGameBoard.UnitBag.Count()
-            </div>
-        }
-    </div>*@
+
+    @if (_showUnitOrderMenuOpen)
+    {
+        <OrderMenu OrderOptions=@_unitMenuOptions ParentMethod=@HandleOrderMenuClick/>
+    }
+
     <div id="BoardContainer">
         @for (int r = 0; r < TheGameBoard.RowCount; r++)
         {

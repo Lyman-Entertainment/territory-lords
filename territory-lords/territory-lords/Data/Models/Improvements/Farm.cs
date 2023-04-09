@@ -2,7 +2,7 @@
 {
     public class Farm : BaseTileImprovement, ITileImprovement
     {
-        public Farm(Player owningPlayer) : base(owningPlayer)
+        public Farm() : base()
         {
             base.MoneyBonus = 1;
             base.BuildCost = 5;

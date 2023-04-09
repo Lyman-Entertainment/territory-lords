@@ -23,7 +23,7 @@ namespace territory_lords.Shared
         [Inject] GameBoardCache BoardCache { get; set; }
         [Inject] AuthenticationStateProvider AuthStateProvider { get; set; }
         [Inject] ILogger<GameBoardDisplay> Logger { get; set; }
-
+        [Inject] UnitOrderManager UnitOrderManager { get; set; }
         [Parameter]
         public GameBoard TheGameBoard { get; set; }
 
@@ -31,13 +31,9 @@ namespace territory_lords.Shared
         private IUnit? PlayerActiveUnit = null;
         private Guid? CurrentPlayerGuid = default;
         private string CurrentPlayerName = string.Empty;
-        private bool _unitOrderMenuOpen = false;
+        private bool _showUnitOrderMenuOpen = false;
+        private List<UnitOrder> _unitMenuOptions = new();
 
-
-        //public GameBoardDisplay(ILogger<GameBoardDisplay> logger)
-        //{
-
-        //}
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
@@ -73,11 +69,6 @@ namespace territory_lords.Shared
                             DestroyUnitMenu();
                         }
                     }
-                    //int unitIndex = TheGameBoard.UnitBag.FindIndex(u => u.Id == unit.Id);
-                    //if (unitIndex == -1)
-                    //{
-                    //    TheGameBoard.UnitBag[unitIndex] = unit;
-                    //}
 
                     StateHasChanged();
                 }
@@ -167,17 +158,17 @@ namespace territory_lords.Shared
                     //this isn't the way to do it but is the way I'm doing it for now to test it
                     var settlerUnit = TheGameBoard.InsertUnitToRandomSpotOnMap(addedPlayer, Data.Statics.UnitName.Settler);
                     var malitiaUnit = TheGameBoard.InsertUnitToRandomSpotOnMap(addedPlayer, Data.Statics.UnitName.Malitia);
-                    var phalanxUnit = TheGameBoard.InsertUnitToRandomSpotOnMap(addedPlayer, Data.Statics.UnitName.Phalanx);
-                    var calvaryUnit = TheGameBoard.InsertUnitToRandomSpotOnMap(addedPlayer, Data.Statics.UnitName.Calvary);
-                    var legionUnit = TheGameBoard.InsertUnitToRandomSpotOnMap(addedPlayer, Data.Statics.UnitName.Legion);
-                    var chariotUnit = TheGameBoard.InsertUnitToRandomSpotOnMap(addedPlayer, Data.Statics.UnitName.Chariot);
+                    //var phalanxUnit = TheGameBoard.InsertUnitToRandomSpotOnMap(addedPlayer, Data.Statics.UnitName.Phalanx);
+                    //var calvaryUnit = TheGameBoard.InsertUnitToRandomSpotOnMap(addedPlayer, Data.Statics.UnitName.Calvary);
+                    //var legionUnit = TheGameBoard.InsertUnitToRandomSpotOnMap(addedPlayer, Data.Statics.UnitName.Legion);
+                    //var chariotUnit = TheGameBoard.InsertUnitToRandomSpotOnMap(addedPlayer, Data.Statics.UnitName.Chariot);
                     BoardCache.UpdateGameCache(TheGameBoard);
                     SendUnitUpdate(settlerUnit);
                     SendUnitUpdate(malitiaUnit);
-                    SendUnitUpdate(phalanxUnit);
-                    SendUnitUpdate(calvaryUnit);
-                    SendUnitUpdate(legionUnit);
-                    SendUnitUpdate(chariotUnit);
+                    //SendUnitUpdate(phalanxUnit);
+                    //SendUnitUpdate(calvaryUnit);
+                    //SendUnitUpdate(legionUnit);
+                    //SendUnitUpdate(chariotUnit);
                 }
             }
         }
@@ -267,35 +258,76 @@ namespace territory_lords.Shared
             
         }
 
-        private void HandleOrderMenuClick()
+        private void HandleOrderMenuClick(OrderType orderType)
         {
-
+            //Destroy the menu because we're done with it. Even though it won't go away until we State has changed
             DestroyUnitMenu();
 
+
             //TODO: this will need to be updated. As of right now if you click any menu option this happens.
-            if (PlayerActiveUnit != null && PlayerActiveUnit.GetType() == typeof(Settler))
+            if (PlayerActiveUnit != null)
             {
-                var coords = PlayerActiveUnit.Coordinate;
-                GameBoardTile? tile = TheGameBoard.GameTileLayer.GetGameTileAtIndex(coords.RowIndex, coords.ColumnIndex);
-                if(tile != null)
+                GameBoardCoordinate coords = PlayerActiveUnit.Coordinate;
+                GameBoardTile? tile = TheGameBoard.GameTileLayer.GetGameBoardTileAtIndex(coords);
+
+                //I would like to pass in an Action or something rather than have to do the logic and work in here
+                switch (orderType)
                 {
-                    var city = new City(1, coords.RowIndex, coords.ColumnIndex, PlayerActiveUnit.OwningPlayer, 1);
+                    case OrderType.BuildCity:
+                        if (tile != null)
+                        {
+                            var city = new City(1, coords, PlayerActiveUnit.OwningPlayer, 1);
 
-                    //a settler will need to be destroyed in this scenario
-                    var settler = TheGameBoard.UnitBag.Where(u => u.Id == PlayerActiveUnit.Id).FirstOrDefault();
-                    if(settler != null)
-                    {
-                        TheGameBoard.UnitBag.Remove(settler);
-                        SendUnitUpdate(settler);
-                    }
+                            //a settler will need to be destroyed in this scenario
+                            var settler = TheGameBoard.UnitBag.Where(u => u.Id == PlayerActiveUnit.Id).FirstOrDefault();
+                            if (settler != null)
+                            {
+                                TheGameBoard.UnitBag.Remove(settler);
+                                SendUnitUpdate(settler);
+                            }
 
-                    PlayerActiveUnit.Active = false;
-                    PlayerActiveUnit = null;
-                    TheGameBoard.CityLayer.Add(coords, city);
-                    BoardCache.UpdateGameCache(TheGameBoard);
+                            TheGameBoard.CityLayer.Add(coords, city);
+                            BoardCache.UpdateGameCache(TheGameBoard);
 
-                    SendGameBoardTileUpdate(tile);
+                            SendGameBoardTileUpdate(tile);
+                        }
+                        break;
+                    case OrderType.Road:
+                        break;
+                    case OrderType.Irrigate:
+                        break;
+                    case OrderType.Mine:
+                        break;
+                    case OrderType.Fortress:
+                        break;
+                    case OrderType.Factory:
+                        break;
+                    case OrderType.Lumbermill:
+                        break;
+                    case OrderType.Sentry:
+                        break;
+                    case OrderType.Fortify:
+                        break;
+                    case OrderType.Pillage:
+                        break;
+                    case OrderType.Unload:
+                        break;
+                    case OrderType.Disband:
+                        //a unit will need to be destroyed in this scenario
+                        var unit = TheGameBoard.UnitBag.Where(u => u.Id == PlayerActiveUnit.Id).FirstOrDefault();
+                        if (unit != null)
+                        {
+                            TheGameBoard.UnitBag.Remove(unit);
+                            SendUnitUpdate(unit);
+                        }
+                        break;
+                    default:
+                        
+                        break;
                 }
+
+                PlayerActiveUnit.Active = false;
+                PlayerActiveUnit = null;
             }
             StateHasChanged();
         }
@@ -382,7 +414,7 @@ namespace territory_lords.Shared
             //if we're on the edge we need to check if there is an ocean tile in the adjoining tiles not in the corresponding line with the tile we're working with
             //if there is not an ocean tile then set the class to the correct straight ocean sprite
             //figure out what's around us so we can act accordingly and not look wierd to everyone. Keep it together Kevin!
-            var directNeighbors = TheGameBoard.GameTileLayer.GetGameTileDirectNeighbors(gameTile.RowIndex,gameTile.ColumnIndex);
+            var directNeighbors = TheGameBoard.GameTileLayer.GetGameBoardTileDirectNeighbors(gameTile.RowIndex,gameTile.ColumnIndex);
             var cssClass = gameTile.LandType.ToString("g");
             switch (gameTile.LandType)
             {
@@ -872,16 +904,18 @@ namespace territory_lords.Shared
 
         private void BuildUnitMenu(IUnit selectedUnit)
         {
-            _unitOrderMenuOpen = true;
+            _showUnitOrderMenuOpen = true;
+            GameBoardTile? tile = TheGameBoard.GameTileLayer.GetGameBoardTileAtIndex(selectedUnit.Coordinate);
+            _unitMenuOptions = UnitOrderManager.GetUnitsMenuOptions(tile, selectedUnit);
         }
 
         private void DestroyUnitMenu()
         {
-            _unitOrderMenuOpen = false;
+            _showUnitOrderMenuOpen = false;
         }
-        void ToggleOrderMenu()
+        private void ToggleOrderMenu()
         {
-            _unitOrderMenuOpen = !_unitOrderMenuOpen;
+            _showUnitOrderMenuOpen = !_showUnitOrderMenuOpen;
         }
     }
 }

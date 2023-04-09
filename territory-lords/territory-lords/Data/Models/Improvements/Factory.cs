@@ -2,7 +2,7 @@
 {
     public class Factory : BaseTileImprovement, ITileImprovement
     {
-        public Factory(Player owningPlayer) : base(owningPlayer)
+        public Factory() : base()
         {
             base.MoneyBonus = 2;
             base.BuildCost = 5;

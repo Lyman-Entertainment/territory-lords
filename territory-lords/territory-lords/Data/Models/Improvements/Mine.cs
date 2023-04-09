@@ -2,7 +2,7 @@
 {
     public class Mine : BaseTileImprovement, ITileImprovement
     {
-        public Mine(Player owningPlayer) : base(owningPlayer)
+        public Mine() : base()
         {
             base.MoneyBonus = 1;
             base.BuildCost = 5;

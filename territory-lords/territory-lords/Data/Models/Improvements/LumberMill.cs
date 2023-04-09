@@ -2,7 +2,7 @@
 {
     public class LumberMill : BaseTileImprovement, ITileImprovement
     {
-        public LumberMill(Player owningPlayer) : base(owningPlayer)
+        public LumberMill() : base()
         {
             base.MoneyBonus = 1;
             base.BuildCost = 5;
