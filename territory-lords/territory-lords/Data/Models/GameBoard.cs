@@ -121,7 +121,7 @@ namespace territory_lords.Data.Models
             var cityCoordinate = new GameBoardCoordinate(randomTile.RowIndex, randomTile.ColumnIndex);
             if (!CityLayer.ContainsKey(cityCoordinate))//just move along if one already exists, it's for testing anyways
             {
-                var city = new City(RandomNumGen.Next(1001), randomTile.RowIndex, randomTile.ColumnIndex, owningPlayer, RandomNumGen.Next(1, 11));
+                var city = new City(RandomNumGen.Next(1001), randomTile.RowIndex, randomTile.ColumnIndex, owningPlayer, (byte)RandomNumGen.Next(1, 11));
                 CityLayer.Add(cityCoordinate, city);
             }
             

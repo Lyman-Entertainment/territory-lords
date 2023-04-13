@@ -4,7 +4,7 @@ using territory_lords.Data.Models.Tiles;
 
 namespace territory_lords.Data.Models.Units
 {
-    public class BaseUnit : IUnit
+    public abstract class BaseUnit : IUnit
     {
         public int Id { get; set; }
         public bool Active { get; set; }
