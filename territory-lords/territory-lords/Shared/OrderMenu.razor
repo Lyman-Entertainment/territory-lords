@@ -1,19 +1,10 @@
-﻿@using territory_lords.Data.Models.Tiles
-@using territory_lords.Data.Models.Units
-
+﻿
 <div id="unitOrderMenu" style="background-color:white; width:200px;position:fixed;z-index:1300;top:0;right:0;">
     <MudList Clickable="true">
         @foreach (var item in OrderOptions)
         {
             <MudListItem Icon="@item.Icon" OnClick="@(() => OrderMenuClickHandler(item.OrderType))">@item.Name</MudListItem>
         }
-        @*<MudListItem Icon="@Icons.Material.Filled.AddRoad">Build Road</MudListItem>
-        <MudListItem Icon="@Icons.Material.Filled.Water">Build Farm</MudListItem>
-        <MudListItem Icon="@Icons.Material.Filled.Nature">Build Mine</MudListItem>
-        <MudListItem Icon="@Icons.Material.Filled.Castle">Build Fortress</MudListItem>
-        <MudListItem Icon="@Icons.Material.Filled.Co2">Build Factory</MudListItem>
-        <MudListItem Icon="@Icons.Material.Filled.Forest">Build Lumbermill</MudListItem>
-        <MudListItem Icon="@Icons.Material.Filled.Home" OnClick="@InvokeParentMethod">Build City</MudListItem>*@
     </MudList>
 </div>
 

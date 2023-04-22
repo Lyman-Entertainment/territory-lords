@@ -34,5 +34,6 @@
 
   <ItemGroup>
     <Folder Include="Actions\" />
+    <Folder Include="Data\Models\Governments\" />
   </ItemGroup>
 </Project>

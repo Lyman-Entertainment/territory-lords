@@ -44,6 +44,56 @@
     }
 }
 
+#cityMenuWrapper {
+    position: fixed;
+    z-index: 1;
+    border: 1px solid blue;
+}
+.city-menu-grid {
+    background-color: white;
+    display: grid;
+    grid-template-columns: 2fr repeat(2, 1fr);
+    grid-template-rows: 0.5fr repeat(4, 1fr);
+    grid-column-gap: 4px;
+    grid-row-gap: 4px;
+}
+    .city-menu-grid .city-menu-section-container
+    {
+        border:1px solid blue;
+    }
+
+    .city-menu-grid .div1 {
+        grid-area: 1 / 1 / 2 / 3;
+    }
+
+    .city-menu-grid .div2 {
+        grid-area: 1 / 3 / 4 / 4;
+    }
+
+    .city-menu-grid .div3 {
+        grid-area: 2 / 1 / 3 / 2;
+    }
+
+    .city-menu-grid .div4 {
+        grid-area: 3 / 1 / 4 / 2;
+    }
+
+    .city-menu-grid .div5 {
+        grid-area: 2 / 2 / 4 / 3;
+    }
+
+    .city-menu-grid .div6 {
+        grid-area: 4 / 1 / 6 / 2;
+    }
+
+    .city-menu-grid .div7 {
+        grid-area: 4 / 2 / 6 / 3;
+    }
+
+    .city-menu-grid .div8 {
+        grid-area: 4 / 3 / 6 / 4;
+    }
+
 .Ocean {
     background: url(/Images/TER257.PIC_256_resized.png) 0px -500px;
 }
