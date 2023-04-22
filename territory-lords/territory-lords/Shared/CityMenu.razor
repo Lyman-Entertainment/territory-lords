@@ -1,0 +1,99 @@
+﻿<div id="cityMenuWrapper">
+    <div class="city-menu-grid">
+        <div class="city-menu-section-container div1">
+            <div>@ClickedCity.Name (Pop:@ClickedCity.Population)</div>
+            <span>t</span>
+            <span>t</span>
+            <span>t</span>
+            <span>t</span>
+            <span>p</span>
+            <span>p</span>
+            <span>p</span>
+            <span>p</span>
+            <span>p</span>
+            <span>p</span>
+            <span>a</span>
+        </div>
+        <div class="city-menu-section-container div2">
+            <div class="city-menu-wonder">Women's Sufferage'</div>
+            <div class="city-menu-wonder">Apollo Program</div>
+            <div class="city-menu-building">Barracks</div>
+            <div class="city-menu-building">Granary</div>
+            <div class="city-menu-building">Temple</div>
+            <div class="city-menu-building">MarketPlace</div>
+            <div class="city-menu-building">Library</div>
+            <div class="city-menu-building">Aqueduct</div>
+        </div>
+        <div class="city-menu-section-container div3">
+            <div>City Resources</div>
+            <div><span>food</span><span>extra food</span></div>
+            <div><span>shields</span><span>extra shields</span></div>
+            <div><span>trade</span><span>extra trade</span></div>
+            <div><span>luxuries</span><span>Tax Revenue</span><span>science</span></div>
+        </div>
+        <div class="city-menu-section-container div4">
+            <span>Home Unit</span>
+            <span>Home Unit</span>
+        </div>
+        <div class="city-menu-section-container div5">
+            <div>City Map view</div>
+        </div>
+        <div class="city-menu-section-container div6">
+            <div>Food Storage</div>
+            <div>
+                <span>food</span>
+                <span>food</span>
+                <span>food</span>
+                <span>food</span>
+                <span>food</span>
+                <span>food</span>
+                <span>food</span>
+                <span>food</span>
+                <span>food</span>
+                <span>food</span>
+                <span>food</span>
+                <span>food</span>
+            </div>
+        </div>
+        <div class="city-menu-section-container div7">
+            <span>Unit in city</span>
+            <span>Unit in city</span>
+            <span>Unit in city</span>
+            <span>Unit in city</span>
+        </div>
+        <div class="city-menu-section-container div8">
+            <div>Thing being built</div>
+            <div>
+                <button>Change</button>
+                <button>Buy</button>
+            </div>
+            <div>
+                <span>shield</span>
+                <span>shield</span>
+                <span>shield</span>
+                <span>shield</span>
+                <span>shield</span>
+                <span>shield</span>
+                <span>shield</span>
+            </div>
+            <div>
+                <button>Rename</button>
+                <button @onclick="@(() => CloseCityMenuClickHandler())">Exit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public EventCallback CloseCityMenuMethod { get; set; } 
+
+    [Parameter]
+    public City ClickedCity { get; set; }
+
+    private void CloseCityMenuClickHandler()
+    {
+        CloseCityMenuMethod.InvokeAsync();
+    }
+}
