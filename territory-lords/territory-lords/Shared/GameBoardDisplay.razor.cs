@@ -31,7 +31,8 @@ namespace territory_lords.Shared
         private IUnit? PlayerActiveUnit = null;
         private Guid? CurrentPlayerGuid = default;
         private string CurrentPlayerName = string.Empty;
-        private bool _showUnitOrderMenuOpen = false;
+        private bool _showUnitOrderMenu = false;
+        private bool _showCityMenu = false;
         private List<UnitOrder> _unitMenuOptions = new();
 
         protected override async Task OnInitializedAsync()
@@ -332,6 +333,12 @@ namespace territory_lords.Shared
             StateHasChanged();
         }
 
+        private void HandleCityClick()
+        {
+            BuildCityMenu();
+            //StateHasChanged();
+        }
+
         //At some point I think this should be handled by a game manager or something
         /// <summary>
         /// Figure out what happens when a player clicks a tile
@@ -341,6 +348,9 @@ namespace territory_lords.Shared
         {
             Logger.LogInformation("{CurrentPlayer} is clicking a GameBoardTile: {gameTile}", CurrentPlayerName, selectedGameTile.ToJson());
             //there's got to be a better way to do this than all these if statements
+
+            //I think just for right now do this. There eventually will be a "Close" button to close the city menu
+            DestroyCityMenu();
 
             if (selectedGameTile.LandType == LandType.Ocean)
             {
@@ -904,18 +914,24 @@ namespace territory_lords.Shared
 
         private void BuildUnitMenu(IUnit selectedUnit)
         {
-            _showUnitOrderMenuOpen = true;
+            _showUnitOrderMenu = true;
             GameBoardTile? tile = TheGameBoard.GameTileLayer.GetGameBoardTileAtIndex(selectedUnit.Coordinate);
             _unitMenuOptions = UnitOrderManager.GetUnitsMenuOptions(tile, selectedUnit);
         }
 
         private void DestroyUnitMenu()
         {
-            _showUnitOrderMenuOpen = false;
+            _showUnitOrderMenu = false;
         }
-        private void ToggleOrderMenu()
+
+        private void BuildCityMenu()
         {
-            _showUnitOrderMenuOpen = !_showUnitOrderMenuOpen;
+            _showCityMenu = true;
+        }
+
+        private void DestroyCityMenu()
+        {
+            _showCityMenu = false;
         }
     }
 }

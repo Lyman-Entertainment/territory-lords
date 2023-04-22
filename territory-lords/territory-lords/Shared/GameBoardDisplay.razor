@@ -5,10 +5,16 @@
 <div id="BoardWrapper">
 
 
-    @if (_showUnitOrderMenuOpen)
+    @if (_showUnitOrderMenu)
     {
         <OrderMenu OrderOptions=@_unitMenuOptions ParentMethod=@HandleOrderMenuClick/>
     }
+
+    @if(_showCityMenu)
+    {
+        <CityMenu CloseCityMenuMethod="@DestroyCityMenu"/>
+    }
+    
 
     <div id="BoardContainer">
         @for (int r = 0; r < TheGameBoard.RowCount; r++)
@@ -52,7 +58,7 @@
                         @if (cityAtTile != null)
                         {
                             var improvementColor = $"background-color: {cityAtTile.OwningPlayer.Colors.TileColor};";
-                            <div class="Tile-city">
+                            <div class="Tile-city" @onclick="() => HandleCityClick()" @onclick:stopPropagation="true">
                                 <img class="City" style="@improvementColor" src="/Images/Layer2Sprite.png"/>
                                 <div class="City-size">@cityAtTile.Size</div>
                                 <div class="City-name">@cityAtTile.Name</div>

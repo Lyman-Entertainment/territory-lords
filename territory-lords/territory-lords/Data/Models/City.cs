@@ -6,6 +6,7 @@ namespace territory_lords.Data.Models
 {
     public class City
     {
+        internal int FoodStored { get; private set; }
         internal int Id { get; init; }
         internal int ColumnIndex { get; set; }
         internal int RowIndex { get; set; }
@@ -27,7 +28,7 @@ namespace territory_lords.Data.Models
         /// </summary>
         internal List<IWonderBuilding> Wonders = new();
         /// <summary>
-        /// The big number population of a city.
+        /// The big number population of a city. Used for display in the City view
         /// </summary>
         internal int Population
         {
@@ -55,6 +56,13 @@ namespace territory_lords.Data.Models
         public City(int id, GameBoardCoordinate gameBoardCoordinate, Player owner, byte size) : this(id, gameBoardCoordinate.RowIndex, gameBoardCoordinate.ColumnIndex, owner, size)
         {
 
+        }
+
+        public void AddFood()
+        {
+            //Look at the land around the city and how much food the city is using and then add or subtract food from the _storedFood
+            //if there is extra make the city bigger and then set the food stored to the remainder
+            //if there is no food subtract from the city population
         }
     }
 }

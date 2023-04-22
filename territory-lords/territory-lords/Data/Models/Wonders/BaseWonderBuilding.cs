@@ -1,10 +1,12 @@
-﻿namespace territory_lords.Data.Models.Wonders
+﻿using territory_lords.Data.Technologies;
+
+namespace territory_lords.Data.Models.Wonders
 {
     public abstract class BaseWonderBuilding : IWonderBuilding
     {
-        public WonderTypes WonderType { get; protected set; }
-        public string RequiredTech { get; protected set; }
-        public string? ObsoleteTech { get; protected set; }
+        public WonderTypes WonderType { get; init; }
+        public ITechnology RequiredTech { get; init; }
+        public ITechnology? ObsoleteTech { get; init; }
 
     }
 }
