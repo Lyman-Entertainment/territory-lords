@@ -35,7 +35,7 @@ namespace territory_lords.Data.Models
             get {
                 //Calculate the simulated population size of the city
                 int totalPop = 0;
-                for (int i = 0; i < Size; i++)
+                for (int i = 1; i <= Size; i++)
                 {
                     totalPop += 10000 * i;
                 }

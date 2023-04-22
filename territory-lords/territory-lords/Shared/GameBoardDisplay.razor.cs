@@ -34,6 +34,7 @@ namespace territory_lords.Shared
         private bool _showUnitOrderMenu = false;
         private bool _showCityMenu = false;
         private List<UnitOrder> _unitMenuOptions = new();
+        private City? _clickedCity;
 
         protected override async Task OnInitializedAsync()
         {
@@ -333,9 +334,9 @@ namespace territory_lords.Shared
             StateHasChanged();
         }
 
-        private void HandleCityClick()
+        private void HandleCityClick(City clickedCity)
         {
-            BuildCityMenu();
+            BuildCityMenu(clickedCity);
             //StateHasChanged();
         }
 
@@ -924,8 +925,9 @@ namespace territory_lords.Shared
             _showUnitOrderMenu = false;
         }
 
-        private void BuildCityMenu()
+        private void BuildCityMenu(City city)
         {
+            _clickedCity = city;
             _showCityMenu = true;
         }
 

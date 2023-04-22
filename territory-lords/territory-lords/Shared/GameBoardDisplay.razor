@@ -12,7 +12,7 @@
 
     @if(_showCityMenu)
     {
-        <CityMenu CloseCityMenuMethod="@DestroyCityMenu"/>
+        <CityMenu ClickedCity="@_clickedCity" CloseCityMenuMethod="@DestroyCityMenu"/>
     }
     
 
@@ -58,7 +58,7 @@
                         @if (cityAtTile != null)
                         {
                             var improvementColor = $"background-color: {cityAtTile.OwningPlayer.Colors.TileColor};";
-                            <div class="Tile-city" @onclick="() => HandleCityClick()" @onclick:stopPropagation="true">
+                            <div class="Tile-city" @onclick="() => HandleCityClick(cityAtTile)" @onclick:stopPropagation="true">
                                 <img class="City" style="@improvementColor" src="/Images/Layer2Sprite.png"/>
                                 <div class="City-size">@cityAtTile.Size</div>
                                 <div class="City-name">@cityAtTile.Name</div>
